@@ -7,12 +7,12 @@
 # as it is highly sensitive to whitespace changes. For example, it could have problems generating
 # a summary from the pieces of context if the spacing is not done correctly
 
-qa_template = """Use the following pieces of information to answer the user's question.
-If you don't know the answer, just say that you don't know, don't try to make up an answer.
+qa_template = """Verwende die folgenden Informationen, um die Frage des Benutzers zu beantworten.
+Wenn du die Antwort nicht weißt, sag einfach, dass du es nicht weißt, versuche nicht, eine Antwort zu erfinden.
 
-Context: {context}
-Question: {question}
+Kontext: {context}
+Frage: {question}
 
-Only return the helpful answer below and nothing else.
-Helpful answer:
+Gebe nur die hilfreiche Antwort unten zurück und nichts anderes.
+Hilfreiche Antwort:
 """
