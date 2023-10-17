@@ -36,7 +36,7 @@ if __name__ == "__main__":
         print(f'\nSource Document {i+1}\n')
         print(f'Source Text: {doc.page_content}')
         print(f'Document Name: {doc.metadata["source"]}')
-        print(f'Page Number: {doc.metadata["page"]}\n')
+        print(f'Page Number: {doc.metadata.get("page", 1)}\n')
         print('='* 60)
 
     print(f"Time to retrieve response: {end - start}")
