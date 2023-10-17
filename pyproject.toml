@@ -11,7 +11,7 @@ start = "main:app"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-ctransformers = "^0.2.5"
+ctransformers = "^0.2.24"
 faiss-cpu = "1.7.4"
 fastapi = "^0.96.0"
 ipykernel = "^6.23.1"
