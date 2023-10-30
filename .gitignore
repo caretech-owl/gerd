@@ -131,5 +131,7 @@ cython_debug/
 
 # MacOS
 .DS_Store
-vectorstore/db_faiss/index.faiss
-vectorstore/db_faiss/index.pkl
+
+# Data Files
+data/*.txt
+data/*.pdf
