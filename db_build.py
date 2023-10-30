@@ -27,7 +27,7 @@ def run_db_build():
     texts = text_splitter.split_documents(documents)
 
     embeddings = HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2',
-                                       model_kwargs={'device': 'cpu'})
+                                       model_kwargs={'device': cfg.DEVICE})
 
     vectorstore = FAISS.from_documents(texts, embeddings)
     vectorstore.save_local(cfg.DB_FAISS_PATH)

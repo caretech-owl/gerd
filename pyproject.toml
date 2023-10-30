@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "Open-Source LLM - CPU Inference"
+name = "team-red"
 version = "0.1.0"
 description = ""
-authors = ["Kenneth Leung"]
+authors = ["cto"]
 license = ""
 readme = "README.md"
 
@@ -12,7 +12,8 @@ start = "main:app"
 [tool.poetry.dependencies]
 python = "^3.9"
 ctransformers = "^0.2.24"
-faiss-cpu = "1.7.4"
+faiss-cpu = {version = "~1.7.4", optional = true}
+faiss-gpu = {version = "~1.7.2", optional = true}
 fastapi = "^0.96.0"
 ipykernel = "^6.23.1"
 langchain = "0.0.225"
@@ -22,6 +23,10 @@ python-dotenv = "1.0.0"
 sentence-transformers = "2.2.2"
 uvicorn = "^0.22.0"
 torch = ">=2.0.0, !=2.0.1"
+
+[tool.poetry.extras]
+cpu = ["faiss-cpu"]
+gpu = ["faiss-gpu"]
 
 
 [build-system]
