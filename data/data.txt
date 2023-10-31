@@ -1,0 +1,1 @@
+Place the desired documents (.pdf / .txt) in \data.

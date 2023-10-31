@@ -5,7 +5,7 @@ CHUNK_OVERLAP: 50
 DATA_PATH: 'data/'
 DB_FAISS_PATH: 'vectorstore/db_faiss'
 MODEL_TYPE: 'llama'
-MODEL_BIN_PATH: 'models/llama-2-7b-chat.gguf'
+MODEL_BIN_PATH: 'models/leo-hessianai-7b-chat.Q5_K_M.gguf'
 MAX_NEW_TOKENS: 256
 TEMPERATURE: 0.01
 DEVICE: 'cpu'  # options: cpu, mps, gpu
