@@ -13,6 +13,14 @@ Wenn du die Antwort nicht weißt, sag einfach, dass du es nicht weißt, versuche
 Kontext: {context}
 Frage: {question}
 
-Gebe nur die hilfreiche Antwort unten zurück und nichts anderes.
+Gebe nur die hilfreiche Antwort unten zurück und nichts anderes. Halte dich außerdem sehr kurz mit der Antwort.
 Hilfreiche Antwort:
+"""
+
+fact_checking_template = """Verwende die folgenden Informationen, um den Fakt einem Faktencheck mit Hilfe des Kontext zu unterziehen.
+Kontext: {context}
+Fakt: {question}
+
+Gebe zurück, ob der Fakt stimmt oder nicht und gebe stimmt aus, wenn der Fakt stimmt und stimmt nicht, wenn der Fakt nicht stimmt, aus. Sonst keine weitere Ausgabe.
+Überprüfte Antwort (stimmt/stimmt nicht):
 """

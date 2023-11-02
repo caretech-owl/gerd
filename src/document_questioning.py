@@ -1,6 +1,12 @@
 import timeit
 import argparse
-from src.utils import setup_dbqa
+import box
+import yaml
+from src.utils import setup_dbqa, setup_dbqa_fact_checking
+
+# Import config vars
+with open('config/config.yml', 'r', encoding='utf8') as ymlfile:
+    cfg = box.Box(yaml.safe_load(ymlfile))
 
 def document_questioning():
     parser = argparse.ArgumentParser()
@@ -11,10 +17,10 @@ def document_questioning():
     args = parser.parse_args()
 
     # Setup DBQA
-    start = timeit.default_timer()
+    startQA = timeit.default_timer()
     dbqa = setup_dbqa()
     response = dbqa({'query': args.input})
-    end = timeit.default_timer()
+    endQA = timeit.default_timer()
 
     print(f'\nAnswer: {response["result"]}')
     print('='*50)
@@ -28,4 +34,24 @@ def document_questioning():
         print(f'Page Number: {doc.metadata.get("page", 1)}\n')
         print('='* 60)
 
-    print(f"Time to retrieve response: {end - start}")
+    print(f"Time to retrieve response: {endQA - startQA}")
+
+    if cfg.FACTCHECKING == True:
+        startFactCheck = timeit.default_timer()
+        dbqafact = setup_dbqa_fact_checking()
+        response_fact = dbqafact({'query': response["result"]})
+        endFactCheck = timeit.default_timer()
+        print("Factcheck:")
+        print(f'\nAnswer: {response_fact["result"]}')
+        print('='*50)
+
+        # Process source documents
+        source_docs = response_fact['source_documents']
+        for i, doc in enumerate(source_docs):
+            print(f'\nSource Document {i+1}\n')
+            print(f'Source Text: {doc.page_content}')
+            print(f'Document Name: {doc.metadata["source"]}')
+            print(f'Page Number: {doc.metadata.get("page", 1)}\n')
+            print('='* 60)
+
+        print(f"Time to retrieve fact check: {endFactCheck - startFactCheck}")

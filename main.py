@@ -16,4 +16,3 @@ if __name__ == "__main__":
         document_generation()
     else:
         document_questioning()
-        
