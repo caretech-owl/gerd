@@ -9,3 +9,4 @@ MODEL_BIN_PATH: 'models/leo-hessianai-7b-chat.Q5_K_M.gguf'
 MAX_NEW_TOKENS: 256
 TEMPERATURE: 0.01
 DEVICE: 'cpu'  # options: cpu, mps, gpu
+DOCUMENT_GENERATION: True # True for Document Generation, False for Document Questioning
