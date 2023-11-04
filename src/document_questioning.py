@@ -2,13 +2,18 @@ import timeit
 import argparse
 import box
 import yaml
+import logging
 from src.utils import setup_dbqa, setup_dbqa_fact_checking
+
 
 # Import config vars
 with open('config/config.yml', 'r', encoding='utf8') as ymlfile:
     cfg = box.Box(yaml.safe_load(ymlfile))
 
 def document_questioning() -> None:
+    logging.basicConfig(level=logging.DEBUG)
+    _LOGGER = logging.getLogger(__name__)
+    _LOGGER.addHandler(logging.NullHandler())
     parser = argparse.ArgumentParser()
     parser.add_argument('--input',
                         type=str,
@@ -22,36 +27,38 @@ def document_questioning() -> None:
     response = dbqa({'query': args.input})
     endQA = timeit.default_timer()
 
-    print(f'\nAnswer: {response["result"]}')
-    print('='*50)
+    _LOGGER.debug(f'\nAnswer: {response["result"]}')
+    _LOGGER.debug('='*50)
 
     # Process source documents
     source_docs = response['source_documents']
     for i, doc in enumerate(source_docs):
-        print(f'\nSource Document {i+1}\n')
-        print(f'Source Text: {doc.page_content}')
-        print(f'Document Name: {doc.metadata["source"]}')
-        print(f'Page Number: {doc.metadata.get("page", 1)}\n')
-        print('='* 60)
+        _LOGGER.debug(f'\nSource Document {i+1}\n')
+        _LOGGER.debug(f'Source Text: {doc.page_content}')
+        _LOGGER.debug(f'Document Name: {doc.metadata["source"]}')
+        _LOGGER.debug(f'Page Number: {doc.metadata.get("page", 1)}\n')
+        _LOGGER.debug('='* 60)
 
-    print(f"Time to retrieve response: {endQA - startQA}")
+    _LOGGER.debug(f"Time to retrieve response: {endQA - startQA}")
 
     if cfg.FACTCHECKING == True:
         startFactCheck = timeit.default_timer()
         dbqafact = setup_dbqa_fact_checking()
         response_fact = dbqafact({'query': response["result"]})
         endFactCheck = timeit.default_timer()
-        print("Factcheck:")
-        print(f'\nAnswer: {response_fact["result"]}')
-        print('='*50)
+        _LOGGER.debug("Factcheck:")
+        _LOGGER.debug(f'\nAnswer: {response_fact["result"]}')
+        _LOGGER.debug('='*50)
 
         # Process source documents
         source_docs = response_fact['source_documents']
         for i, doc in enumerate(source_docs):
-            print(f'\nSource Document {i+1}\n')
-            print(f'Source Text: {doc.page_content}')
-            print(f'Document Name: {doc.metadata["source"]}')
-            print(f'Page Number: {doc.metadata.get("page", 1)}\n')
-            print('='* 60)
+            _LOGGER.debug(f'\nSource Document {i+1}\n')
+            _LOGGER.debug(f'Source Text: {doc.page_content}')
+            _LOGGER.debug(f'Document Name: {doc.metadata["source"]}')
+            _LOGGER.debug(f'Page Number: {doc.metadata.get("page", 1)}\n')
+            _LOGGER.debug('='* 60)
 
-        print(f"Time to retrieve fact check: {endFactCheck - startFactCheck}")
+        _LOGGER.debug(f"Time to retrieve fact check: {endFactCheck - startFactCheck}")
+    
+    logging.shutdown()
