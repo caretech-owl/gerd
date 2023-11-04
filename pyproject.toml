@@ -23,6 +23,7 @@ python-dotenv = "1.0.0"
 sentence-transformers = "2.2.2"
 uvicorn = "^0.22.0"
 torch = ">=2.0.0, !=2.0.1"
+streamlit = "1.25.0"
 
 [tool.poetry.extras]
 cpu = ["faiss-cpu"]

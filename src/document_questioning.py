@@ -8,7 +8,7 @@ from src.utils import setup_dbqa, setup_dbqa_fact_checking
 with open('config/config.yml', 'r', encoding='utf8') as ymlfile:
     cfg = box.Box(yaml.safe_load(ymlfile))
 
-def document_questioning():
+def document_questioning() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('--input',
                         type=str,
