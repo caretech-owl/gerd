@@ -6,6 +6,7 @@ DATA_PATH: 'data/'
 DB_FAISS_PATH: 'vectorstore/db_faiss'
 MODEL_TYPE: 'llama'
 MODEL_BIN_PATH: 'models/leo-hessianai-7b-chat.Q5_K_M.gguf'
+MODEL_EMBEDDED_BIN_PATH: 'sentence-transformers/all-MiniLM-L6-v2'
 MAX_NEW_TOKENS: 256
 TEMPERATURE: 0.01
 DEVICE: 'cpu'  # options: cpu, mps, gpu
