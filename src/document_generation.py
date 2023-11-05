@@ -1,4 +1,3 @@
-import json
 import streamlit as st
 from ctransformers import AutoModelForCausalLM, AutoTokenizer
 from transformers import pipeline
@@ -34,11 +33,18 @@ def document_generation() -> None:
 
         with st.spinner("Generiere Dokument..."):
             response = pipe(prompt_format.format(history = history, doctor_name = doctor_name, patient_name = patient_name, hospital = hospital), do_sample=True, top_p=0.95, max_new_tokens=256)
-            letter = json.dumps(response)
-            generated_cover_letter = letter
+            response_content = response[0]
+            letter_raw = response_content['generated_text']
+            # Cut string after matching keyword
+            before1, match1, after1 = letter_raw.partition('Generiere daraus das Dokument:')
+            # Cut string before matching keyword
+            before2, match2, after2 = after1.partition('assistant')
+            # Output relevant model answer
+            generated_cover_letter = before2
+            
         st.success("Fertig!")
         st.subheader("Generiertes Dokument:")
-        st.write(generated_cover_letter)
+        st.text(generated_cover_letter)
             
         # Offering download link for generated cover letter  
         st.subheader("Download generiertes Dokument:")
