@@ -1,14 +1,25 @@
-RETURN_SOURCE_DOCUMENTS: True
-VECTOR_COUNT: 2
-CHUNK_SIZE: 500
-CHUNK_OVERLAP: 50
-DATA_PATH: 'data/'
-DB_FAISS_PATH: 'vectorstore/db_faiss'
-MODEL_TYPE: 'llama'
-MODEL_BIN_PATH: 'models/leo-hessianai-7b-chat.Q5_K_M.gguf'
-MODEL_EMBEDDED_BIN_PATH: 'sentence-transformers/all-MiniLM-L6-v2'
-MAX_NEW_TOKENS: 256
-TEMPERATURE: 0.01
-DEVICE: 'cpu'  # options: cpu, mps, gpu
-DOCUMENT_GENERATION: False # True for Document Generation, False for Document Questioning
-FACTCHECKING: True
+
+data:
+  path: './data'
+  chunk_size: 500
+  chunk_overlap: 50
+  embedding:
+    model: 'sentence-transformers/all-MiniLM-L6-v2'
+    db_path: 'vectorstore/db_faiss'
+    vector_count: 2
+model:
+  name: 'TheBloke/leo-hessianai-7B-chat-GGUF'
+  file: 'leo-hessianai-7b-chat.Q5_K_M.gguf'
+  type: 'llama'
+  temperature: 0.01
+  max_new_tokens: 256
+device: 'cpu'  # options: cpu, mps, gpu
+features:
+  fact_checking: True
+  return_source: True
+logging:
+  level: 'info'  # options: debug, info, warn, error, none
+backend:
+  mode: 'direct'
+  ip: 'localhost'
+  port: 8000
