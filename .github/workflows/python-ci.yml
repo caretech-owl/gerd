@@ -5,9 +5,9 @@ name: python-ci
 
 on:
   push:
-    branches: [ main, dev-gha ]
+    branches: [main, dev-gha]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:
@@ -21,26 +21,26 @@ jobs:
         #     extras: "[]"
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Install poetry
-      run: pipx install poetry
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-        cache: 'poetry'
-    - name: Install development dependencies with extras
-      run: poetry install --with dev --extras "${{matrix.extras}}"
-    - name: Run ruff linting via pre-commit on all files and verbose
-      uses: pre-commit/action@v3.0.0
-      with:
-        extra_args: ruff --all-files -v
-    - name: Run mypy on package
-      run: poetry run mypy team_red
-    # - name: Run mypy on tests
-    #   run: poetry run mypy tests --disable-error-code attr-defined --disable-error-code no-untyped-def 
-    - name: Run pytests without coverage for now
-      run: poetry run pytest
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "poetry"
+      - name: Install development dependencies with extras
+        run: poetry install --with dev --extras "${{matrix.extras}}"
+      - name: Run ruff linting via pre-commit on all files and verbose
+        uses: pre-commit/action@v3.0.0
+        with:
+          extra_args: ruff --all-files -v
+      - name: Run mypy on package
+        run: poetry run mypy team_red
+      # - name: Run mypy on tests
+      #   run: poetry run mypy tests --disable-error-code attr-defined --disable-error-code no-untyped-def
+      - name: Run pytests without coverage for now
+        run: poetry run pytest
     # - name: Test with pytest
     #   run: |
     #     coverage run --source=transitions -m pytest --doctest-modules tests/
