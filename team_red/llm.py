@@ -8,7 +8,7 @@ from langchain.llms import CTransformers
 from team_red.config import CONFIG
 
 
-def build_llm():
+def build_llm() -> CTransformers:
     # Local CTransformers model
     llm = CTransformers(
         model=CONFIG.model.name,

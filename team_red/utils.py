@@ -5,6 +5,7 @@
 """
 from langchain.chains import RetrievalQA
 from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.llms import CTransformers
 from langchain.prompts import PromptTemplate
 from langchain.vectorstores import FAISS
 
@@ -13,7 +14,7 @@ from .llm import build_llm
 from .prompts_dq import fact_checking_template, qa_template
 
 
-def set_qa_prompt():
+def set_qa_prompt() -> PromptTemplate:
     """
     Prompt template for QA retrieval for each vectorstore
     """
@@ -24,7 +25,7 @@ def set_qa_prompt():
     return prompt
 
 
-def set_fact_checking_prompt():
+def set_fact_checking_prompt() -> PromptTemplate:
     """
     Prompt template for QA retrieval for each vectorstore
     """
@@ -35,7 +36,9 @@ def set_fact_checking_prompt():
     return prompt
 
 
-def build_retrieval_qa(llm, prompt, vectordb):
+def build_retrieval_qa(
+    llm: CTransformers, prompt: PromptTemplate, vectordb: FAISS
+) -> RetrievalQA:
     dbqa = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
@@ -48,7 +51,7 @@ def build_retrieval_qa(llm, prompt, vectordb):
     return dbqa
 
 
-def setup_dbqa():
+def setup_dbqa() -> RetrievalQA:
     embeddings = HuggingFaceEmbeddings(
         model_name=CONFIG.data.embedding.model,
         model_kwargs={"device": CONFIG.device},
@@ -61,7 +64,7 @@ def setup_dbqa():
     return dbqa
 
 
-def setup_dbqa_fact_checking():
+def setup_dbqa_fact_checking() -> RetrievalQA:
     embeddings = HuggingFaceEmbeddings(
         model_name=CONFIG.data.embedding.model,
         model_kwargs={"device": CONFIG.device},
