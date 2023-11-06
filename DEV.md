@@ -54,6 +54,8 @@ To run `ruff` manually, use poetry syntax:
 poetry run ruff check team_red
 ```
 
+There is a [VSCode extension](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff) that handles formatting and linting.
+
 ### MyPy
 
 MyPy does static type checking.
