@@ -10,7 +10,7 @@ readme = "README.md"
 start = "main:app"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.11"
 ctransformers = "^0.2.24"
 faiss-cpu = {version = "~1.7.4", optional = true}
 faiss-gpu = {version = "~1.7.2", optional = true}
@@ -47,7 +47,6 @@ select = [
     "B",     # bugbear checks
     "ANN",   # type annotations
     "S",     # bandid code security
-    "COM",   # stricter comma rules
     "C",     # improve code comprehension
     "EM",    # use recommended error message composition
     "G",     # use recommended logging format
@@ -58,14 +57,17 @@ select = [
     "TCH",   # checks for type checking imports
     "ARG",   # no unused arguments
     "PERF",  # performance anti pattern
-    "FURB",  # enforces modern python
+    # "FURB",  # enforces modern python
+    # "D",     # enforce documented functions [will be enabled soon]
+
 ]
 
 # 2. Avoid enforcing line-length violations (`E501`)
 # ignore = ["E501"]
 
-# 3. Avoid trying to fix flake8-bugbear (`B`) violations.
-# unfixable = ["B"]
+# 3. Fix everything except flake8-bugbear (`B`) violations.
+fixable = ["ALL"]
+unfixable = ["B"]
 
 # 4. Ignore `E402` (import violations) in all `__init__.py` files, and in select subdirectories.
 # [tool.ruff.lint.per-file-ignores]
