@@ -135,3 +135,6 @@ cython_debug/
 # Data Files
 data/*.txt
 data/*.pdf
+
+# Pyenv
+.python-version
