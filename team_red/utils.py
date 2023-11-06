@@ -3,18 +3,14 @@
         Module: Util functions
 ===========================================
 """
-import box
-import yaml
-from langchain import PromptTemplate
 from langchain.chains import RetrievalQA
 from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.prompts import PromptTemplate
 from langchain.vectorstores import FAISS
+
+from .config import CONFIG
 from .llm import build_llm
 from .prompts_dq import fact_checking_template, qa_template
-
-# Import config vars
-with open("config/config.yml", "r", encoding="utf8") as ymlfile:
-    cfg = box.Box(yaml.safe_load(ymlfile))
 
 
 def set_qa_prompt():
@@ -43,8 +39,10 @@ def build_retrieval_qa(llm, prompt, vectordb):
     dbqa = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
-        retriever=vectordb.as_retriever(search_kwargs={"k": cfg.VECTOR_COUNT}),
-        return_source_documents=cfg.RETURN_SOURCE_DOCUMENTS,
+        retriever=vectordb.as_retriever(
+            search_kwargs={"k": CONFIG.data.embedding.vector_count}
+        ),
+        return_source_documents=CONFIG.features.return_source,
         chain_type_kwargs={"prompt": prompt},
     )
     return dbqa
@@ -52,10 +50,10 @@ def build_retrieval_qa(llm, prompt, vectordb):
 
 def setup_dbqa():
     embeddings = HuggingFaceEmbeddings(
-        model_name=cfg.MODEL_EMBEDDED_BIN_PATH,
-        model_kwargs={"device": cfg.DEVICE},
+        model_name=CONFIG.data.embedding.model,
+        model_kwargs={"device": CONFIG.device},
     )
-    vectordb = FAISS.load_local(cfg.DB_FAISS_PATH, embeddings)
+    vectordb = FAISS.load_local(CONFIG.data.embedding.db_path, embeddings)
     llm = build_llm()
     qa_prompt = set_qa_prompt()
     dbqa = build_retrieval_qa(llm, qa_prompt, vectordb)
@@ -65,10 +63,10 @@ def setup_dbqa():
 
 def setup_dbqa_fact_checking():
     embeddings = HuggingFaceEmbeddings(
-        model_name=cfg.MODEL_EMBEDDED_BIN_PATH,
-        model_kwargs={"device": cfg.DEVICE},
+        model_name=CONFIG.data.embedding.model,
+        model_kwargs={"device": CONFIG.device},
     )
-    vectordb = FAISS.load_local(cfg.DB_FAISS_PATH, embeddings)
+    vectordb = FAISS.load_local(CONFIG.data.embedding.db_path, embeddings)
     llm = build_llm()
     fact_checking_prompt = set_fact_checking_prompt()
     dbqa = build_retrieval_qa(llm, fact_checking_prompt, vectordb)

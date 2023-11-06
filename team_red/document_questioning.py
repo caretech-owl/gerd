@@ -1,69 +1,39 @@
-import argparse
 import logging
+import pathlib
 import timeit
+from tempfile import NamedTemporaryFile
 
-import box
-import yaml
+import streamlit as st
+
+from team_red.backend.interface import QAQuestion
+
+from .backend import BACKEND
+from .config import CONFIG
 from .utils import setup_dbqa, setup_dbqa_fact_checking
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
 
 
-# Import config vars
-with open("config/config.yml", "r", encoding="utf8") as ymlfile:
-    cfg = box.Box(yaml.safe_load(ymlfile))
-
-
 def document_questioning() -> None:
-    logging.basicConfig(level=logging.DEBUG)
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--input",
-        type=str,
-        default="Wie heißt der Patient?",
-        help="Enter the query to pass into the LLM",
+    st.title("Entlassbriefe QA")
+
+    st.divider()
+
+    uploaded_file = st.file_uploader(
+        "Ein Dokument hochladen:", accept_multiple_files=False, type=["pdf", "txt"]
     )
-    args = parser.parse_args()
 
-    # Setup DBQA
-    startQA = timeit.default_timer()
-    dbqa = setup_dbqa()
-    response = dbqa({"query": args.input})
-    endQA = timeit.default_timer()
+    if uploaded_file is not None:
+        filetype = pathlib.Path(uploaded_file.name).suffix
+        buffer = uploaded_file.getbuffer()
+        # BACKEND.upload_txt(buffer)
 
-    _LOGGER.debug(f'\nAnswer: {response["result"]}')
-    _LOGGER.debug("=" * 50)
+    with st.form("user_form", clear_on_submit=False):
+        question = st.text_input("Stellen Sie Ihre Frage: ", value="")
+        submit_button = st.form_submit_button(label="Frage stellen")
 
-    # Process source documents
-    source_docs = response["source_documents"]
-    for i, doc in enumerate(source_docs):
-        _LOGGER.debug(f"\nSource Document {i+1}\n")
-        _LOGGER.debug(f"Source Text: {doc.page_content}")
-        _LOGGER.debug(f'Document Name: {doc.metadata["source"]}')
-        _LOGGER.debug(f'Page Number: {doc.metadata.get("page", 1)}\n')
-        _LOGGER.debug("=" * 60)
-
-    _LOGGER.debug(f"Time to retrieve response: {endQA - startQA}")
-
-    if cfg.FACTCHECKING == True:
-        startFactCheck = timeit.default_timer()
-        dbqafact = setup_dbqa_fact_checking()
-        response_fact = dbqafact({"query": response["result"]})
-        endFactCheck = timeit.default_timer()
-        _LOGGER.debug("Factcheck:")
-        _LOGGER.debug(f'\nAnswer: {response_fact["result"]}')
-        _LOGGER.debug("=" * 50)
-
-        # Process source documents
-        source_docs = response_fact["source_documents"]
-        for i, doc in enumerate(source_docs):
-            _LOGGER.debug(f"\nSource Document {i+1}\n")
-            _LOGGER.debug(f"Source Text: {doc.page_content}")
-            _LOGGER.debug(f'Document Name: {doc.metadata["source"]}')
-            _LOGGER.debug(f'Page Number: {doc.metadata.get("page", 1)}\n')
-            _LOGGER.debug("=" * 60)
-
-        _LOGGER.debug(f"Time to retrieve fact check: {endFactCheck - startFactCheck}")
-
-    logging.shutdown()
+    if submit_button:
+        with st.spinner(f"{CONFIG.model.name} generiert Antwort..."):
+            answer = BACKEND.qa_query(QAQuestion(question=question))
+            st.success(f"Antwort: {answer.answer}")
