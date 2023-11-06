@@ -1,0 +1,12 @@
+@hostname = localhost
+@port = 8000
+@host = {{hostname}}:{{port}}
+
+POST http://{{host}}/api/v1/qa/query
+content-type: application/json
+
+{
+    "query": "Wie heißt der Patient?"
+}
+
+###
