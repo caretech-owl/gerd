@@ -138,3 +138,6 @@ data/*.pdf
 
 # Pyenv
 .python-version
+
+# do not upload encrypted secrets
+*.secrets.yml
