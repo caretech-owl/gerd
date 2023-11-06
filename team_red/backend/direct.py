@@ -1,10 +1,20 @@
 import logging
-import timeit
+from string import Formatter
+
+from ctransformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import pipeline
 
 from team_red.config import CONFIG
 from team_red.utils import setup_dbqa, setup_dbqa_fact_checking
 
-from .interface import Interface, QAAnswer, QAQuestion
+from .interface import (
+    GenResponse,
+    Interface,
+    PromptConfig,
+    PromptParameters,
+    QAAnswer,
+    QAQuestion,
+)
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
@@ -14,6 +24,7 @@ class Direct(Interface):
     def __init__(self) -> None:
         super().__init__()
         self._database = setup_dbqa()
+        self._prompt_config = None
         if CONFIG.features.fact_checking:
             self._fact_checker_db = setup_dbqa_fact_checking()
 
@@ -22,6 +33,53 @@ class Direct(Interface):
         if CONFIG.features.fact_checking:
             response = self._fact_checker_db({"query": response["result"]})
         return QAAnswer(answer=response["result"])
+
+    def set_prompt(self, config: PromptConfig) -> PromptConfig:
+        names = {
+            fn: fn for _, fn, _, _ in Formatter().parse(config.text) if fn is not None
+        }
+        self._prompt_config = config
+        self._prompt_config.parameters = names
+        return self._prompt_config
+
+    def get_prompt(self) -> PromptConfig:
+        return self._prompt_config
+
+    def generate(self, parameters: PromptParameters) -> GenResponse:
+        model = AutoModelForCausalLM.from_pretrained(
+            model_path_or_repo_id=CONFIG.model.name,
+            model_file=CONFIG.model.file,
+            model_type=CONFIG.model.type,
+            hf=True,
+        )
+        tokenizer = AutoTokenizer.from_pretrained(model)
+        pipe = pipeline(
+            "text-generation",
+            model=model,
+            tokenizer=tokenizer,
+            device_map="auto",
+        )
+
+        prompt = self._prompt_config.text.format(**parameters.parameters)
+        _LOGGER.debug("Resolved prompt: %s", prompt)
+
+        response = pipe(
+            prompt,
+            do_sample=True,
+            top_p=0.95,
+            max_new_tokens=CONFIG.model.max_new_tokens,
+        )
+        response_content = response[0]
+        letter_raw = response_content["generated_text"]
+        # Cut string after matching keyword
+        before1, match1, after1 = letter_raw.partition(
+            "Generiere daraus das Dokument:",
+        )
+        # Cut string before matching keyword
+        before2, match2, after2 = after1.partition("assistant")
+        # Output relevant model answer
+        generated_cover_letter = before2
+        return GenResponse(text=generated_cover_letter)
 
 
 # # Process source documents
