@@ -9,8 +9,8 @@ from langchain import PromptTemplate
 from langchain.chains import RetrievalQA
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
-from src.llm import build_llm
-from src.prompts_dq import fact_checking_template, qa_template
+from .llm import build_llm
+from .prompts_dq import fact_checking_template, qa_template
 
 # Import config vars
 with open("config/config.yml", "r", encoding="utf8") as ymlfile:

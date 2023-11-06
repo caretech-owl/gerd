@@ -4,7 +4,7 @@ import timeit
 
 import box
 import yaml
-from src.utils import setup_dbqa, setup_dbqa_fact_checking
+from .utils import setup_dbqa, setup_dbqa_fact_checking
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
