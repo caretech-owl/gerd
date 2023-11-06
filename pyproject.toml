@@ -69,9 +69,11 @@ select = [
 fixable = ["ALL"]
 unfixable = ["B"]
 
-# 4. Ignore `E402` (import violations) in all `__init__.py` files, and in select subdirectories.
-# [tool.ruff.lint.per-file-ignores]
+# 4. Things to ignore
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]  # assert is fine in pytest
 # "__init__.py" = ["E402"]
+# 
 # "**/{tests,docs,tools}/*" = ["E402"]
 
 # [tool.ruff.format]
