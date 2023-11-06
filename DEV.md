@@ -74,6 +74,27 @@ To install pre-commit hooks, execute this *once*:
 poetry run pre-commit install
 ```
 
+### Poe Task Runner
+
+See [pyproject.toml](pyproject.toml) for task runner configurations.
+
+#### Run Frontend 
+
+Either run Generate Frontend:
+
+```python
+poetry poe frontend gen
+```
+
+or QA Frontend:
+
+```
+poetry poe frontend qa
+```
+
+The backend is chosen via `config.yaml`.
+Currently only the direct backend is implemented.
+
 ### GitHub Actions
 
 GitHub Actions can be found under [github/workflows](./.github/workflows/) and will run linting.
