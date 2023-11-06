@@ -8,6 +8,8 @@ if CONFIG.backend.mode == BackendMode.DIRECT:
 
     BACKEND = Backend()
 elif CONFIG.backend.mode == BackendMode.REST:
-    raise NotImplementedError("REST backend not implemented yet.")
+    msg = "REST backend not implemented yet."
+    raise NotImplementedError(msg)
 else:
-    raise RuntimeError("Invalid backend configured.")
+    msg = "Invalid backend configured."
+    raise RuntimeError(msg)

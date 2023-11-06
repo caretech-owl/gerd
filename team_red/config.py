@@ -24,10 +24,10 @@ class YamlConfig(PydanticBaseSettingsSource):
     ) -> Tuple[Any, str, bool]:
         raise NotImplementedError()
 
-    def prepare_field_value(
-        self, field_name: str, field: FieldInfo, value: Any, value_is_complex: bool
-    ) -> Any:
-        raise NotImplementedError()
+    # def prepare_field_value(
+    #     self, field_name: str, field: FieldInfo, value: Any, value_is_complex: bool
+    # ) -> Any:
+    #     raise NotImplementedError()
 
     def __call__(self) -> Dict[str, Any]:
         with Path(PROJECT_DIR, "config", "config.yml").open() as f:
@@ -58,6 +58,7 @@ class Settings(BaseSettings):
             init_settings,
             YamlConfig(settings_cls),
             env_settings,
+            dotenv_settings,
             file_secret_settings,
         )
 
