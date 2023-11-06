@@ -11,9 +11,10 @@ start = "main:app"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-ctransformers = "^0.2.24"
-faiss-cpu = {version = "~1.7.4", optional = true}
-faiss-gpu = {version = "~1.7.2", optional = true}
+ctransformers = "^0.2.20"
+transformers = "<4.34"
+faiss-cpu = { version = "~1.7.4", optional = true }
+faiss-gpu = { version = "~1.7.2", optional = true }
 fastapi = "^0.104.1"
 ipykernel = "^6.23.1"
 langchain = "^0.0.331"
@@ -42,40 +43,39 @@ cpu = ["faiss-cpu"]
 gpu = ["faiss-gpu"]
 
 [tool.poe.tasks]
-test         = "poetry run pytest"
-backend      = "poetry run python team_red/backend.py"
-frontend     = "poetry run streamlit run team_red/frontend.py"
+test = "poetry run pytest"
+backend = "poetry run python team_red/backend.py"
+frontend = "poetry run streamlit run team_red/frontend.py"
 
 
 [tool.ruff.lint]
 # 1. Enable flake8-bugbear (`B`) rules, in addition to the defaults.
 select = [
-    "E",     # pycodestyle errors
-    "W",     # pycodestyle warnings
-    "I",     # isort (imports) styling
-    "N",     # pep8 naming checks
-    "B",     # bugbear checks
-    "ANN",   # type annotations
-    "S",     # bandid code security
-    "C",     # improve code comprehension
-    "EM",    # use recommended error message composition
-    "G",     # use recommended logging format
-    "T20",   # no print allowed
-    "PT",    # pytest styling recommendations
-    "SLF",   # prevent access to private members
-    "SIM",   # code simplification recommendations
-    "TCH",   # checks for type checking imports
-    "ARG",   # no unused arguments
-    "PERF",  # performance anti pattern
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "I",    # isort (imports) styling
+    "N",    # pep8 naming checks
+    "B",    # bugbear checks
+    "ANN",  # type annotations
+    "S",    # bandid code security
+    "C",    # improve code comprehension
+    "EM",   # use recommended error message composition
+    "G",    # use recommended logging format
+    "T20",  # no print allowed
+    "PT",   # pytest styling recommendations
+    "SLF",  # prevent access to private members
+    "SIM",  # code simplification recommendations
+    "TCH",  # checks for type checking imports
+    "ARG",  # no unused arguments
+    "PERF", # performance anti pattern
     # "FURB",  # enforces modern python
     # "D",     # enforce documented functions [will be enabled soon]
-
 ]
 
 # 2. Avoid enforcing line-length violations (`E501`)
 ignore = [
-    "ANN101",  # do not enforce self type annotation
-    "ANN102",  # do not enforce cls type annoation
+    "ANN101", # do not enforce self type annotation
+    "ANN102", # do not enforce cls type annoation
 ]
 
 # 3. Fix everything except flake8-bugbear (`B`) violations.
@@ -84,7 +84,7 @@ unfixable = ["B"]
 
 # 4. Things to ignore
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S101"]  # assert is fine in pytest
+"tests/*" = ["S101"] # assert is fine in pytest
 # "__init__.py" = ["E402"]
 # 
 # "**/{tests,docs,tools}/*" = ["E402"]
