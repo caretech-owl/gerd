@@ -35,5 +35,8 @@ def document_questioning() -> None:
 
     if submit_button:
         with st.spinner(f"{CONFIG.model.name} generiert Antwort..."):
-            answer = BACKEND.qa_query(QAQuestion(question=question))
-            st.success(f"Antwort: {answer.answer}")
+            if BACKEND is None:
+                _LOGGER.error("Backend has not been set!")
+            else:
+                answer = BACKEND.qa_query(QAQuestion(question=question))
+                st.success(f"Antwort: {answer.answer}")

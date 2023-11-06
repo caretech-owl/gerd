@@ -1,7 +1,13 @@
+import logging
+from typing import Dict
+
 import streamlit as st
 
 from team_red.backend import BACKEND
 from team_red.backend.interface import PromptConfig, PromptParameters
+
+_LOGGER = logging.getLogger(__name__)
+_LOGGER.addHandler(logging.NullHandler())
 
 PROMPT = """Du bist ein hilfreicher Assistant.\
 Du wandelst Eckdaten in ein fertiges Dokument um.
@@ -21,9 +27,14 @@ def document_generation() -> None:
     with st.form("Form zur Generierung eines Dokumentes"):
         # User input for letter of dismissal
         st.markdown("### Details")
+        if BACKEND is None:
+            _LOGGER.error("Backend has not been set!")
+            return
         config = BACKEND.set_prompt(PromptConfig(text=PROMPT))
         fields = {}
-        for key, value in config.parameters.items():
+        if not config.parameters:
+            config.parameters = PromptParameters(parameters={})
+        for key, value in config.parameters.parameters.items():
             fields[key] = st.text_input(value)
 
         # Generate LLM repsonse

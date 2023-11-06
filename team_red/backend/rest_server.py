@@ -19,7 +19,7 @@ app = FastAPI()
 
 
 @app.post("/api/v1/qa/query", status_code=200, response_model=QAAnswer)
-def qa_query(*, _: QAQuestion) -> dict:
+def qa_query(*, _: QAQuestion) -> QAAnswer:
     return QAAnswer(status=200, answer="42")
 
 
