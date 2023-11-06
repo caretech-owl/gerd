@@ -5,9 +5,9 @@ name: python-ci
 
 on:
   push:
-    branches: [ master, dev-gha ]
+    branches: [ main, dev-gha ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   test:
