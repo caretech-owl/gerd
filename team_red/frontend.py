@@ -8,10 +8,10 @@ from team_red.document_questioning import document_questioning
 
 
 class App:
-    def gen(self):
+    def gen(self) -> None:
         document_generation()
 
-    def qa(self):
+    def qa(self) -> None:
         document_questioning()
 
 
