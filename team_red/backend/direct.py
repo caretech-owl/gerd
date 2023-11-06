@@ -1,5 +1,6 @@
 import logging
 from string import Formatter
+from typing import Optional
 
 from ctransformers import AutoModelForCausalLM, AutoTokenizer
 from transformers import pipeline
@@ -24,7 +25,7 @@ class Direct(Interface):
     def __init__(self) -> None:
         super().__init__()
         self._database = setup_dbqa()
-        self._prompt_config = None
+        self._prompt_config: Optional[PromptConfig] = None
         if CONFIG.features.fact_checking:
             self._fact_checker_db = setup_dbqa_fact_checking()
 
@@ -38,12 +39,12 @@ class Direct(Interface):
         names = {
             fn: fn for _, fn, _, _ in Formatter().parse(config.text) if fn is not None
         }
+        config.parameters = PromptParameters(parameters=names)
         self._prompt_config = config
-        self._prompt_config.parameters = names
         return self._prompt_config
 
     def get_prompt(self) -> PromptConfig:
-        return self._prompt_config
+        return self._prompt_config or PromptConfig(text="")
 
     def generate(self, parameters: PromptParameters) -> GenResponse:
         model = AutoModelForCausalLM.from_pretrained(
@@ -59,7 +60,10 @@ class Direct(Interface):
             tokenizer=tokenizer,
             device_map="auto",
         )
-
+        if self._prompt_config is None:
+            self._prompt_config = PromptConfig(
+                text="Bitte antworte, dass du keinen sinnvollen prompt erhalten hast."
+            )
         prompt = self._prompt_config.text.format(**parameters.parameters)
         _LOGGER.debug("Resolved prompt: %s", prompt)
 

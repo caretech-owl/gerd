@@ -4,6 +4,7 @@
 ===========================================
 """
 from langchain.chains import RetrievalQA
+from langchain.chains.retrieval_qa.base import BaseRetrievalQA
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.llms import CTransformers
 from langchain.prompts import PromptTemplate
@@ -36,9 +37,11 @@ def set_fact_checking_prompt() -> PromptTemplate:
     return prompt
 
 
-def build_retrieval_qa(
-    llm: CTransformers, prompt: PromptTemplate, vectordb: FAISS
-) -> RetrievalQA:
+def build_retrieval_qa(  # type: ignore[no-any-unimported]
+    llm: CTransformers,
+    prompt: PromptTemplate,
+    vectordb: FAISS,
+) -> BaseRetrievalQA:
     dbqa = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
@@ -51,7 +54,7 @@ def build_retrieval_qa(
     return dbqa
 
 
-def setup_dbqa() -> RetrievalQA:
+def setup_dbqa() -> BaseRetrievalQA:
     embeddings = HuggingFaceEmbeddings(
         model_name=CONFIG.data.embedding.model,
         model_kwargs={"device": CONFIG.device},
@@ -64,7 +67,7 @@ def setup_dbqa() -> RetrievalQA:
     return dbqa
 
 
-def setup_dbqa_fact_checking() -> RetrievalQA:
+def setup_dbqa_fact_checking() -> BaseRetrievalQA:
     embeddings = HuggingFaceEmbeddings(
         model_name=CONFIG.data.embedding.model,
         model_kwargs={"device": CONFIG.device},

@@ -5,7 +5,6 @@ from pydantic.fields import FieldInfo
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
-    SettingsConfigDict,
 )
 from yaml import safe_load
 
@@ -36,8 +35,6 @@ class YamlConfig(PydanticBaseSettingsSource):
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file_encoding="utf-8")
-
     backend: BackendConfig
     data: DataConfig
     features: FeaturesConfig
@@ -63,4 +60,4 @@ class Settings(BaseSettings):
         )
 
 
-CONFIG = Settings()
+CONFIG = Settings()  # type: ignore[call-arg]
