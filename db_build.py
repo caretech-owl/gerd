@@ -1,36 +1,32 @@
 # =========================
 #  Module: Vector DB Build
 # =========================
-import box
-import yaml
-from langchain.vectorstores import FAISS
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.document_loaders import PyPDFLoader, DirectoryLoader,TextLoader
+from langchain.document_loaders import DirectoryLoader, PyPDFLoader, TextLoader
 from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.vectorstores import FAISS
 
-# Import config vars
-with open('config/config.yml', 'r', encoding='utf8') as ymlfile:
-    cfg = box.Box(yaml.safe_load(ymlfile))
+from team_red.config import CONFIG
 
 
 # Build vector database
-def run_db_build():
-    pdf_loader = DirectoryLoader(cfg.DATA_PATH,
-                                glob='*.pdf',
-                                loader_cls=PyPDFLoader)
-    txt_loader = DirectoryLoader(cfg.DATA_PATH,
-                                glob='*.txt',
-                                loader_cls=TextLoader)
+def run_db_build() -> None:
+    pdf_loader = DirectoryLoader(CONFIG.data.path, glob="*.pdf", loader_cls=PyPDFLoader)
+    txt_loader = DirectoryLoader(CONFIG.data.path, glob="*.txt", loader_cls=TextLoader)
     documents = pdf_loader.load() + txt_loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=cfg.CHUNK_SIZE,
-                                                   chunk_overlap=cfg.CHUNK_OVERLAP)
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=CONFIG.data.chunk_size, chunk_overlap=CONFIG.data.chunk_overlap
+    )
     texts = text_splitter.split_documents(documents)
 
-    embeddings = HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2',
-                                       model_kwargs={'device': cfg.DEVICE})
+    embeddings = HuggingFaceEmbeddings(
+        model_name=CONFIG.data.embedding.model,
+        model_kwargs={"device": CONFIG.device},
+    )
 
     vectorstore = FAISS.from_documents(texts, embeddings)
-    vectorstore.save_local(cfg.DB_FAISS_PATH)
+    vectorstore.save_local(CONFIG.data.embedding.db_path)
+
 
 if __name__ == "__main__":
     run_db_build()
