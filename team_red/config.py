@@ -1,6 +1,5 @@
-from typing import Any, Type, Tuple, Dict
 from pathlib import Path
-from yaml import safe_load
+from typing import Any, Dict, Tuple, Type
 
 from pydantic.fields import FieldInfo
 from pydantic_settings import (
@@ -8,13 +7,13 @@ from pydantic_settings import (
     PydanticBaseSettingsSource,
     SettingsConfigDict,
 )
+from yaml import safe_load
 
 from team_red.models.backend import BackendConfig
 from team_red.models.data import DataConfig
 from team_red.models.features import FeaturesConfig
 from team_red.models.logging import LoggingConfig
 from team_red.models.model import ModelConfig
-
 
 PROJECT_DIR = Path(__file__).parent.parent
 

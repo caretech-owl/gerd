@@ -2,6 +2,8 @@ import streamlit as st
 from ctransformers import AutoModelForCausalLM, AutoTokenizer
 from transformers import pipeline
 
+from team_red.config import CONFIG
+
 
 def document_generation() -> None:
     # Define the Streamlit app layout
@@ -30,9 +32,9 @@ def document_generation() -> None:
         Generiere daraus das Dokument:"""
 
         model = AutoModelForCausalLM.from_pretrained(
-            "TheBloke/leo-hessianai-7B-chat-GGUF",
-            model_file="leo-hessianai-7b-chat.Q5_K_M.gguf",
-            model_type="llama",
+            model=CONFIG.model.name,
+            model_file=CONFIG.model.file,
+            model_type=CONFIG.model.type,
             hf=True,
         )
         tokenizer = AutoTokenizer.from_pretrained(model)
