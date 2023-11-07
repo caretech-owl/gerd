@@ -33,7 +33,7 @@ class Bridge(Transport):
             self._gen = GenerationService()
         return self._gen.set_prompt(config)
 
-    def get_prompt(self) -> PromptConfig:
+    def get_gen_rompt(self) -> PromptConfig:
         if self._gen:
             self._gen.get_prompt()
         return PromptConfig(text="")
