@@ -1,15 +1,12 @@
 import logging
 import pathlib
-import timeit
 from tempfile import NamedTemporaryFile
 
 import streamlit as st
 
-from team_red.backend.interface import QAQuestion
-
-from .backend import BACKEND
-from .config import CONFIG
-from .utils import setup_dbqa, setup_dbqa_fact_checking
+from team_red.backend import TRANSPORTER
+from team_red.config import CONFIG
+from team_red.transport import QAQuestion
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
@@ -35,8 +32,5 @@ def document_questioning() -> None:
 
     if submit_button:
         with st.spinner(f"{CONFIG.model.name} generiert Antwort..."):
-            if BACKEND is None:
-                _LOGGER.error("Backend has not been set!")
-            else:
-                answer = BACKEND.qa_query(QAQuestion(question=question))
-                st.success(f"Antwort: {answer.answer}")
+            answer = TRANSPORTER.qa_query(QAQuestion(question=question))
+            st.success(f"Antwort: {answer.answer}")

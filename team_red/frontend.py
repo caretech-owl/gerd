@@ -3,8 +3,7 @@ import logging
 import fire
 
 from team_red.config import CONFIG
-from team_red.document_generation import document_generation
-from team_red.document_questioning import document_questioning
+from team_red.frontends import document_generation, document_questioning
 
 
 class App:

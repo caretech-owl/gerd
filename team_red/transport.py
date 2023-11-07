@@ -26,11 +26,11 @@ class QAAnswer(BaseModel):
     answer: str = ""
 
 
-class Interface(Protocol):
+class Transport(Protocol):
     def qa_query(self, query: QAQuestion) -> QAAnswer:
         pass
 
-    def set_prompt(self, config: PromptConfig) -> PromptConfig:
+    def set_gen_prompt(self, config: PromptConfig) -> PromptConfig:
         pass
 
     def get_prompt(self) -> PromptConfig:
