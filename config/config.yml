@@ -1,7 +1,7 @@
 data:
   path: "./data"
-  chunk_size: 500
-  chunk_overlap: 50
+  chunk_size: 1028
+  chunk_overlap: 128
   embedding:
     model: "sentence-transformers/all-MiniLM-L6-v2"
     db_path: "vectorstore/db_faiss"
@@ -11,11 +11,11 @@ model:
   file: "leo-hessianai-7b-chat.Q5_K_M.gguf"
   type: "llama"
   temperature: 0.01
-  max_new_tokens: 256
+  max_new_tokens: 128
 device: "cpu" # options: cpu, mps, gpu
 features:
-  fact_checking: True
-  return_source: True
+  fact_checking: false
+  return_source: true
 logging:
   level: "debug" # options: debug, info, warn, error, none
 server:
