@@ -1,10 +1,9 @@
 import logging
-from typing import Dict
 
 import streamlit as st
 
-from team_red.backend import BACKEND
-from team_red.backend.interface import PromptConfig, PromptParameters
+from team_red.backend import TRANSPORTER
+from team_red.transport import PromptConfig, PromptParameters
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
@@ -19,6 +18,13 @@ Der Name des Patienten, um den es geht: {patient_name}\n
 Das Krankenhaus, bei dem der Patient behandelt wurde: {hospital}\n
 Generiere daraus das Dokument:"""
 
+_field_labels = {
+    "history": "Patientengeschichte",
+    "doctor_name": "Name des behandelnden Hausarztes",
+    "patient_name": "Name des Patienten",
+    "hospital": "Name des Krankenhauses",
+}
+
 
 def document_generation() -> None:
     # Define the Streamlit app layout
@@ -27,22 +33,19 @@ def document_generation() -> None:
     with st.form("Form zur Generierung eines Dokumentes"):
         # User input for letter of dismissal
         st.markdown("### Details")
-        if BACKEND is None:
-            _LOGGER.error("Backend has not been set!")
-            return
-        config = BACKEND.set_prompt(PromptConfig(text=PROMPT))
+        config = TRANSPORTER.set_gen_prompt(PromptConfig(text=PROMPT))
         fields = {}
         if not config.parameters:
             config.parameters = PromptParameters(parameters={})
         for key, value in config.parameters.parameters.items():
-            fields[key] = st.text_input(value)
+            fields[key] = st.text_input(_field_labels.get(key, key), value=value)
 
         # Generate LLM repsonse
         generate_cover_letter = st.form_submit_button("Generiere Dokument")
 
     if generate_cover_letter:
         with st.spinner("Generiere Dokument..."):
-            response = BACKEND.generate(PromptParameters(parameters=fields))
+            response = TRANSPORTER.generate(PromptParameters(parameters=fields))
 
         st.success("Fertig!")
         st.subheader("Generiertes Dokument:")

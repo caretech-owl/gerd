@@ -26,7 +26,7 @@ def qa_query(*, _: QAQuestion) -> QAAnswer:
 if __name__ == "__main__":
     uvicorn.run(
         "team_red.backend:app",
-        host=CONFIG.backend.ip,
-        port=CONFIG.backend.port,
+        host=CONFIG.server.ip,
+        port=CONFIG.server.port,
         reload=True,
     )
