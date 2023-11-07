@@ -17,6 +17,9 @@ def build_llm() -> CTransformers:  # type: ignore[no-any-unimported]
         config={
             "max_new_tokens": CONFIG.model.max_new_tokens,
             "temperature": CONFIG.model.max_new_tokens,
+            "context_length": CONFIG.model.max_new_tokens
+            + CONFIG.data.chunk_size
+            + 256,  # delta for prompting
         },
     )
 
