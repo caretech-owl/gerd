@@ -1,2 +1,2 @@
-from .document_generation import document_generation
-from .document_questioning import document_questioning
+from .gen_frontend import gen_frontend
+from .qa_frontend import qa_frontend

@@ -9,6 +9,7 @@ from ..transport import (
     PromptConfig,
     PromptParameters,
     QAAnswer,
+    QAFileUpload,
     QAQuestion,
     Transport,
 )
@@ -27,6 +28,11 @@ class Bridge(Transport):
         if not self._qa:
             self._qa = QAService()
         return self._qa.query(question)
+
+    def add_file(self, file: QAFileUpload) -> QAAnswer:
+        if not self._qa:
+            self._qa = QAService()
+        return self._qa.add_file(file)
 
     def set_gen_prompt(self, config: PromptConfig) -> PromptConfig:
         if not self._gen:
