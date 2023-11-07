@@ -102,11 +102,11 @@ class QAService:
             chunk_overlap=CONFIG.data.chunk_overlap,
         )
         texts = text_splitter.split_documents(documents)
-        if self._vectorstore:
+        if self._vectorstore is None:
+            self._vectorstore = FAISS.from_documents(texts, self._embeddings)
+        else:
             tmp = FAISS.from_documents(texts, self._embeddings)
             self._vectorstore.merge_from(tmp)
-        else:
-            self._vectorstore = FAISS.from_documents(texts, self._embeddings)
         self._vectorstore.save_local(CONFIG.data.embedding.db_path)
         return QAAnswer()
 
