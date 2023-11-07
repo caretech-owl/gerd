@@ -26,7 +26,7 @@ _field_labels = {
 }
 
 
-def document_generation() -> None:
+def gen_frontend() -> None:
     # Define the Streamlit app layout
     st.title("Dokument-Generator mit Llama 2")
 
