@@ -1,18 +1,17 @@
 import logging
 import pathlib
-from tempfile import NamedTemporaryFile
 
 import streamlit as st
 
 from team_red.backend import TRANSPORTER
 from team_red.config import CONFIG
-from team_red.transport import QAQuestion
+from team_red.transport import QAFileUpload, QAQuestion
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
 
 
-def document_questioning() -> None:
+def qa_frontend() -> None:
     st.title("Entlassbriefe QA")
 
     st.divider()
@@ -22,9 +21,18 @@ def document_questioning() -> None:
     )
 
     if uploaded_file is not None:
-        filetype = pathlib.Path(uploaded_file.name).suffix
-        buffer = uploaded_file.getbuffer()
-        # BACKEND.upload_txt(buffer)
+        res = TRANSPORTER.add_file(
+            QAFileUpload(
+                data=uploaded_file.getvalue(),
+                type=pathlib.Path(uploaded_file.name).suffix[1:],
+            )
+        )
+        if res.status != 200:
+            _LOGGER.warning(
+                "Data upload failed with error code: %d\nReason: %s",
+                res.status,
+                res.error_msg,
+            )
 
     with st.form("user_form", clear_on_submit=False):
         question = st.text_input("Stellen Sie Ihre Frage: ", value="")
@@ -33,4 +41,7 @@ def document_questioning() -> None:
     if submit_button:
         with st.spinner(f"{CONFIG.model.name} generiert Antwort..."):
             answer = TRANSPORTER.qa_query(QAQuestion(question=question))
-            st.success(f"Antwort: {answer.answer}")
+            if answer.status == 200:
+                st.success(f"Antwort: {answer.answer}")
+            else:
+                st.error(f"{answer.error_msg} (ErrorCode {answer.status})")

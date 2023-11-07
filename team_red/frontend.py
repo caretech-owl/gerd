@@ -3,15 +3,15 @@ import logging
 import fire
 
 from team_red.config import CONFIG
-from team_red.frontends import document_generation, document_questioning
+from team_red.frontends import gen_frontend, qa_frontend
 
 
 class App:
     def gen(self) -> None:
-        document_generation()
+        gen_frontend()
 
     def qa(self) -> None:
-        document_questioning()
+        qa_frontend()
 
 
 if __name__ == "__main__":
