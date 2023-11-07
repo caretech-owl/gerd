@@ -18,7 +18,7 @@ features:
   return_source: True
 logging:
   level: "debug" # options: debug, info, warn, error, none
-backend:
-  mode: "direct"
+server:
+  enabled: false
   ip: "localhost"
   port: 8000
