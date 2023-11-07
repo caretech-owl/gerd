@@ -5,7 +5,7 @@ import streamlit as st
 
 from team_red.backend import TRANSPORTER
 from team_red.config import CONFIG
-from team_red.transport import QAFileUpload, QAQuestion
+from team_red.transport import FileTypes, QAFileUpload, QAQuestion
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
@@ -24,7 +24,7 @@ def qa_frontend() -> None:
         res = TRANSPORTER.add_file(
             QAFileUpload(
                 data=uploaded_file.getvalue(),
-                type=pathlib.Path(uploaded_file.name).suffix[1:],
+                type=FileTypes[pathlib.Path(uploaded_file.name).suffix[1:]],
             )
         )
         if res.status != 200:
