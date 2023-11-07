@@ -5,6 +5,7 @@ from pydantic.fields import FieldInfo
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
+    SettingsConfigDict,
 )
 from yaml import safe_load
 
@@ -35,6 +36,10 @@ class YamlConfig(PydanticBaseSettingsSource):
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", env_nested_delimiter="__"
+    )
+
     server: ServerConfig
     data: DataConfig
     features: FeaturesConfig
