@@ -46,7 +46,10 @@ class GenerationService:
                 text="Bitte antworte, dass du keinen sinnvollen prompt erhalten hast."
             )
         prompt = self._prompt_config.text.format(**parameters.parameters)
-        _LOGGER.debug("Resolved prompt: %s", prompt)
+        _LOGGER.debug(
+            "\n====== Resolved prompt =====\n\n%s\n\n=============================",
+            prompt,
+        )
 
         response = pipe(
             prompt,

@@ -49,7 +49,7 @@ def document_generation() -> None:
 
         st.success("Fertig!")
         st.subheader("Generiertes Dokument:")
-        st.text(response.text)
+        st.markdown(response.text)
 
         # Offering download link for generated cover letter
         st.subheader("Download generiertes Dokument:")
