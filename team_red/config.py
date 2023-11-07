@@ -8,11 +8,11 @@ from pydantic_settings import (
 )
 from yaml import safe_load
 
-from team_red.models.backend import BackendConfig
 from team_red.models.data import DataConfig
 from team_red.models.features import FeaturesConfig
 from team_red.models.logging import LoggingConfig
 from team_red.models.model import ModelConfig
+from team_red.models.server import ServerConfig
 
 PROJECT_DIR = Path(__file__).parent.parent
 
@@ -35,7 +35,7 @@ class YamlConfig(PydanticBaseSettingsSource):
 
 
 class Settings(BaseSettings):
-    backend: BackendConfig
+    server: ServerConfig
     data: DataConfig
     features: FeaturesConfig
     logging: LoggingConfig
