@@ -24,7 +24,7 @@ def qa_frontend() -> None:
         res = TRANSPORTER.add_file(
             QAFileUpload(
                 data=uploaded_file.getvalue(),
-                type=FileTypes[pathlib.Path(uploaded_file.name).suffix[1:]],
+                type=FileTypes(pathlib.Path(uploaded_file.name).suffix[1:]),
             )
         )
         if res.status != 200:
