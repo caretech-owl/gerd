@@ -30,6 +30,7 @@ jobs:
       - name: Run mypy on package
         run: poetry run mypy team_red
   testing:
+    needs: linting
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
