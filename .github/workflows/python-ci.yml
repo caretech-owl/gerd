@@ -10,15 +10,30 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "poetry"
+      - name: Install development dependencies with extras
+        run: poetry install --with dev --extras cpu
+      - name: Run ruff linting via pre-commit on all files and verbose
+        uses: pre-commit/action@v3.0.0
+        with:
+          extra_args: ruff --all-files -v
+      - name: Run mypy on package
+        run: poetry run mypy team_red
+  testing:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: ["3.11"]
-        extras: ["cpu"]
-        # include:
-        #   - python-version: "3.11"
-        #     extras: "[]"
+        python-version: ["3.10", "3.11"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -30,15 +45,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: "poetry"
       - name: Install development dependencies with extras
-        run: poetry install --with dev --extras "${{matrix.extras}}"
-      - name: Run ruff linting via pre-commit on all files and verbose
-        uses: pre-commit/action@v3.0.0
-        with:
-          extra_args: ruff --all-files -v
-      - name: Run mypy on package
-        run: poetry run mypy team_red
-      # - name: Run mypy on tests
-      #   run: poetry run mypy tests --disable-error-code attr-defined --disable-error-code no-untyped-def
+        run: poetry install --with dev --extras cpu
       - name: Run pytests without coverage for now
         run: poetry run pytest
     # - name: Test with pytest
