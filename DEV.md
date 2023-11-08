@@ -12,10 +12,11 @@ Setup your environment and install poetry (e.g. via `pip`):
 pip install poetry
 ```
 
-Next intall the package and all dependencies, including `dev` depenendies:
+Next intall the package and all dependencies, including `dev` dependencies. Furthermore, you need to chose whether you need packages for `cpu` or `gpu` operation. Depending on your choise, run one of the commands below:
 
 ```sh
-poetry install --with dev
+poetry install --with dev --extras cpu
+poetry install --with dev --extras gpu
 ```
 
 To add a new *runtime* dependency, just run `poetry add`:
