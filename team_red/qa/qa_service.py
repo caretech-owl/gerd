@@ -55,7 +55,10 @@ class QAService:
         self._vectorstore: Optional[VectorStore] = None
         self._database: Optional[BaseRetrievalQA] = None
         self._fact_checker_db: Optional[BaseRetrievalQA] = None
-        if Path(CONFIG.data.embedding.db_path, "index.faiss").exists():
+        if (
+            CONFIG.data.embedding.db_path
+            and Path(CONFIG.data.embedding.db_path, "index.faiss").exists()
+        ):
             self._vectorstore = FAISS.load_local(
                 CONFIG.data.embedding.db_path, self._embeddings
             )
@@ -107,7 +110,8 @@ class QAService:
         else:
             tmp = FAISS.from_documents(texts, self._embeddings)
             self._vectorstore.merge_from(tmp)
-        self._vectorstore.save_local(CONFIG.data.embedding.db_path)
+        if CONFIG.data.embedding.db_path:
+            self._vectorstore.save_local(CONFIG.data.embedding.db_path)
         return QAAnswer()
 
     def _setup_dbqa(self) -> BaseRetrievalQA:
