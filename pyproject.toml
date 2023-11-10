@@ -10,7 +10,10 @@ readme = "README.md"
 start = "main:app"
 
 [tool.poetry.dependencies]
-torch = { version = ">=2.0.0, !=2.0.10", source = "torch_cpu", optional = true }
+torch = [
+    { version = ">=2.0.0, !=2.0.1", platform = "!darwin", source = "torch_cpu" },
+    { version = ">=2.0.0, !=2.0.1", platform = "darwin", source = "pypi" },
+]
 python = ">=3.10, <3.12"
 ctransformers = "^0.2.20"
 transformers = "<4.34"
@@ -45,7 +48,7 @@ gpu = ["faiss-gpu"]
 [[tool.poetry.source]]
 name = "torch_cpu"
 url = "https://download.pytorch.org/whl/cpu"
-priority = "supplemental"
+priority = "explicit"
 
 [tool.poe.tasks]
 test = "poetry run pytest"
