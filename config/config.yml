@@ -1,7 +1,7 @@
 data:
   path: "./data"
-  chunk_size: 1028
-  chunk_overlap: 128
+  chunk_size: 256
+  chunk_overlap: 25
   embedding:
     model: "sentence-transformers/all-MiniLM-L6-v2"
     db_path: "vectorstore/db_faiss"
