@@ -1,8 +1,10 @@
 import logging
+from typing import List, Tuple
 
-import streamlit as st
+import gradio as gr
 
 from team_red.backend import TRANSPORTER
+from team_red.config import CONFIG
 from team_red.transport import PromptConfig
 
 _LOGGER = logging.getLogger(__name__)
@@ -26,35 +28,36 @@ _field_labels = {
 }
 
 
-def gen_frontend() -> None:
-    # Define the Streamlit app layout
-    st.title("Dokument-Generator mit Llama 2")
+def _pairwise(fields: Tuple[gr.Textbox]) -> List[gr.Textbox]:
+    a = iter(fields)
+    return zip(a, a, a)
 
-    with st.form("Form zur Generierung eines Dokumentes"):
-        # User input for letter of dismissal
-        st.markdown("### Details")
-        config = TRANSPORTER.set_gen_prompt(PromptConfig(text=PROMPT))
-        fields = {}
-        if not config.parameters:
-            config.parameters = {}
-        for key, value in config.parameters.items():
-            fields[key] = st.text_input(_field_labels.get(key, key), value=value)
 
-        # Generate LLM repsonse
-        generate_cover_letter = st.form_submit_button("Generiere Dokument")
+def generate(*fields: Tuple[gr.Textbox]) -> str:
+    params = {}
+    for key, name, value in _pairwise(fields):
+        if not value:
+            msg = f"Feld '{name}' darf nicht leer sein!"
+            raise gr.Error(msg)
+        params[key] = value
+    response = TRANSPORTER.generate(params)
+    return response.text
 
-    if generate_cover_letter:
-        with st.spinner("Generiere Dokument..."):
-            response = TRANSPORTER.generate(fields)
 
-        st.success("Fertig!")
-        st.subheader("Generiertes Dokument:")
-        st.markdown(response.text)
+with gr.Blocks() as demo:
+    config = TRANSPORTER.set_gen_prompt(PromptConfig(text=PROMPT))
+    if not config.parameters:
+        config.parameters = {}
+    fields = []
+    for key in config.parameters:
+        fields.append(gr.Textbox(key, visible=False))
+        fields.append(gr.Textbox(_field_labels.get(key, key), visible=False))
+        fields.append(gr.Textbox(label=_field_labels.get(key, key)))
+    output = gr.TextArea(label="Dokument")
+    submit_button = gr.Button("Generiere Dokument")
+    submit_button.click(fn=generate, inputs=fields, outputs=output)
 
-        # Offering download link for generated cover letter
-        st.subheader("Download generiertes Dokument:")
-        st.download_button(
-            "Download generiertes Dokument als .txt",
-            response.text,
-            key="cover_letter",
-        )
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+    demo.launch()
