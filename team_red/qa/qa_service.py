@@ -111,7 +111,7 @@ class QAService:
                 unlink(f.name)
         if not documents:
             _LOGGER.warning("No document was loaded!")
-            return
+            return QAAnswer(error_msg="No document was loaded!", status=500)
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=CONFIG.data.chunk_size,
             chunk_overlap=CONFIG.data.chunk_overlap,
