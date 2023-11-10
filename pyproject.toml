@@ -13,6 +13,10 @@ start = "main:app"
 python = ">=3.10, <3.12"
 ctransformers = "^0.2.20"
 transformers = "<4.34"
+torch = [
+    { version = ">=2.0.0, !=2.0.1", source = "pypi", markers = "extra != 'cpu' or sys_platform == 'darwin'", optional = true },
+    { version = ">=2.0.0, !=2.0.1", source = "torch_cpu", markers = "extra == 'cpu' and sys_platform != 'darwin'", optional = true },
+]
 faiss-cpu = { version = "~1.7.4", optional = true }
 faiss-gpu = { version = "~1.7.2", optional = true }
 fastapi = "^0.104.1"
@@ -21,7 +25,6 @@ langchain = "^0.0.331"
 pypdf = "3.8.1"
 sentence-transformers = "2.2.2"
 uvicorn = "^0.22.0"
-torch = ">=2.0.0, !=2.0.1"
 streamlit = "1.25.0"
 pydantic = "^2.4.2"
 pydantic-settings = "^2.0.3"
@@ -39,8 +42,13 @@ mypy = "^1.6.1"
 types-pyyaml = "^6.0.12.12"
 
 [tool.poetry.extras]
-cpu = ["faiss-cpu"]
-gpu = ["faiss-gpu"]
+cpu = ["faiss-cpu", "torch"]
+gpu = ["faiss-gpu", "torch"]
+
+[[tool.poetry.source]]
+name = "torch_cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "supplemental"
 
 [tool.poe.tasks]
 test = "poetry run pytest"
