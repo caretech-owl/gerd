@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import Dict, Optional
 
 from team_red.gen import GenerationService
 from team_red.qa import QAService
@@ -7,7 +7,6 @@ from team_red.qa import QAService
 from ..transport import (
     GenResponse,
     PromptConfig,
-    PromptParameters,
     QAAnswer,
     QAFileUpload,
     QAQuestion,
@@ -44,7 +43,7 @@ class Bridge(Transport):
             self._gen.get_prompt()
         return PromptConfig(text="")
 
-    def generate(self, parameters: PromptParameters) -> GenResponse:
+    def generate(self, parameters: Dict[str, str]) -> GenResponse:
         if not self._gen:
             self._gen = GenerationService()
         return self._gen.generate(parameters)
