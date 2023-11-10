@@ -1,4 +1,5 @@
 import logging
+from os import unlink
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Iterable, List, Optional, Protocol
@@ -24,6 +25,7 @@ from team_red.utils import build_retrieval_qa
 from .prompts import fact_checking_template, qa_template
 
 if TYPE_CHECKING:
+    from langchain.docstore.document import Document
     from langchain.document_loaders.base import BaseLoader
 
 
@@ -90,16 +92,26 @@ class QAService:
         return answer
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:
-        with NamedTemporaryFile(dir=".", suffix=file.type.value) as f:
+        documents: Optional[List[Document]] = None
+        try:
+            f = NamedTemporaryFile(dir=".", suffix="." + file.type.value, delete=False)
             f.write(file.data)
             f.flush()
+            f.close()
             loader: BaseLoader
             if file.type == FileTypes.TEXT:
                 loader = TextLoader(f.name)
             elif file.type == FileTypes.PDF:
                 loader = PyPDFLoader(f.name)
             documents = loader.load()
-
+        except BaseException as err:
+            _LOGGER.error(err)
+        finally:
+            if f:
+                unlink(f.name)
+        if not documents:
+            _LOGGER.warning("No document was loaded!")
+            return
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=CONFIG.data.chunk_size,
             chunk_overlap=CONFIG.data.chunk_overlap,
