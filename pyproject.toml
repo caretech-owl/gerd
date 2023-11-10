@@ -14,8 +14,8 @@ python = ">=3.10, <3.12"
 ctransformers = "^0.2.20"
 transformers = "<4.34"
 torch = [
-    { version = ">=2.0.0, !=2.0.1", source = "pypi", markers = "extra != 'cpu' or sys_platform == 'darwin'", optional = true },
-    { version = ">=2.0.0, !=2.0.1", source = "torch_cpu", markers = "extra == 'cpu' and sys_platform != 'darwin'", optional = true },
+    { version = ">=2.0.0, !=2.0.1", source = "pypi", markers = "extra != 'cpu' or sys_platform != 'linux'", optional = true },
+    { version = ">=2.0.0, !=2.0.1, !=2.1.0", source = "torch_cpu", markers = "extra == 'cpu' and sys_platform == 'linux'", optional = true },
 ]
 faiss-cpu = { version = "~1.7.4", optional = true }
 faiss-gpu = { version = "~1.7.2", optional = true }
