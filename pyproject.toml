@@ -10,7 +10,7 @@ readme = "README.md"
 start = "main:app"
 
 [tool.poetry.dependencies]
-torch = { version = ">=2.0.0, !=2.0.10, <3.12", source = "torch_cpu", optional = true }
+torch = { version = ">=2.0.0, !=2.0.10", source = "torch_cpu", optional = true }
 python = ">=3.10, <3.12"
 ctransformers = "^0.2.20"
 transformers = "<4.34"
