@@ -3,7 +3,8 @@ from string import Formatter
 from typing import Dict, Optional
 
 from ctransformers import AutoModelForCausalLM, AutoTokenizer
-from transformers import Pipeline, pipeline
+from transformers import pipeline
+from transformers.pipelines.base import Pipeline
 
 from team_red.config import CONFIG
 from team_red.transport import GenResponse, PromptConfig
@@ -15,10 +16,10 @@ _LOGGER.addHandler(logging.NullHandler())
 class GenerationService:
     def __init__(self) -> None:
         self._prompt_config: Optional[PromptConfig] = None
-        self._pipeline: Optional[Pipeline] = None
+        self._pipeline: Optional[Pipeline] = None  # type: ignore[no-any-unimported]
 
     @property
-    def pipeline(self) -> Pipeline:
+    def pipeline(self) -> Pipeline:  # type: ignore[no-any-unimported]
         if not self._pipeline:
             model = AutoModelForCausalLM.from_pretrained(
                 model_path_or_repo_id=CONFIG.model.name,
