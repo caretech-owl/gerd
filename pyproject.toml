@@ -25,11 +25,11 @@ langchain = "^0.0.331"
 pypdf = "3.8.1"
 sentence-transformers = "2.2.2"
 uvicorn = "^0.22.0"
-streamlit = "1.25.0"
 pydantic = "^2.4.2"
 pydantic-settings = "^2.0.3"
 fire = "^0.5.0"
 poethepoet = "^0.24.2"
+gradio = "^4.1.2"
 
 [tool.poetry.group.dev]
 optional = true
@@ -53,7 +53,7 @@ priority = "explicit"
 [tool.poe.tasks]
 test = "poetry run pytest"
 backend = "poetry run python team_red/backend.py"
-frontend = "poetry run streamlit run team_red/frontend.py"
+gen = "poetry run gradio team_red/frontends/gen_frontend.py"
 
 
 [tool.ruff.lint]
