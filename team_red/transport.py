@@ -4,17 +4,15 @@ from typing import Dict, List, Optional, Protocol
 from pydantic import BaseModel
 
 
-class PromptParameters(BaseModel):
-    parameters: Dict[str, str]
-
-
 class PromptConfig(BaseModel):
     text: str
-    parameters: Optional[PromptParameters] = None
+    parameters: Optional[Dict[str, str]] = None
 
 
 class GenResponse(BaseModel):
-    text: str
+    status: int = 200
+    text: str = ""
+    error_msg: str = ""
 
 
 class QAQuestion(BaseModel):
@@ -57,5 +55,5 @@ class Transport(Protocol):
     def get_gen_rompt(self) -> PromptConfig:
         pass
 
-    def generate(self, parameters: PromptParameters) -> GenResponse:
+    def generate(self, parameters: Dict[str, str]) -> GenResponse:
         pass

@@ -3,7 +3,7 @@ import logging
 import streamlit as st
 
 from team_red.backend import TRANSPORTER
-from team_red.transport import PromptConfig, PromptParameters
+from team_red.transport import PromptConfig
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
@@ -36,8 +36,8 @@ def gen_frontend() -> None:
         config = TRANSPORTER.set_gen_prompt(PromptConfig(text=PROMPT))
         fields = {}
         if not config.parameters:
-            config.parameters = PromptParameters(parameters={})
-        for key, value in config.parameters.parameters.items():
+            config.parameters = {}
+        for key, value in config.parameters.items():
             fields[key] = st.text_input(_field_labels.get(key, key), value=value)
 
         # Generate LLM repsonse
@@ -45,7 +45,7 @@ def gen_frontend() -> None:
 
     if generate_cover_letter:
         with st.spinner("Generiere Dokument..."):
-            response = TRANSPORTER.generate(PromptParameters(parameters=fields))
+            response = TRANSPORTER.generate(fields)
 
         st.success("Fertig!")
         st.subheader("Generiertes Dokument:")
