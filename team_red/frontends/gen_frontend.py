@@ -1,5 +1,5 @@
 import logging
-from typing import List, Tuple
+from typing import Iterable, List, Tuple
 
 import gradio as gr
 
@@ -28,12 +28,14 @@ _field_labels = {
 }
 
 
-def _pairwise(fields: Tuple[gr.Textbox]) -> List[gr.Textbox]:
+def _pairwise(
+    fields: Tuple[gr.Textbox, ...]
+) -> Iterable[Tuple[gr.Textbox, gr.Textbox, gr.Textbox]]:
     a = iter(fields)
     return zip(a, a, a)
 
 
-def generate(*fields: Tuple[gr.Textbox]) -> str:
+def generate(*fields: gr.Textbox) -> str:
     params = {}
     for key, name, value in _pairwise(fields):
         if not value:
