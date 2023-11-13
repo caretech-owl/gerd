@@ -1,47 +1,92 @@
 import logging
 import pathlib
+from typing import Optional
 
-import streamlit as st
+import gradio as gr
 
 from team_red.backend import TRANSPORTER
 from team_red.config import CONFIG
-from team_red.transport import FileTypes, QAFileUpload, QAQuestion
+from team_red.transport import FileTypes, PromptConfig, QAFileUpload, QAQuestion
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
 
 
-def qa_frontend() -> None:
-    st.title("Entlassbriefe QA")
+PROMPT = """Verwende die folgenden Informationen, \
+um die Frage des Benutzers zu beantworten. Wenn du die Antwort nicht weißt, \
+sag einfach, dass du es nicht weißt, versuche nicht, eine Antwort zu erfinden.
 
-    st.divider()
+Kontext: {context}
+Frage: {question}
 
-    uploaded_file = st.file_uploader(
-        "Ein Dokument hochladen:", accept_multiple_files=False, type=["pdf", "txt"]
-    )
+Gebe nur die hilfreiche Antwort unten zurück und nichts anderes. Halte dich außerdem \
+sehr kurz mit der Antwort.
+Hilfreiche Antwort:
+"""
 
-    if uploaded_file is not None:
-        res = TRANSPORTER.add_file(
-            QAFileUpload(
-                data=uploaded_file.getvalue(),
-                type=FileTypes(pathlib.Path(uploaded_file.name).suffix[1:]),
-            )
+
+def query(question: str) -> str:
+    res = TRANSPORTER.qa_query(QAQuestion(question=question))
+    if res.status != 200:
+        msg = f"Query was unsuccessful: {res.error_msg} (Error Code {res.status})"
+        raise gr.Error(msg)
+    return res.answer
+
+
+def upload(file_path: str, progress: Optional[gr.Progress] = None) -> str:
+    if not file_path:
+        return
+    if progress is None:
+        progress = gr.Progress()
+    progress(0, desc="Hochladen...")
+    with pathlib.Path(file_path).open("rb") as file:
+        data = QAFileUpload(
+            data=file.read(),
+            type=FileTypes(pathlib.Path(file_path).suffix[1:]),
         )
-        if res.status != 200:
-            _LOGGER.warning(
-                "Data upload failed with error code: %d\nReason: %s",
-                res.status,
-                res.error_msg,
-            )
+    res = TRANSPORTER.add_file(data)
+    if res.status != 200:
+        _LOGGER.warning(
+            "Data upload failed with error code: %d\nReason: %s",
+            res.status,
+            res.error_msg,
+        )
+        msg = (
+            f"Datei konnte nicht hochgeladen werden: {res.error_msg}"
+            "(Error Code {res.status})"
+        )
+        raise gr.Error(msg)
+    progress(100, desc="Fertig!")
 
-    with st.form("user_form", clear_on_submit=False):
-        question = st.text_input("Stellen Sie Ihre Frage: ", value="")
-        submit_button = st.form_submit_button(label="Frage stellen")
 
-    if submit_button:
-        with st.spinner(f"{CONFIG.model.name} generiert Antwort..."):
-            answer = TRANSPORTER.qa_query(QAQuestion(question=question))
-            if answer.status == 200:
-                st.success(f"Antwort: {answer.answer}")
-            else:
-                st.error(f"{answer.error_msg} (ErrorCode {answer.status})")
+def set_prompt(prompt: str, progress: Optional[gr.Progress] = None) -> str:
+    if progress is None:
+        progress = gr.Progress()
+    progress(0, "Aktualisiere Prompt...")
+    _ = TRANSPORTER.set_gen_prompt(PromptConfig(text=prompt))
+    progress(100, "Fertig!")
+
+
+demo = gr.Blocks(title="Entlassbriefe QA")
+
+
+with demo:
+    gr.Markdown("# Entlassbriefe QA")
+    with gr.Row():
+        file_upload = gr.File(file_count="single", file_types=[".txt"])
+        with gr.Column():
+            prompt = gr.TextArea(value=PROMPT, interactive=True, label="Prompt")
+            prompt_submit = gr.Button("Aktualisiere Prompt")
+    inp = gr.Textbox(
+        label="Stellen Sie eine Frage:", placeholder="Wie heißt der Patient?"
+    )
+    out = gr.Textbox(label="Antwort")
+    file_upload.change(fn=upload, inputs=file_upload, outputs=out)
+    btn = gr.Button("Frage stellen")
+    btn.click(fn=query, inputs=inp, outputs=out)
+    inp.submit(fn=query, inputs=inp, outputs=out)
+    prompt_submit.click(fn=set_prompt, inputs=prompt, outputs=out)
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+    demo.launch()
