@@ -50,6 +50,9 @@ with demo:
     config = TRANSPORTER.set_gen_prompt(PromptConfig(text=PROMPT))
     if not config.parameters:
         config.parameters = {}
+
+    gr.Markdown("# Entlassbrief generieren")
+
     fields = []
     for key in config.parameters:
         fields.append(gr.Textbox(key, visible=False))
