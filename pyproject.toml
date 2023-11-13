@@ -52,7 +52,7 @@ priority = "explicit"
 
 [tool.poe.tasks]
 test = "poetry run pytest"
-backend = "poetry run python team_red/backend.py"
+qa = "poetry run gradio team_red/frontends/qa_frontend.py"
 gen = "poetry run gradio team_red/frontends/gen_frontend.py"
 
 

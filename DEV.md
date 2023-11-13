@@ -86,13 +86,13 @@ See [pyproject.toml](pyproject.toml) for task runner configurations.
 Either run Generate Frontend:
 
 ```shell
-poetry poe frontend gen
+poetry poe gen
 ```
 
 or QA Frontend:
 
 ```shell
-poetry poe frontend qa
+poetry poe qa
 ```
 
 The backend is chosen via `config.yaml`.
