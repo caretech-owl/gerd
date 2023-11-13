@@ -1,6 +1,7 @@
 import logging
 from os import unlink
 from pathlib import Path
+from string import Formatter
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Iterable, List, Optional, Protocol
 
@@ -16,6 +17,7 @@ from team_red.llm import build_llm
 from team_red.transport import (
     DocumentSource,
     FileTypes,
+    PromptConfig,
     QAAnswer,
     QAFileUpload,
     QAQuestion,
@@ -71,7 +73,7 @@ class QAService:
                 msg = "No vector store initialized! Upload documents first."
                 _LOGGER.error(msg)
                 return QAAnswer(status=404, error_msg=msg)
-            self._database = self._setup_dbqa()
+            self._database = self._setup_dbqa(qa_template)
 
         response = self._database({"query": question.question})
         answer = QAAnswer(answer=response["result"])
@@ -90,6 +92,18 @@ class QAService:
             response = self._fact_checker_db({"query": response["result"]})
             answer.answer = response["result"]
         return answer
+
+    def set_prompt(self, config: PromptConfig) -> PromptConfig:
+        names = {
+            fn: "" for _, fn, _, _ in Formatter().parse(config.text) if fn is not None
+        }
+        config.parameters = names
+        self._prompt_config = config
+        self._database = self._setup_dbqa(config.text)
+        return self._prompt_config
+
+    def get_prompt(self) -> PromptConfig:
+        return self._prompt_config or PromptConfig(text="")
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:
         documents: Optional[List[Document]] = None
@@ -126,9 +140,9 @@ class QAService:
             self._vectorstore.save_local(CONFIG.data.embedding.db_path)
         return QAAnswer()
 
-    def _setup_dbqa(self) -> BaseRetrievalQA:
+    def _setup_dbqa(self, prompt: str) -> BaseRetrievalQA:
         qa_prompt = PromptTemplate(
-            template=qa_template,
+            template=prompt,
             input_variables=["context", "question"],
         )
         dbqa = build_retrieval_qa(self._llm, qa_prompt, self._vectorstore)
