@@ -44,7 +44,9 @@ def generate(*fields: Tuple[gr.Textbox]) -> str:
     return response.text
 
 
-with gr.Blocks() as demo:
+demo = gr.Blocks()
+
+with demo:
     config = TRANSPORTER.set_gen_prompt(PromptConfig(text=PROMPT))
     if not config.parameters:
         config.parameters = {}
