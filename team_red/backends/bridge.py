@@ -38,9 +38,19 @@ class Bridge(Transport):
             self._gen = GenerationService()
         return self._gen.set_prompt(config)
 
-    def get_gen_rompt(self) -> PromptConfig:
-        if self._gen:
-            self._gen.get_prompt()
+    def get_gen_prompt(self) -> PromptConfig:
+        if self._qa:
+            return self._gen.get_prompt()
+        return PromptConfig(text="")
+
+    def set_qa_prompt(self, config: PromptConfig) -> PromptConfig:
+        if not self._qa:
+            self._gen = QAService()
+        return self._gen.set_prompt(config)
+
+    def get_qa_prompt(self) -> PromptConfig:
+        if self._qa:
+            return self._qa.get_prompt()
         return PromptConfig(text="")
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:
