@@ -39,14 +39,14 @@ class Bridge(Transport):
         return self._gen.set_prompt(config)
 
     def get_gen_prompt(self) -> PromptConfig:
-        if self._qa:
+        if self._gen:
             return self._gen.get_prompt()
         return PromptConfig(text="")
 
     def set_qa_prompt(self, config: PromptConfig) -> PromptConfig:
         if not self._qa:
-            self._gen = QAService()
-        return self._gen.set_prompt(config)
+            self._qa = QAService()
+        return self._qa.set_prompt(config)
 
     def get_qa_prompt(self) -> PromptConfig:
         if self._qa:
