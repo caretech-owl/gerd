@@ -27,7 +27,6 @@ sentence-transformers = "2.2.2"
 uvicorn = "^0.22.0"
 pydantic = "^2.4.2"
 pydantic-settings = "^2.0.3"
-fire = "^0.5.0"
 poethepoet = "^0.24.2"
 gradio = "^4.1.2"
 
