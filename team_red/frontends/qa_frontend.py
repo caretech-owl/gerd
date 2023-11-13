@@ -33,7 +33,7 @@ def query(question: str) -> str:
     return res.answer
 
 
-def upload(file_path: str, progress: Optional[gr.Progress] = None) -> str:
+def upload(file_path: str, progress: Optional[gr.Progress] = None) -> None:
     if not file_path:
         return
     if progress is None:
@@ -59,7 +59,7 @@ def upload(file_path: str, progress: Optional[gr.Progress] = None) -> str:
     progress(100, desc="Fertig!")
 
 
-def set_prompt(prompt: str, progress: Optional[gr.Progress] = None) -> str:
+def set_prompt(prompt: str, progress: Optional[gr.Progress] = None) -> None:
     if progress is None:
         progress = gr.Progress()
     progress(0, "Aktualisiere Prompt...")
