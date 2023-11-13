@@ -52,7 +52,13 @@ class Transport(Protocol):
     def set_gen_prompt(self, config: PromptConfig) -> PromptConfig:
         pass
 
-    def get_gen_rompt(self) -> PromptConfig:
+    def get_gen_prompt(self) -> PromptConfig:
+        pass
+
+    def set_qa_prompt(self, config: PromptConfig) -> PromptConfig:
+        pass
+
+    def get_qa_prompt(self) -> PromptConfig:
         pass
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:
