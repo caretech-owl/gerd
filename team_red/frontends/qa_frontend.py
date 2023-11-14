@@ -11,19 +11,6 @@ _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
 
 
-PROMPT = """Verwende die folgenden Informationen, \
-um die Frage des Benutzers zu beantworten. Wenn du die Antwort nicht weißt, \
-sag einfach, dass du es nicht weißt, versuche nicht, eine Antwort zu erfinden.
-
-Kontext: {context}
-Frage: {question}
-
-Gebe nur die hilfreiche Antwort unten zurück und nichts anderes. Halte dich außerdem \
-sehr kurz mit der Antwort.
-Hilfreiche Antwort:
-"""
-
-
 def query(question: str) -> str:
     res = TRANSPORTER.qa_query(QAQuestion(question=question))
     if res.status != 200:
@@ -62,7 +49,7 @@ def set_prompt(prompt: str, progress: Optional[gr.Progress] = None) -> None:
     if progress is None:
         progress = gr.Progress()
     progress(0, "Aktualisiere Prompt...")
-    _ = TRANSPORTER.set_gen_prompt(PromptConfig(text=prompt))
+    _ = TRANSPORTER.set_qa_prompt(PromptConfig(text=prompt))
     progress(100, "Fertig!")
 
 
@@ -74,7 +61,9 @@ with demo:
     with gr.Row():
         file_upload = gr.File(file_count="single", file_types=[".txt"])
         with gr.Column():
-            prompt = gr.TextArea(value=PROMPT, interactive=True, label="Prompt")
+            prompt = gr.TextArea(
+                value=TRANSPORTER.get_qa_prompt().text, interactive=True, label="Prompt"
+            )
             prompt_submit = gr.Button("Aktualisiere Prompt")
     inp = gr.Textbox(
         label="Stellen Sie eine Frage:", placeholder="Wie heißt der Patient?"
