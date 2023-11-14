@@ -39,19 +39,20 @@ class GenerationService:
 
     def set_prompt(self, config: PromptConfig) -> PromptConfig:
         self._config.model.prompt = config
+        return self._config.model.prompt
 
     def get_prompt(self) -> PromptConfig:
         return self._config.model.prompt
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:
-        prompt = self._config.model.prompt.text.format(**parameters)
+        resolved = self._config.model.prompt.text.format(**parameters)
         _LOGGER.debug(
             "\n====== Resolved prompt =====\n\n%s\n\n=============================",
-            prompt,
+            resolved,
         )
 
         response = self.pipeline(
-            prompt,
+            resolved,
             do_sample=True,
             top_p=0.95,
             max_new_tokens=self._config.model.max_new_tokens,
