@@ -1,24 +1,29 @@
-data:
-  path: "./data"
-  chunk_size: 256
-  chunk_overlap: 25
-  embedding:
-    model: "sentence-transformers/all-MiniLM-L6-v2"
-    db_path: "vectorstore/db_faiss"
-    vector_count: 2
-model:
-  name: "TheBloke/leo-hessianai-7B-chat-GGUF"
-  file: "leo-hessianai-7b-chat.Q5_K_M.gguf"
-  type: "llama"
-  temperature: 0.01
-  max_new_tokens: 128
 device: "cpu" # options: cpu, mps, gpu
-features:
-  fact_checking: false
-  return_source: true
 logging:
   level: "debug" # options: debug, info, warn, error, none
-server:
-  enabled: false
-  ip: "localhost"
-  port: 8000
+gen:
+  model:
+    name: "TheBloke/leo-hessianai-7B-chat-GGUF"
+    # file: ""
+    type: "llama"
+    temperature: 0.01
+    max_new_tokens: 128
+qa:
+  model: &qa_model
+    name: "TheBloke/leo-hessianai-7B-chat-GGUF"
+    type: "llama"
+    temperature: 0.01
+    max_new_tokens: 128
+    context_lenght: 512
+  features:
+    fact_checking:
+      enabled: false
+      model: *qa_model
+    return_source: true
+  embedding:
+    chunk_size: 256
+    chunk_overlap: 25
+    vector_count: 2
+    model:
+      name: "sentence-transformers/all-MiniLM-L6-v2"
+    # db_path: "vectorstore/db_faiss"
