@@ -4,20 +4,9 @@ from typing import Iterable, Tuple
 import gradio as gr
 
 from team_red.backend import TRANSPORTER
-from team_red.transport import PromptConfig
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
-
-PROMPT = """Du bist ein hilfreicher Assistant.\
-Du wandelst Eckdaten in ein fertiges Dokument um.
-Du gibst ausschließlich das fertige Dokument zurück und nichts anderes.\
-Die Eckdaten lauten wie folgt:
-Der Aufenthaltsverlauf des Patienten: {history}\n
-Der Name des Arztes der im Anschreiben angegeben werden soll: {doctor_name}\n
-Der Name des Patienten, um den es geht: {patient_name}\n
-Das Krankenhaus, bei dem der Patient behandelt wurde: {hospital}\n
-Generiere daraus das Dokument:"""
 
 _field_labels = {
     "history": "Patientengeschichte",
@@ -48,9 +37,7 @@ def generate(*fields: gr.Textbox) -> str:
 demo = gr.Blocks()
 
 with demo:
-    config = TRANSPORTER.set_gen_prompt(PromptConfig(text=PROMPT))
-    if not config.parameters:
-        config.parameters = {}
+    config = TRANSPORTER.get_gen_prompt()
 
     gr.Markdown("# Entlassbrief generieren")
 
