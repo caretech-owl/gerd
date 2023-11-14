@@ -3,23 +3,26 @@
         Module: Open-source LLM Setup
 ===========================================
 """
+import logging
+
 from langchain.llms import CTransformers
 
-from team_red.config import CONFIG
+from team_red.models.model import ModelConfig
+
+_LOGGER = logging.getLogger(__name__)
+_LOGGER.addHandler(logging.NullHandler())
 
 
-def build_llm() -> CTransformers:  # type: ignore[no-any-unimported]
+def build_llm(model: ModelConfig) -> CTransformers:  # type: ignore[no-any-unimported]
     # Local CTransformers model
     llm = CTransformers(
-        model=CONFIG.model.name,
-        model_file=CONFIG.model.file,
-        model_type=CONFIG.model.type,
+        model=model.name,
+        model_file=model.file,
+        model_type=model.type,
         config={
-            "max_new_tokens": CONFIG.model.max_new_tokens,
-            "temperature": CONFIG.model.max_new_tokens,
-            "context_length": CONFIG.model.max_new_tokens
-            + CONFIG.data.chunk_size
-            + 256,  # delta for prompting
+            "max_new_tokens": model.max_new_tokens,
+            "temperature": model.temperature,
+            "context_length": model.context_length,
         },
     )
 

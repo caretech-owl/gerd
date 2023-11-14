@@ -12,8 +12,8 @@ from langchain.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 
-from team_red.config import CONFIG
 from team_red.llm import build_llm
+from team_red.models.qa import QAConfig
 from team_red.transport import (
     DocumentSource,
     FileTypes,
@@ -50,21 +50,25 @@ class VectorStore(Protocol):
 
 
 class QAService:
-    def __init__(self) -> None:
-        self._llm = build_llm()
+    def __init__(self, config: QAConfig) -> None:
+        self._config = config
+        self._llm = build_llm(config.model)
         self._embeddings = HuggingFaceEmbeddings(
-            model_name=CONFIG.data.embedding.model,
-            model_kwargs={"device": CONFIG.device},
+            model_name=self._config.embedding.model.name,
+            model_kwargs={"device": self._config.device},
         )
         self._vectorstore: Optional[VectorStore] = None
         self._database: Optional[BaseRetrievalQA] = None
         self._fact_checker_db: Optional[BaseRetrievalQA] = None
         if (
-            CONFIG.data.embedding.db_path
-            and Path(CONFIG.data.embedding.db_path, "index.faiss").exists()
+            config.embedding.db_path
+            and Path(config.embedding.db_path, "index.faiss").exists()
         ):
+            _LOGGER.info(
+                "Load existing vector store from '%s'.", config.embedding.db_path
+            )
             self._vectorstore = FAISS.load_local(
-                CONFIG.data.embedding.db_path, self._embeddings
+                config.embedding.db_path, self._embeddings
             )
 
     def query(self, question: QAQuestion) -> QAAnswer:
@@ -77,7 +81,7 @@ class QAService:
 
         response = self._database({"query": question.question})
         answer = QAAnswer(answer=response["result"])
-        if CONFIG.features.return_source:
+        if self._config.features.return_source:
             for doc in response["source_documents"]:
                 answer.sources.append(
                     DocumentSource(
@@ -86,7 +90,7 @@ class QAService:
                         page=doc.metadata.get("page", 1),
                     )
                 )
-        if CONFIG.features.fact_checking:
+        if self._config.features.fact_checking:
             if not self._fact_checker_db:
                 self._fact_checker_db = self._setup_dbqa_fact_checking()
             response = self._fact_checker_db({"query": response["result"]})
@@ -127,17 +131,19 @@ class QAService:
             _LOGGER.warning("No document was loaded!")
             return QAAnswer(error_msg="No document was loaded!", status=500)
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=CONFIG.data.chunk_size,
-            chunk_overlap=CONFIG.data.chunk_overlap,
+            chunk_size=self._config.embedding.chunk_size,
+            chunk_overlap=self._config.embedding.chunk_overlap,
         )
         texts = text_splitter.split_documents(documents)
         if self._vectorstore is None:
+            _LOGGER.info("Create new vector store from document.")
             self._vectorstore = FAISS.from_documents(texts, self._embeddings)
         else:
+            _LOGGER.info("Adding document to existing vector store.")
             tmp = FAISS.from_documents(texts, self._embeddings)
             self._vectorstore.merge_from(tmp)
-        if CONFIG.data.embedding.db_path:
-            self._vectorstore.save_local(CONFIG.data.embedding.db_path)
+        if self._config.embedding.db_path:
+            self._vectorstore.save_local(self._config.embedding.db_path)
         return QAAnswer()
 
     def _setup_dbqa(self, prompt: str) -> BaseRetrievalQA:
@@ -145,7 +151,13 @@ class QAService:
             template=prompt,
             input_variables=["context", "question"],
         )
-        dbqa = build_retrieval_qa(self._llm, qa_prompt, self._vectorstore)
+        dbqa = build_retrieval_qa(
+            self._llm,
+            qa_prompt,
+            self._vectorstore,
+            self._config.embedding.vector_count,
+            self._config.features.return_source,
+        )
 
         return dbqa
 
@@ -154,7 +166,13 @@ class QAService:
             template=fact_checking_template,
             input_variables=["context", "question"],
         )
-        dbqa = build_retrieval_qa(self._llm, fact_checking_prompt, self._vectorstore)
+        dbqa = build_retrieval_qa(
+            self._llm,
+            fact_checking_prompt,
+            self._vectorstore,
+            self._config.embedding.vector_count,
+            self._config.features.return_source,
+        )
 
         return dbqa
 
