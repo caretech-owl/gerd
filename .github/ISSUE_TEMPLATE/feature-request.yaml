@@ -1,0 +1,44 @@
+name: Feature request
+description: Suggest an idea for this project
+title: "[FR]: "
+labels: ["enhancement"]
+# assignees:
+#   - aleneum
+body:
+  - type: markdown
+    attributes:
+      value: Do you have an idea for a feature that would make this project more helpful or easier to use?
+  - type: textarea
+    id: problem-description
+    attributes:
+      label: Problem description
+      description: Is your feature request related to a problem? Please describe.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solution
+      description: A clear and concise description of what you want to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the feature request here.
+    validations:
+      required: false
+  - type: dropdown
+    id: affected-components
+    attributes:
+      label: Affected components
+      description: Which components are affected
+      multiple: true
+      options:
+        - Gen Service
+        - Qa Service
+        - Frontend
+        - Backend
+    validations:
+      required: false
