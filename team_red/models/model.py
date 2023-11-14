@@ -1,11 +1,32 @@
-from typing import List, Optional
+from pathlib import Path
+from string import Formatter
+from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError, computed_field
+
+
+class PromptConfig(BaseModel):
+    text: Optional[str] = None
+    path: Optional[str] = None
+
+    def model_post_init(self, __context: Any) -> None:  # noqa: ANN401
+        if self.text is None:
+            if Path(self.path).exists():
+                with Path(self.path).open("r") as f:
+                    self.text = f.read()
+            else:
+                msg = f"Prompt text is not set and '{self.path}' does not exist!"
+                raise ValidationError(msg)
+
+    @computed_field()
+    def parameters(self) -> List[str]:
+        return [fn for _, fn, _, _ in Formatter().parse(self.text) if fn is not None]
 
 
 # Default values chosen by https://github.com/marella/ctransformers#config
 class ModelConfig(BaseModel):
     name: str
+    prompt: Optional[PromptConfig] = None
     type: Optional[str] = None
     file: Optional[str] = None
     top_k: int = 40
