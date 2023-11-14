@@ -10,6 +10,8 @@ from team_red.transport import FileTypes, PromptConfig, QAFileUpload, QAQuestion
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
 
+logging.basicConfig(level=logging.DEBUG)
+
 
 def query(question: str) -> str:
     res = TRANSPORTER.qa_query(QAQuestion(question=question))
@@ -76,5 +78,4 @@ with demo:
     prompt_submit.click(fn=set_prompt, inputs=prompt, outputs=out)
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
     demo.launch()

@@ -15,6 +15,8 @@ _field_labels = {
     "hospital": "Name des Krankenhauses",
 }
 
+logging.basicConfig(level=logging.DEBUG)
+
 
 def _pairwise(
     fields: Tuple[gr.Textbox, ...]
@@ -52,5 +54,4 @@ with demo:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
     demo.launch()
