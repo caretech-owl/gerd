@@ -1,0 +1,76 @@
+name: Bug
+description: File a bug report
+title: "[Bug]: "
+labels: ["bug"]
+# assignees:
+#   - aleneum
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What should happen
+    validations:
+      required: true
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: What happened instead
+    validations:
+      required: true
+  - type: textarea
+    id: steps-reproduce
+    attributes:
+      label: Steps to Reproduce the Problem
+      value: |
+        1.
+        2.
+        3.
+
+    validations:
+      required: true
+  - type: input
+    id: affected-version
+    attributes:
+      label: Affected version
+      description: Version number or commit hash
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: affected-components
+    attributes:
+      label: Affected components
+      description: Which components are affected
+      multiple: true
+      options:
+        - Gen Service
+        - Qa Service
+        - Frontend
+        - Backend
+    validations:
+      required: false
+  - type: dropdown
+    id: affected-plattforms
+    attributes:
+      label: Affected plattforms
+      description: Which plattforms are affected
+      multiple: true
+      options:
+        - Windows
+        - Linux
+        - MacOS
+    validations:
+      required: false
+  - type: textarea
+    id: further-information
+    attributes:
+      label: Further contextual information and suggestions
+      description: More detailed descriptions or possible solutions
+    validations:
+      required: false
