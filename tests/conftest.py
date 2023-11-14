@@ -11,7 +11,7 @@ GRASCCO_PATH = Path(DATA_PATH, "grascco")
 
 @pytest.fixture(scope="session", autouse=True)
 def _set_config() -> None:
-    CONFIG.data.embedding.db_path = ""
+    CONFIG.qa.embedding.db_path = ""
 
 
 @pytest.fixture(scope="session")

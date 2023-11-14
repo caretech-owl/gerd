@@ -1,16 +1,17 @@
 import pytest
 
+from team_red.config import CONFIG
 from team_red.gen.generation_service import GenerationService
 from team_red.transport import PromptConfig
 
 
 @pytest.fixture()
 def gen_service() -> GenerationService:
-    return GenerationService()
+    return GenerationService(CONFIG.gen)
 
 
 def test_init() -> None:
-    gen = GenerationService()
+    gen = GenerationService(CONFIG.gen)
 
 
 def test_get_prompt(gen_service: GenerationService) -> None:

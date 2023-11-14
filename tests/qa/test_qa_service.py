@@ -7,7 +7,7 @@ from team_red.transport import FileTypes, QAFileUpload, QAQuestion
 
 @pytest.fixture()
 def qa_service() -> QAService:
-    return QAService()
+    return QAService(CONFIG.qa)
 
 
 @pytest.fixture()
@@ -18,11 +18,11 @@ def qa_service_cajal(qa_service: QAService, cajal_txt: bytes) -> QAService:
 
 
 def test_init() -> None:
-    qa = QAService()
+    qa = QAService(CONFIG.qa)
 
 
 def test_query_without_document(qa_service: QAService) -> None:
-    assert CONFIG.data.embedding.db_path == ""
+    assert CONFIG.qa.embedding.db_path == ""
     res = qa_service.query(QAQuestion(question="This should return a 404"))
     assert res.status == 404
 
