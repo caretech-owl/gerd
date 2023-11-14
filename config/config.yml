@@ -14,7 +14,7 @@ qa:
     type: "llama"
     temperature: 0.01
     max_new_tokens: 128
-    context_lenght: 512
+    context_length: 512
   features:
     fact_checking:
       enabled: false
