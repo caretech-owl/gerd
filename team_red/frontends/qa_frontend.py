@@ -5,7 +5,6 @@ from typing import Optional
 import gradio as gr
 
 from team_red.backend import TRANSPORTER
-from team_red.config import CONFIG
 from team_red.transport import FileTypes, PromptConfig, QAFileUpload, QAQuestion
 
 _LOGGER = logging.getLogger(__name__)
