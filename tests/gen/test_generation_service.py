@@ -17,7 +17,7 @@ def test_init() -> None:
 def test_get_prompt(gen_service: GenerationService) -> None:
     prompt = gen_service.get_prompt()
     assert prompt
-    assert prompt.text == ""
+    assert prompt.text == CONFIG.gen.model.prompt.text
 
 
 def test_set_prompt(gen_service: GenerationService) -> None:
