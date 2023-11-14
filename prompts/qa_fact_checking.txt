@@ -1,0 +1,7 @@
+Verwende die folgenden Informationen, um den Fakt einem Faktencheck mit Hilfe des Kontext zu unterziehen.
+
+Kontext: {context}
+Fakt: {question}
+
+Gebe zurück, ob der Fakt stimmt oder nicht und gebe stimmt aus, wenn der Fakt stimmt und stimmt nicht, wenn der Fakt nicht stimmt, aus. Sonst keine weitere Ausgabe.
+Überprüfte Antwort (stimmt/stimmt nicht):
