@@ -1,12 +1,9 @@
 from enum import Enum
-from typing import Dict, List, Optional, Protocol
+from typing import Dict, List, Protocol
 
 from pydantic import BaseModel
 
-
-class PromptConfig(BaseModel):
-    text: str
-    parameters: Optional[Dict[str, str]] = None
+from team_red.models.model import PromptConfig
 
 
 class GenResponse(BaseModel):
