@@ -6,11 +6,11 @@ from pydantic import BaseModel, ValidationError, computed_field
 
 
 class PromptConfig(BaseModel):
-    text: Optional[str] = None
+    text: str = ""
     path: Optional[str] = None
 
     def model_post_init(self, __context: Any) -> None:  # noqa: ANN401
-        if self.text is None:
+        if not self.text and self.path is not None:
             if Path(self.path).exists():
                 with Path(self.path).open("r") as f:
                     self.text = f.read()
@@ -18,7 +18,8 @@ class PromptConfig(BaseModel):
                 msg = f"Prompt text is not set and '{self.path}' does not exist!"
                 raise ValidationError(msg)
 
-    @computed_field()
+    @computed_field  # type: ignore[misc]
+    @property
     def parameters(self) -> List[str]:
         return [fn for _, fn, _, _ in Formatter().parse(self.text) if fn is not None]
 
@@ -26,7 +27,7 @@ class PromptConfig(BaseModel):
 # Default values chosen by https://github.com/marella/ctransformers#config
 class ModelConfig(BaseModel):
     name: str
-    prompt: Optional[PromptConfig] = None
+    prompt: PromptConfig = PromptConfig()
     type: Optional[str] = None
     file: Optional[str] = None
     top_k: int = 40
