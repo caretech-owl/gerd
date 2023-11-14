@@ -6,7 +6,7 @@ from ctransformers import AutoModelForCausalLM, AutoTokenizer
 from transformers import pipeline
 from transformers.pipelines.base import Pipeline
 
-from team_red.config import CONFIG
+from team_red.models.gen import GenerationConfig
 from team_red.transport import GenResponse, PromptConfig
 
 _LOGGER = logging.getLogger(__name__)
@@ -14,7 +14,8 @@ _LOGGER.addHandler(logging.NullHandler())
 
 
 class GenerationService:
-    def __init__(self) -> None:
+    def __init__(self, config: GenerationConfig) -> None:
+        self._config = config
         self._prompt_config: Optional[PromptConfig] = None
         self._pipeline: Optional[Pipeline] = None  # type: ignore[no-any-unimported]
 
@@ -22,9 +23,9 @@ class GenerationService:
     def pipeline(self) -> Pipeline:  # type: ignore[no-any-unimported]
         if not self._pipeline:
             model = AutoModelForCausalLM.from_pretrained(
-                model_path_or_repo_id=CONFIG.model.name,
-                model_file=CONFIG.model.file,
-                model_type=CONFIG.model.type,
+                model_path_or_repo_id=self._config.model.name,
+                model_file=self._config.model.file,
+                model_type=self._config.model.type,
                 hf=True,
             )
             tokenizer = AutoTokenizer.from_pretrained(model)
@@ -65,7 +66,7 @@ class GenerationService:
             prompt,
             do_sample=True,
             top_p=0.95,
-            max_new_tokens=CONFIG.model.max_new_tokens,
+            max_new_tokens=self._config.model.max_new_tokens,
         )
         _LOGGER.debug(
             "\n====== Response =====\n\n%s\n\n=============================", response

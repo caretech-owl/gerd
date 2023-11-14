@@ -1,10 +1,9 @@
 import logging
-from typing import Iterable, List, Tuple
+from typing import Iterable, Tuple
 
 import gradio as gr
 
 from team_red.backend import TRANSPORTER
-from team_red.config import CONFIG
 from team_red.transport import PromptConfig
 
 _LOGGER = logging.getLogger(__name__)
