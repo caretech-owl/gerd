@@ -1,0 +1,105 @@
+name: Use Case
+description: A description of a user-centered system requirement
+title: "[UC]: "
+labels: ["use case"]
+# assignees:
+#   - aleneum
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: A concise description of the use case
+    validations:
+      required: true
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Rationale
+      description: The motivation and value added by the described use case
+    validations:
+      required: true
+  - type: dropdown
+    id: level
+    attributes:
+      label: Level
+      multiple: false
+      options:
+        - user goal
+        - subfunction
+  - type: input
+    id: actors
+    attributes:
+      label: Actors
+      description: Someone or something with behavior, e.g. a person (identified by role), a computer system, or an organization
+    validations:
+      required: true
+  - type: textarea
+    id: preconditions
+    attributes:
+      label: Preconditions
+      description: What needs to be true on start
+      placeholder: |
+        - Use Cases: #1, #2
+        - User is authenticated
+    validations:
+      required: true
+  - type: textarea
+    id: postconditions
+    attributes:
+      label: Postconditions
+      description: What must be true on successful completion
+      placeholder: "The form "
+    validations:
+      required: true
+  - type: textarea
+    id: basic-flow
+    attributes:
+      label: Basic Flow
+      description: A typical, unconditional happy path
+      value: |
+        1.
+        2.
+        3.
+
+    validations:
+      required: true
+  - type: textarea
+    id: alternative-paths
+    attributes:
+      label: Alternative Paths
+      description: Alternate scenarios of success or failure
+      placeholder: |
+        2.1
+        2.2
+        3.1
+
+    validations:
+      required: false
+  - type: textarea
+    id: visualisation
+    attributes:
+      label: Visualisation
+      description: A mermaid diagram or image depiciting the action flow
+      value: |
+        ```mermaid
+        flowchart LR;
+          1-->2
+          2-->3
+          3-->4
+          3-->3.1
+          3.1-->3.2
+          3.2-->2
+          4-->4.1
+          4.1-->4
+        ```
+    validations:
+      required: false
+  - type: textarea
+    id: related-issues
+    attributes:
+      label: Other related issues, use cases, features
+      description: What must be true on successful completion
+      placeholder: "#1 #2 #3"
+    validations:
+      required: false
