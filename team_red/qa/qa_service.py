@@ -24,8 +24,6 @@ from team_red.transport import (
 )
 from team_red.utils import build_retrieval_qa
 
-from .prompts import fact_checking_template, qa_template
-
 if TYPE_CHECKING:
     from langchain.docstore.document import Document
     from langchain.document_loaders.base import BaseLoader
@@ -77,7 +75,7 @@ class QAService:
                 msg = "No vector store initialized! Upload documents first."
                 _LOGGER.error(msg)
                 return QAAnswer(status=404, error_msg=msg)
-            self._database = self._setup_dbqa(qa_template)
+            self._database = self._setup_dbqa(self._config.model.prompt)
 
         response = self._database({"query": question.question})
         answer = QAAnswer(answer=response["result"])
@@ -90,24 +88,22 @@ class QAService:
                         page=doc.metadata.get("page", 1),
                     )
                 )
-        if self._config.features.fact_checking:
+        if self._config.features.fact_checking.enabled is True:
             if not self._fact_checker_db:
-                self._fact_checker_db = self._setup_dbqa_fact_checking()
+                self._fact_checker_db = self._setup_dbqa_fact_checking(
+                    self._config.features.fact_checking.model.prompt
+                )
             response = self._fact_checker_db({"query": response["result"]})
             answer.answer = response["result"]
         return answer
 
     def set_prompt(self, config: PromptConfig) -> PromptConfig:
-        names = {
-            fn: "" for _, fn, _, _ in Formatter().parse(config.text) if fn is not None
-        }
-        config.parameters = names
-        self._prompt_config = config
-        self._database = self._setup_dbqa(config.text)
-        return self._prompt_config
+        self._config.model.prompt = config
+        self._database = self._setup_dbqa(self._config.model.prompt)
+        return self._config.model.prompt
 
     def get_prompt(self) -> PromptConfig:
-        return self._prompt_config or PromptConfig(text="")
+        return self._config.model.prompt
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:
         documents: Optional[List[Document]] = None
@@ -146,10 +142,20 @@ class QAService:
             self._vectorstore.save_local(self._config.embedding.db_path)
         return QAAnswer()
 
-    def _setup_dbqa(self, prompt: str) -> BaseRetrievalQA:
+    def _setup_dbqa(self, prompt: PromptConfig) -> BaseRetrievalQA:
+        if "context" not in prompt.parameters:
+            _LOGGER.warning(
+                "Prompt does not include '{context}' variable."
+                "It will be appened to the prompt."
+            )
+            prompt.text += "\n\n{context}"
+        _LOGGER.info(
+            "\n===== Setup dbqa with prompt ====\n\n%s\n\n====================",
+            prompt.text,
+        )
         qa_prompt = PromptTemplate(
-            template=prompt,
-            input_variables=["context", "question"],
+            template=prompt.text,
+            input_variables=prompt.parameters,
         )
         dbqa = build_retrieval_qa(
             self._llm,
@@ -161,10 +167,17 @@ class QAService:
 
         return dbqa
 
-    def _setup_dbqa_fact_checking(self) -> BaseRetrievalQA:
+    def _setup_dbqa_fact_checking(self, prompt: PromptConfig) -> BaseRetrievalQA:
+        _LOGGER.info("Setup fact checking...")
+        if "context" not in prompt.parameters:
+            _LOGGER.warning(
+                "Prompt does not include '{context}' variable."
+                "It will be appened to the prompt."
+            )
+            prompt.text += "\n\n{context}"
         fact_checking_prompt = PromptTemplate(
-            template=fact_checking_template,
-            input_variables=["context", "question"],
+            template=prompt.text,
+            input_variables=prompt.parameters,
         )
         dbqa = build_retrieval_qa(
             self._llm,
