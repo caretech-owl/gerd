@@ -1,6 +1,7 @@
 import logging
 from typing import Dict, Optional
 
+from team_red.config import CONFIG
 from team_red.gen import GenerationService
 from team_red.qa import QAService
 
@@ -23,37 +24,35 @@ class Bridge(Transport):
         self._qa: Optional[QAService] = None
         self._gen: Optional[GenerationService] = None
 
+    @property
+    def qa(self) -> QAService:
+        if self._qa is None:
+            self._qa = QAService(CONFIG.qa)
+        return self._qa
+
+    @property
+    def gen(self) -> GenerationService:
+        if self._gen is None:
+            self._gen = GenerationService(CONFIG.gen)
+        return self._gen
+
     def qa_query(self, question: QAQuestion) -> QAAnswer:
-        if not self._qa:
-            self._qa = QAService()
-        return self._qa.query(question)
+        return self.qa.query(question)
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:
-        if not self._qa:
-            self._qa = QAService()
-        return self._qa.add_file(file)
+        return self.qa.add_file(file)
 
     def set_gen_prompt(self, config: PromptConfig) -> PromptConfig:
-        if not self._gen:
-            self._gen = GenerationService()
-        return self._gen.set_prompt(config)
+        return self.gen.set_prompt(config)
 
     def get_gen_prompt(self) -> PromptConfig:
-        if self._gen:
-            return self._gen.get_prompt()
-        return PromptConfig(text="")
+        return self.gen.get_prompt()
 
     def set_qa_prompt(self, config: PromptConfig) -> PromptConfig:
-        if not self._qa:
-            self._qa = QAService()
-        return self._qa.set_prompt(config)
+        return self.qa.set_prompt(config)
 
     def get_qa_prompt(self) -> PromptConfig:
-        if self._qa:
-            return self._qa.get_prompt()
-        return PromptConfig(text="")
+        return self.qa.get_prompt()
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:
-        if not self._gen:
-            self._gen = GenerationService()
-        return self._gen.generate(parameters)
+        return self.gen.generate(parameters)
