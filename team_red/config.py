@@ -9,11 +9,9 @@ from pydantic_settings import (
 )
 from yaml import safe_load
 
-from team_red.models.data import DataConfig
-from team_red.models.features import FeaturesConfig
+from team_red.models.gen import GenerationConfig
 from team_red.models.logging import LoggingConfig
-from team_red.models.model import ModelConfig
-from team_red.models.server import ServerConfig
+from team_red.models.qa import QAConfig
 
 PROJECT_DIR = Path(__file__).parent.parent
 
@@ -39,13 +37,10 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", env_nested_delimiter="__"
     )
-
-    server: ServerConfig
-    data: DataConfig
-    features: FeaturesConfig
-    logging: LoggingConfig
-    model: ModelConfig
     device: str
+    logging: LoggingConfig
+    gen: GenerationConfig
+    qa: QAConfig
 
     @classmethod
     def settings_customise_sources(
