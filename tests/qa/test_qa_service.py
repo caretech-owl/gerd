@@ -12,7 +12,7 @@ def qa_service() -> QAService:
 
 @pytest.fixture()
 def qa_service_cajal(qa_service: QAService, cajal_txt: bytes) -> QAService:
-    request = QAFileUpload(data=cajal_txt, type=FileTypes.TEXT)
+    request = QAFileUpload(data=cajal_txt, name="Cajal.txt")
     qa_service.add_file(request)
     return qa_service
 
@@ -28,7 +28,7 @@ def test_query_without_document(qa_service: QAService) -> None:
 
 
 def test_load(qa_service: QAService, cajal_txt: bytes) -> None:
-    request = QAFileUpload(data=cajal_txt, type=FileTypes.TEXT)
+    request = QAFileUpload(data=cajal_txt, name="Cajal.txt")
     qa_service.add_file(request)
 
 
