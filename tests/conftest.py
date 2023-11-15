@@ -18,6 +18,6 @@ def _set_config() -> None:
 def cajal_txt() -> bytes:
     p = Path(GRASCCO_PATH, "Cajal.txt")
     assert p.exists()
-    with p.open() as f:
+    with p.open(encoding="utf-8") as f:
         data = f.read()
     return data
