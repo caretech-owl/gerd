@@ -35,7 +35,9 @@ class YamlConfig(PydanticBaseSettingsSource):
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", env_nested_delimiter="__"
+        env_file=".env",
+        env_file_encoding="utf-8",
+        env_nested_delimiter="__",
     )
     device: str
     logging: LoggingConfig
@@ -52,11 +54,11 @@ class Settings(BaseSettings):
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> Tuple[PydanticBaseSettingsSource, ...]:
         return (
+            file_secret_settings,
+            dotenv_settings,
+            env_settings,
             init_settings,
             YamlConfig(settings_cls),
-            env_settings,
-            dotenv_settings,
-            file_secret_settings,
         )
 
 
