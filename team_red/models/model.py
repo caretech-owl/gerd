@@ -12,7 +12,7 @@ class PromptConfig(BaseModel):
     def model_post_init(self, __context: Any) -> None:  # noqa: ANN401
         if not self.text and self.path is not None:
             if Path(self.path).exists():
-                with Path(self.path).open("r") as f:
+                with Path(self.path).open("r", encoding="utf-8") as f:
                     self.text = f.read()
             else:
                 msg = f"Prompt text is not set and '{self.path}' does not exist!"
