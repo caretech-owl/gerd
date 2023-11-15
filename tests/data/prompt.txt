@@ -1,0 +1,6 @@
+Erste Zeile
+Zweite Zeile
+Dritte Zeile
+Umlaute: äöü
+Sonderzeichen: |$&?(())
+{variableA}{variableB}
