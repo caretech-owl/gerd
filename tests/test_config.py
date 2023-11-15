@@ -2,7 +2,7 @@ from team_red.config import Settings
 
 
 def test_config() -> None:
-    config = Settings(_env_file="tests/data/.env")
+    config = Settings(_env_file="tests/data/env.test")
 
     assert config.gen.model.prompt.path == "tests/data/prompt.txt"
     assert (
