@@ -28,7 +28,7 @@ class YamlConfig(PydanticBaseSettingsSource):
     #     raise NotImplementedError()
 
     def __call__(self) -> Dict[str, Any]:
-        with Path(PROJECT_DIR, "config", "config.yml").open(encoding="utf-8") as f:
+        with Path(PROJECT_DIR, "config", "config.yml").open("r", encoding="utf-8") as f:
             d: Dict[str, Any] = safe_load(f)
         return d
 
