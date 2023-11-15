@@ -36,7 +36,7 @@ class FileTypes(Enum):
 
 class QAFileUpload(BaseModel):
     data: bytes
-    type: FileTypes
+    name: str
 
 
 class Transport(Protocol):

@@ -80,7 +80,7 @@ class QAService:
         response = self._database({"query": question.question})
         answer = QAAnswer(answer=response["result"])
         if self._config.features.return_source:
-            for doc in response["source_documents"]:
+            for doc in response.get("source_documents", []):
                 answer.sources.append(
                     DocumentSource(
                         content=doc.page_content,
@@ -94,7 +94,15 @@ class QAService:
                     self._config.features.fact_checking.model.prompt
                 )
             response = self._fact_checker_db({"query": response["result"]})
-            answer.answer = response["result"]
+            for doc in response.get("source_documents", []):
+                answer.sources.append(
+                    DocumentSource(
+                        content=doc.page_content,
+                        name=doc.metadata.get("source", "unknown"),
+                        page=doc.metadata.get("page", 1),
+                    )
+                )
+        _LOGGER.debug("\n==== Answer ====\n\n%s\n===============", answer)
         return answer
 
     def set_prompt(self, config: PromptConfig) -> PromptConfig:
@@ -107,17 +115,23 @@ class QAService:
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:
         documents: Optional[List[Document]] = None
+        file_path = Path(file.name)
         try:
-            f = NamedTemporaryFile(dir=".", suffix="." + file.type.value, delete=False)
+            f = NamedTemporaryFile(dir=".", suffix=file_path.suffix, delete=False)
             f.write(file.data)
             f.flush()
             f.close()
+            file_type = FileTypes(file_path.suffix[1:])
             loader: BaseLoader
-            if file.type == FileTypes.TEXT:
+            if file_type == FileTypes.TEXT:
                 loader = TextLoader(f.name)
-            elif file.type == FileTypes.PDF:
+            elif file_type == FileTypes.PDF:
                 loader = PyPDFLoader(f.name)
             documents = loader.load()
+            # source must be overriden to not leak upload information
+            # about the temp file which are rather useless anyway
+            for doc in documents:
+                doc.metadata["source"] = file_path.name
         except BaseException as err:
             _LOGGER.error(err)
         finally:

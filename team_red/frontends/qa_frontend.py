@@ -5,7 +5,7 @@ from typing import Optional
 import gradio as gr
 
 from team_red.backend import TRANSPORTER
-from team_red.transport import FileTypes, PromptConfig, QAFileUpload, QAQuestion
+from team_red.transport import PromptConfig, QAFileUpload, QAQuestion
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
@@ -30,7 +30,7 @@ def upload(file_path: str, progress: Optional[gr.Progress] = None) -> None:
     with pathlib.Path(file_path).open("rb") as file:
         data = QAFileUpload(
             data=file.read(),
-            type=FileTypes(pathlib.Path(file_path).suffix[1:]),
+            name=pathlib.Path(file_path).name,
         )
     res = TRANSPORTER.add_file(data)
     if res.status != 200:
