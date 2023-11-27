@@ -21,7 +21,9 @@ class PromptConfig(BaseModel):
     @computed_field  # type: ignore[misc]
     @property
     def parameters(self) -> List[str]:
-        return sorted(set([fn for _, fn, _, _ in Formatter().parse(self.text) if fn is not None]))
+        dup = {fn for _, fn, _, _ in Formatter().parse(self.text) if fn is not None}
+        uniq = set(dup)
+        return sorted(uniq)
 
 
 # Default values chosen by https://github.com/marella/ctransformers#config
