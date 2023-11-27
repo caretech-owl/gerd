@@ -25,6 +25,12 @@ class GenerationService:
                 model_path_or_repo_id=self._config.model.name,
                 model_file=self._config.model.file,
                 model_type=self._config.model.type,
+                context_length=self._config.model.context_length,
+                temperature=self._config.model.temperature,
+                repetition_penalty =self._config.model.repetition_penalty,
+                last_n_tokens = self._config.model.last_n_tokens,
+                top_k = self._config.model.top_k,
+                top_p = self._config.model.top_p,
                 hf=True,
             )
             tokenizer = AutoTokenizer.from_pretrained(model)
