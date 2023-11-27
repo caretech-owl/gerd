@@ -44,8 +44,7 @@ with demo:
     gr.Markdown("# Entlassbrief generieren")
 
     fields = []
-    parameters = list(set(config.parameters))
-    for key in parameters:
+    for key in config.parameters:
         fields.append(gr.Textbox(key, visible=False))
         fields.append(gr.Textbox(_field_labels.get(key, key), visible=False))
         fields.append(gr.Textbox(label=_field_labels.get(key, key)))

@@ -21,7 +21,7 @@ class PromptConfig(BaseModel):
     @computed_field  # type: ignore[misc]
     @property
     def parameters(self) -> List[str]:
-        return [fn for _, fn, _, _ in Formatter().parse(self.text) if fn is not None]
+        return sorted(set([fn for _, fn, _, _ in Formatter().parse(self.text) if fn is not None]))
 
 
 # Default values chosen by https://github.com/marella/ctransformers#config
