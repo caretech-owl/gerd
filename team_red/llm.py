@@ -23,6 +23,10 @@ def build_llm(model: ModelConfig) -> CTransformers:  # type: ignore[no-any-unimp
             "max_new_tokens": model.max_new_tokens,
             "temperature": model.temperature,
             "context_length": model.context_length,
+            "top_p": model.top_p,
+            "top_k": model.top_k,
+            "repetition_penalty": model.repetition_penalty,
+            "last_n_tokens": model.last_n_tokens
         },
     )
 
