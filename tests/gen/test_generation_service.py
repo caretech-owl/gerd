@@ -28,6 +28,12 @@ def test_set_prompt(gen_service: GenerationService) -> None:
     assert gen_service.get_prompt().text == tmp
 
 
+def test_prompt_duplicate(gen_service: GenerationService) -> None:
+    tmp = "A {value} prompt {test} and another duplicate {value} and {foo} in between as well as {test} and {value} again."
+    prompt = gen_service.set_prompt(PromptConfig(text=tmp))
+    assert len(prompt.parameters) == len(set(prompt.parameters))
+
+
 def test_generate(gen_service: GenerationService) -> None:
     gen_service.set_prompt(PromptConfig(text="Schreibe einen Brief an Herrn {name}."))
     response = gen_service.generate({"name": "Cajal"})
