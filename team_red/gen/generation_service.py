@@ -2,7 +2,6 @@ import logging
 from typing import Dict, Optional
 
 from ctransformers import AutoModelForCausalLM
-from transformers.pipelines.base import Pipeline
 
 from team_red.models.gen import GenerationConfig
 from team_red.models.model import PromptConfig
@@ -14,7 +13,6 @@ _LOGGER.addHandler(logging.NullHandler())
 class GenerationService:
     def __init__(self, config: GenerationConfig) -> None:
         self._config = config
-        self._pipeline: Optional[Pipeline] = None  # type: ignore[no-any-unimported]
 
     def set_model(self) -> AutoModelForCausalLM:  # type: ignore[no-any-unimported]
         model = AutoModelForCausalLM.from_pretrained(
