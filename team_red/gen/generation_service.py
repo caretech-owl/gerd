@@ -14,7 +14,7 @@ class GenerationService:
     def __init__(self, config: GenerationConfig) -> None:
         self._config = config
 
-    def set_model(self) -> AutoModelForCausalLM:  # type: ignore[no-any-unimported]
+    def set_model(self) -> AutoModelForCausalLM:
         model = AutoModelForCausalLM.from_pretrained(
             model_path_or_repo_id=self._config.model.name,
             model_file=self._config.model.file,

@@ -10,6 +10,7 @@ gen:
     top_k: 100
     top_p: 0.95
     max_new_tokens: 100
+    repetition_penalty: 1.1
     prompt:
       path: "prompts/gen.txt"
 qa:
