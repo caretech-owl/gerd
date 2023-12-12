@@ -29,7 +29,8 @@ def test_set_prompt(gen_service: GenerationService) -> None:
 
 
 def test_prompt_duplicate(gen_service: GenerationService) -> None:
-    tmp = "A {value} prompt {test} and another duplicate {value} and {foo} in between as well as {test} and {value} again."
+    tmp = """A {value} prompt {test} and another duplicate {value} and {foo}
+    in between as well as {test} and {value} again."""
     prompt = gen_service.set_prompt(PromptConfig(text=tmp))
     assert len(prompt.parameters) == len(set(prompt.parameters))
 
