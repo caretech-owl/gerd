@@ -16,9 +16,9 @@ class GenerationService:
 
     def set_model(self) -> AutoModelForCausalLM:
         model = AutoModelForCausalLM.from_pretrained(
-            model_path_or_repo_id=self._config.model.name,
-            model_file=self._config.model.file,
-            model_type=self._config.model.type,
+            model_path_or_repo_id = self._config.model.name,
+            model_file = self._config.model.file,
+            model_type = self._config.model.type,
         )
         return model
 
@@ -37,12 +37,12 @@ class GenerationService:
         )
         response = self.set_model()(
             resolved,
-            stop="<|im_end|>",
-            max_new_tokens=self._config.model.max_new_tokens,
-            top_p=self._config.model.top_p,
-            top_k=self._config.model.top_k,
-            temperature=self._config.model.temperature,
-            repetition_penalty =self._config.model.repetition_penalty,
+            stop = "<|im_end|>",
+            max_new_tokens = self._config.model.max_new_tokens,
+            top_p = self._config.model.top_p,
+            top_k = self._config.model.top_k,
+            temperature = self._config.model.temperature,
+            repetition_penalty = self._config.model.repetition_penalty,
         )
         _LOGGER.debug(
             "\n====== Response =====\n\n%s\n\n=============================", response
