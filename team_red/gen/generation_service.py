@@ -13,8 +13,9 @@ _LOGGER.addHandler(logging.NullHandler())
 class GenerationService:
     def __init__(self, config: GenerationConfig) -> None:
         self._config = config
+        self._model = self.init_model()
 
-    def set_model(self) -> AutoModelForCausalLM:  # type: ignore[no-any-unimported]
+    def init_model(self) -> AutoModelForCausalLM:  # type: ignore[no-any-unimported]
         model = AutoModelForCausalLM.from_pretrained(
             model_path_or_repo_id = self._config.model.name,
             model_file = self._config.model.file,
@@ -35,7 +36,7 @@ class GenerationService:
             "\n====== Resolved prompt =====\n\n%s\n\n=============================",
             resolved,
         )
-        response = self.set_model()(
+        response = self._model(
             resolved,
             stop = "<|im_end|>",
             max_new_tokens = self._config.model.max_new_tokens,
