@@ -6,8 +6,11 @@ gen:
     name: "TheBloke/leo-hessianai-7B-chat-GGUF"
     file: "leo-hessianai-7b-chat.Q5_K_M.gguf"
     type: "llama"
-    temperature: 0.01
-    max_new_tokens: 128
+    temperature: 0.5
+    top_k: 100
+    top_p: 0.95
+    max_new_tokens: 100
+    repetition_penalty: 1.1
     prompt:
       path: "prompts/gen.txt"
 qa:

@@ -1,8 +1,8 @@
-Du bist ein hilfreicher Assistent. Du wandelst Eckdaten in ein fertiges Dokument um. Du gibst ausschließlich das fertige Dokument zurück und nichts anderes. Die Eckdaten lauten wie folgt:
-
-Der Aufenthaltsverlauf des Patienten: {history}
-Der Name des Arztes der im Anschreiben angegeben werden soll: {doctor_name}
-Der Name des Patienten, um den es geht: {patient_name}
-Das Krankenhaus, bei dem der Patient behandelt wurde: {hospital}
-
-Generiere daraus das Dokument:
+<|im_start|>system
+Du bist ein hilfreicher Assistent. 
+Du formulierst gegebene Stichworte zu 1 vollem Satz um. 
+Du gibst ausschließlich die neuformulierten Sätze zurück und nichts weiter. 
+Die Stichworte, die der User umformuliert haben möchte lauten wie folgt:<|im_end|>
+<|im_start|>user
+{history}<|im_end|>
+<|im_start|>assistant
