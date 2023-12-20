@@ -6,6 +6,7 @@ from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Iterable, List, Optional, Protocol
 
 from langchain.chains.retrieval_qa.base import BaseRetrievalQA
+from langchain.docstore.document import Document
 from langchain.document_loaders import PyPDFLoader, TextLoader
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.prompts import PromptTemplate
@@ -25,7 +26,6 @@ from team_red.transport import (
 from team_red.utils import build_retrieval_qa
 
 if TYPE_CHECKING:
-    from langchain.docstore.document import Document
     from langchain.document_loaders.base import BaseLoader
 
 
@@ -44,6 +44,9 @@ class VectorStore(Protocol):
         self,
         texts: Iterable[str],
     ) -> List[str]:
+        pass
+
+    def search(self, query: str, search_type: str, k: int) -> List[Document]:
         pass
 
 
@@ -68,6 +71,27 @@ class QAService:
             self._vectorstore = FAISS.load_local(
                 config.embedding.db_path, self._embeddings
             )
+
+    def db_query(self, question: QAQuestion) -> List[DocumentSource]:
+        if not self._vectorstore:
+            return []
+        return [
+            DocumentSource(
+                content=doc.page_content,
+                name=doc.metadata.get("source", "unknown"),
+                page=doc.metadata.get("page", 1),
+            )
+            for doc in self._vectorstore.search(
+                question.question,
+                search_type=question.search_type,
+                k=question.max_sources,
+            )
+        ]
+
+    @classmethod
+    def is_lc_serializable(cls) -> bool:
+        """Return whether this class is serializable."""
+        return True
 
     def query(self, question: QAQuestion) -> QAAnswer:
         if not self._database:
