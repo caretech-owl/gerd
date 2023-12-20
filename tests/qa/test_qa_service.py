@@ -36,3 +36,15 @@ def test_query(qa_service_cajal: QAService) -> None:
     res = qa_service_cajal.query(QAQuestion(question="Wer ist der Patient?"))
     assert res.status == 200
     assert res.answer
+
+
+def test_db_query(qa_service_cajal: QAService) -> None:
+    q = QAQuestion(question="Wer ist der Patient?")
+    res = qa_service_cajal.db_query(q)
+    assert len(res) == q.max_sources
+    assert res[0].name == "Cajal.txt"
+    assert len(res[0].content) <= CONFIG.qa.embedding.chunk_size
+    q = QAQuestion(question="Wie heißt das Krankenhaus", max_sources=1)
+    res = qa_service_cajal.db_query(q)
+    assert len(res) == q.max_sources
+    assert "Diakonissenkrankenhaus Berlin" in res[0].content
