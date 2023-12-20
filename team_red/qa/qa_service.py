@@ -88,11 +88,6 @@ class QAService:
             )
         ]
 
-    @classmethod
-    def is_lc_serializable(cls) -> bool:
-        """Return whether this class is serializable."""
-        return True
-
     def query(self, question: QAQuestion) -> QAAnswer:
         if not self._database:
             if not self._vectorstore:
