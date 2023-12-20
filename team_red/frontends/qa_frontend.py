@@ -18,17 +18,20 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
         question=question, search_strategy=search_strategy, max_sources=k_source
     )
     if search_type == "LLM":
-        res = TRANSPORTER.qa_query(q)
-        if res.status != 200:
-            msg = f"Query was unsuccessful: {res.error_msg} (Error Code {res.status})"
+        qa_res = TRANSPORTER.qa_query(q)
+        if qa_res.status != 200:
+            msg = (
+                f"Query was unsuccessful: {qa_res.error_msg}"
+                f" (Error Code {qa_res.status})"
+            )
             raise gr.Error(msg)
-        return res.answer
-    res = TRANSPORTER.db_query(q)
-    if not res:
+        return qa_res.answer
+    db_res = TRANSPORTER.db_query(q)
+    if not db_res:
         msg = f"Database query returned empty!"
         raise gr.Error(msg)
     output = ""
-    for doc in res:
+    for doc in db_res:
         output += f"{doc.content}\n"
         output += f"({doc.name} / {doc.page})\n----------\n\n"
     return output
