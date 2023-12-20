@@ -83,7 +83,7 @@ class QAService:
             )
             for doc in self._vectorstore.search(
                 question.question,
-                search_type=question.search_type,
+                search_type=question.search_strategy,
                 k=question.max_sources,
             )
         ]
