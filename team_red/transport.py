@@ -14,7 +14,7 @@ class GenResponse(BaseModel):
 
 class QAQuestion(BaseModel):
     question: str
-    search_type: str = "similarity"
+    search_strategy: str = "similarity"
     max_sources: int = 3
 
 
@@ -43,6 +43,9 @@ class QAFileUpload(BaseModel):
 
 class Transport(Protocol):
     def qa_query(self, query: QAQuestion) -> QAAnswer:
+        pass
+
+    def db_query(self, question: QAQuestion) -> List[DocumentSource]:
         pass
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:
