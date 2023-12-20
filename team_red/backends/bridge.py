@@ -1,11 +1,12 @@
 import logging
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from team_red.config import CONFIG
 from team_red.gen import GenerationService
 from team_red.qa import QAService
 
 from ..transport import (
+    DocumentSource,
     GenResponse,
     PromptConfig,
     QAAnswer,
@@ -38,6 +39,9 @@ class Bridge(Transport):
 
     def qa_query(self, question: QAQuestion) -> QAAnswer:
         return self.qa.query(question)
+
+    def db_query(self, question: QAQuestion) -> List[DocumentSource]:
+        return self.qa.db_query(question)
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:
         return self.qa.add_file(file)
