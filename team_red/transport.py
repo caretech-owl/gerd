@@ -14,6 +14,8 @@ class GenResponse(BaseModel):
 
 class QAQuestion(BaseModel):
     question: str
+    search_type: str = "similarity"
+    max_sources: int = 3
 
 
 class DocumentSource(BaseModel):
