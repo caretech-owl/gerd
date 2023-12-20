@@ -13,12 +13,25 @@ _LOGGER.addHandler(logging.NullHandler())
 logging.basicConfig(level=logging.DEBUG)
 
 
-def query(question: str) -> str:
-    res = TRANSPORTER.qa_query(QAQuestion(question=question))
-    if res.status != 200:
-        msg = f"Query was unsuccessful: {res.error_msg} (Error Code {res.status})"
+def query(question: str, search_type: str, k_source: int, search_strategy: str) -> str:
+    q = QAQuestion(
+        question=question, search_strategy=search_strategy, max_sources=k_source
+    )
+    if search_type == "LLM":
+        res = TRANSPORTER.qa_query(q)
+        if res.status != 200:
+            msg = f"Query was unsuccessful: {res.error_msg} (Error Code {res.status})"
+            raise gr.Error(msg)
+        return res.answer
+    res = TRANSPORTER.db_query(q)
+    if not res:
+        msg = f"Database query returned empty!"
         raise gr.Error(msg)
-    return res.answer
+    output = ""
+    for doc in res:
+        output += f"{doc.content}\n"
+        output += f"({doc.name} / {doc.page})\n----------\n\n"
+    return output
 
 
 def upload(file_path: str, progress: Optional[gr.Progress] = None) -> None:
@@ -61,20 +74,45 @@ demo = gr.Blocks(title="Entlassbriefe QA")
 with demo:
     gr.Markdown("# Entlassbriefe QA")
     with gr.Row():
-        file_upload = gr.File(file_count="single", file_types=[".txt"])
-        with gr.Column():
-            prompt = gr.TextArea(
-                value=TRANSPORTER.get_qa_prompt().text, interactive=True, label="Prompt"
+        with gr.Column(scale=1):
+            file_upload = gr.File(file_count="single", file_types=[".txt"])
+        with gr.Column(scale=1):
+            type_radio = gr.Radio(
+                choices=["LLM", "VectorDB"],
+                value="LLM",
+                label="Suchmodus",
+                interactive=True,
             )
-            prompt_submit = gr.Button("Aktualisiere Prompt")
+            k_slider = gr.Slider(
+                minimum=1,
+                maximum=10,
+                step=1,
+                value=3,
+                interactive=True,
+                label="Quellenanzahl",
+            )
+            strategy_dropdown = gr.Dropdown(
+                choices=["similarity", "mmr"],
+                value="similarity",
+                interactive=True,
+                label="Suchmodus",
+            )
+    prompt = gr.TextArea(
+        value=TRANSPORTER.get_qa_prompt().text, interactive=True, label="Prompt"
+    )
+    prompt_submit = gr.Button("Aktualisiere Prompt")
     inp = gr.Textbox(
         label="Stellen Sie eine Frage:", placeholder="Wie heißt der Patient?"
     )
     out = gr.Textbox(label="Antwort")
     file_upload.change(fn=upload, inputs=file_upload, outputs=out)
     btn = gr.Button("Frage stellen")
-    btn.click(fn=query, inputs=inp, outputs=out)
-    inp.submit(fn=query, inputs=inp, outputs=out)
+    btn.click(
+        fn=query, inputs=[inp, type_radio, k_slider, strategy_dropdown], outputs=out
+    )
+    inp.submit(
+        fn=query, inputs=[inp, type_radio, k_slider, strategy_dropdown], outputs=out
+    )
     prompt_submit.click(fn=set_prompt, inputs=prompt, outputs=out)
 
 if __name__ == "__main__":
