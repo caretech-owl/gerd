@@ -26,7 +26,8 @@ def build_llm(model: ModelConfig) -> CTransformers:  # type: ignore[no-any-unimp
             "top_p": model.top_p,
             "top_k": model.top_k,
             "repetition_penalty": model.repetition_penalty,
-            "last_n_tokens": model.last_n_tokens
+            "last_n_tokens": model.last_n_tokens,
+            "stop": "<|im_end|>",
         },
     )
 
