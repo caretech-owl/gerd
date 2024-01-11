@@ -20,6 +20,7 @@ from team_red.transport import (
     FileTypes,
     PromptConfig,
     QAAnswer,
+    QAAnalyzeAnswer,
     QAFileUpload,
     QAQuestion,
 )
@@ -87,6 +88,34 @@ class QAService:
                 k=question.max_sources,
             )
         ]
+    
+    def analyze_query(self) -> QAAnalyzeAnswer:
+        if not self._database:
+            if not self._vectorstore:
+                msg = "No vector store initialized! Upload documents first."
+                _LOGGER.error(msg)
+                return QAAnswer(status=404, error_msg=msg)
+            self._database = self._setup_dbqa(self._config.features.analyze.model.prompt)
+
+            
+        response = self._database({"query": "Wie heißt der Patient? Wo wohnt der Patient?"})
+        answer = QAAnalyzeAnswer(patient=response["result"])
+
+                # for now check json
+        _LOGGER.debug("Answer in valid json: ", str(self._check_json_format(answer)))
+
+        if self._config.features.return_source:
+            for doc in response.get("source_documents", []):
+                answer.sources.append(
+                    DocumentSource(
+                        content=doc.page_content,
+                        name=doc.metadata.get("source", "unknown"),
+                        page=doc.metadata.get("page", 1),
+                    )
+                )
+
+        _LOGGER.warning("\n==== Answer ====\n\n%s\n===============", answer)
+        return answer
 
     def query(self, question: QAQuestion) -> QAAnswer:
         if not self._database:
@@ -98,6 +127,10 @@ class QAService:
 
         response = self._database({"query": question.question})
         answer = QAAnswer(answer=response["result"])
+
+        # for now check json
+        _LOGGER.debug("Answer in valid json: ", str(self._check_json_format(answer)))
+
         if self._config.features.return_source:
             for doc in response.get("source_documents", []):
                 answer.sources.append(
@@ -221,6 +254,23 @@ class QAService:
         )
 
         return dbqa
+    
+    def _check_json_format(self, json_content, analyze: bool) -> bool:
+        try: 
+            if analyze:
+                json_file = json.loads(json_content)
+                if json_file["Patient"] != "" or json_file["Addresse"] != "" or json_file["Arzt"]:
+                    return False
+            else:
+                json_file = json.loads(json_content)
+                if json_file["Frage"] != "" or json_file["Antwort"] != "":
+                    return False
+        #except ValueError as exception:
+        #    return False
+        except:
+            return False
+            
+        return True
 
 
 # # Process source documents

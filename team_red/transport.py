@@ -30,6 +30,14 @@ class QAAnswer(BaseModel):
     answer: str = ""
     sources: List[DocumentSource] = []
 
+class QAAnalyzeAnswer(BaseModel):
+    status: int = 200
+    error_msg: str = ""
+    patient: str = ""
+    attendind_doctor: str = ""
+    treatment_period: str = ""
+    sources: List[DocumentSource] = []
+
 
 class FileTypes(Enum):
     TEXT = "txt"
@@ -43,6 +51,9 @@ class QAFileUpload(BaseModel):
 
 class Transport(Protocol):
     def qa_query(self, query: QAQuestion) -> QAAnswer:
+        pass
+
+    def analyze_query(self) -> QAAnswer:
         pass
 
     def db_query(self, question: QAQuestion) -> List[DocumentSource]:

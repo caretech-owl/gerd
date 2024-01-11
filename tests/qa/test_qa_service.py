@@ -48,3 +48,9 @@ def test_db_query(qa_service_cajal: QAService) -> None:
     res = qa_service_cajal.db_query(q)
     assert len(res) == q.max_sources
     assert "Diakonissenkrankenhaus Berlin" in res[0].content
+
+def test_analyze_query(qa_service_cajal: QAService) -> None:
+    res = qa_service_cajal.analyze_query()
+    print(res.answer)
+    assert res.status == 200
+    assert res.answer
