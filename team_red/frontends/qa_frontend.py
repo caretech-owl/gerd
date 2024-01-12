@@ -34,7 +34,7 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
                 f" (Error Code {qa_res.status})"
             )
             raise gr.Error(msg)
-        return qa_res.patient
+        return qa_res.patient_name
     db_res = TRANSPORTER.db_query(q)
     if not db_res:
         msg = f"Database query returned empty!"

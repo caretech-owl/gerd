@@ -51,6 +51,6 @@ def test_db_query(qa_service_cajal: QAService) -> None:
 
 def test_analyze_query(qa_service_cajal: QAService) -> None:
     res = qa_service_cajal.analyze_query()
-    print(res.answer)
+    print(res.patient_name)
     assert res.status == 200
-    assert res.answer
+    assert res.patient_name

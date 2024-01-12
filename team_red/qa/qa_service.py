@@ -99,7 +99,7 @@ class QAService:
 
             
         response = self._database({"query": "Wie heißt der Patient? Wo wohnt der Patient?"})
-        answer = QAAnalyzeAnswer(patient=response["result"])
+        answer = QAAnalyzeAnswer(patient_name=response["result"])
 
                 # for now check json
         _LOGGER.debug("Answer in valid json: ", str(self._check_json_format(answer)))
