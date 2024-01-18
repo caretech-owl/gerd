@@ -142,7 +142,7 @@ class QAService:
         answer = QAAnswer(answer=response["result"])
 
         # for now check json
-        _LOGGER.debug("Answer in valid json: ", str(self._check_json_format(answer)))
+        #_LOGGER.debug("Answer in valid json: ", str(self._check_json_format(answer, False)))
 
         if self._config.features.return_source:
             for doc in response.get("source_documents", []):
