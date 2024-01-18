@@ -1,4 +1,5 @@
 import logging
+import json
 from os import unlink
 from pathlib import Path
 from string import Formatter
@@ -99,10 +100,12 @@ class QAService:
 
             
         response = self._database({"query": "Wie heißt der Patient? Wo wohnt der Patient?"})
-        answer = QAAnalyzeAnswer(patient_name=response["result"])
 
-                # for now check json
-        _LOGGER.debug("Answer in valid json: ", str(self._check_json_format(answer)))
+        # convert json to QAAnalyzerAnswerclass
+        answer_dict = json.loads(response["result"])
+        answer = QAAnalyzeAnswer(**answer_dict)
+
+        # for now check json
 
         if self._config.features.return_source:
             for doc in response.get("source_documents", []):
