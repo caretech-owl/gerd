@@ -99,7 +99,12 @@ class QAService:
             self._database = self._setup_dbqa(self._config.features.analyze.model.prompt)
 
             
-        response = self._database({"query": "Wie heißt der Patient? Wann hat der Patient Geburtstag?"})
+        response = self._database({"query": "Wie heißt der Patient? Wann hat der Patient Geburtstag? Wann wurde der Patient aufgenommen?"})
+
+        _LOGGER.info(
+            "\n===== Modelresult ====\n\n%s\n\n====================",
+            response["result"]
+        )
 
         # convert json to QAAnalyzerAnswerclass
         answer_dict = json.loads(response["result"])
@@ -116,6 +121,11 @@ class QAService:
                         page=doc.metadata.get("page", 1),
                     )
                 )
+            _LOGGER.info(
+            "\n===== Sources ====\n\n%s\n\n====================",
+            answer.sources
+        )
+
 
         _LOGGER.warning("\n==== Answer ====\n\n%s\n===============", answer)
         return answer
