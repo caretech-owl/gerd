@@ -99,7 +99,7 @@ class QAService:
             self._database = self._setup_dbqa(self._config.features.analyze.model.prompt)
 
             
-        response = self._database({"query": "Wie heißt der Patient? Wo wohnt der Patient?"})
+        response = self._database({"query": "Wie heißt der Patient? Wann hat der Patient Geburtstag?"})
 
         # convert json to QAAnalyzerAnswerclass
         answer_dict = json.loads(response["result"])
