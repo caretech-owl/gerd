@@ -30,6 +30,50 @@ class QAAnswer(BaseModel):
     answer: str = ""
     sources: List[DocumentSource] = []
 
+class QAAnalyzeAnswer(BaseModel):
+    status: int = 200
+    error_msg: str = ""
+    # Section
+    conclusion: str = ""
+    anamnesis: str = ""
+    salutation: str = ""
+    admission_diagnosis: str = ""
+    admission_medication: str = ""
+    findings: str = ""
+    echo_findings: str = ""
+    discharge_diagnosis: str = ""
+    discharge_medication: str = ""
+    physical_examination_findings: str = ""
+    laboratory: str = ""
+    mix: str = ""
+    laboratory: str = ""
+    risk_factor_allergy: str = ""
+    recommendations: str = ""
+    summary: str = ""
+    # Context
+    recording_date: str = ""
+    recording_duration: str = ""
+    attendind_doctor: str = ""
+    release_date: str = ""
+    family_doctor: str = ""
+    institution: str = ""
+    department: str = ""
+    patient_name: str = ""
+    patient_date_of_birth: str = ""
+    sources: List[DocumentSource] = []
+    # Mediction Information
+    active_ingredient: str = ""
+    dosage: str = ""
+    drug: str = ""
+    duration: str = ""
+    form: str = ""
+    frequency: str = ""
+    reason: str = ""
+    route: str = ""
+    strength: str = ""
+
+
+
 
 class FileTypes(Enum):
     TEXT = "txt"
@@ -43,6 +87,9 @@ class QAFileUpload(BaseModel):
 
 class Transport(Protocol):
     def qa_query(self, query: QAQuestion) -> QAAnswer:
+        pass
+
+    def analyze_query(self) -> QAAnswer:
         pass
 
     def db_query(self, question: QAQuestion) -> List[DocumentSource]:

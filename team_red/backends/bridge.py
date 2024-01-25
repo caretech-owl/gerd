@@ -39,6 +39,9 @@ class Bridge(Transport):
 
     def qa_query(self, question: QAQuestion) -> QAAnswer:
         return self.qa.query(question)
+    
+    def analyze_query(self) -> QAAnswer:
+        return self.qa.analyze_query()
 
     def db_query(self, question: QAQuestion) -> List[DocumentSource]:
         return self.qa.db_query(question)
