@@ -2,7 +2,7 @@ import json
 from enum import Enum
 from typing import Dict, List, Optional
 
-from pydantic import BaseModel, ConfigDict, TypeAdapter
+from pydantic import BaseModel, ConfigDict, TypeAdapter, computed_field
 
 
 class LabelStudioLabel(Enum):
@@ -81,6 +81,11 @@ class LabelStudioTask(BaseModel):
     unresolved_comment_count: int
     updated_at: str
     updated_by: int
+
+    @computed_field  # type: ignore[misc]
+    @property
+    def file_name(self) -> str:
+        return self.file_upload.split("-", 1)[-1]
 
     model_config = ConfigDict(extra="forbid")
 
