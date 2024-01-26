@@ -53,7 +53,7 @@ priority = "explicit"
 test = "poetry run pytest"
 qa = "poetry run gradio team_red/frontends/qa_frontend.py"
 gen = "poetry run gradio team_red/frontends/gen_frontend.py"
-
+server = "poetry run python -m team_red.backends.rest_server"
 
 [tool.ruff.lint]
 # 1. Enable flake8-bugbear (`B`) rules, in addition to the defaults.
