@@ -33,6 +33,11 @@ _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
 
 
+class VectorEmbeddings(Protocol):
+    def embed_documents(self, documents: List[str]) -> List[List[float]]:
+        pass
+
+
 class VectorStore(Protocol):
     def merge_from(self, vector_store: "VectorStore") -> None:
         pass
@@ -48,6 +53,8 @@ class VectorStore(Protocol):
 
     def search(self, query: str, search_type: str, k: int) -> List[Document]:
         pass
+
+    embeddings: VectorEmbeddings
 
 
 class QAService:
