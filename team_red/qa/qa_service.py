@@ -88,6 +88,11 @@ class QAService:
             )
         ]
 
+    def db_embedding(self, question: QAQuestion) -> List[float]:
+        if not self._vectorstore:
+            return []
+        return self._vectorstore.embeddings.embed_documents([question.question])[0]
+
     def query(self, question: QAQuestion) -> QAAnswer:
         if not self._database:
             if not self._vectorstore:
