@@ -38,3 +38,7 @@ qa:
     model:
       name: "sentence-transformers/all-MiniLM-L6-v2"
     db_path: "vectorstore/db_faiss"
+server:
+  host: localhost
+  port: 8888
+  api_prefix: "/api/v1"
