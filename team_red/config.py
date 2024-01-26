@@ -12,6 +12,7 @@ from yaml import safe_load
 from team_red.models.gen import GenerationConfig
 from team_red.models.logging import LoggingConfig
 from team_red.models.qa import QAConfig
+from team_red.models.server import ServerConfig
 
 PROJECT_DIR = Path(__file__).parent.parent
 
@@ -43,6 +44,7 @@ class Settings(BaseSettings):
     logging: LoggingConfig
     gen: GenerationConfig
     qa: QAConfig
+    server: ServerConfig
 
     @classmethod
     def settings_customise_sources(
