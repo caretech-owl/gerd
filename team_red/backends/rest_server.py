@@ -55,7 +55,7 @@ class RestServer(Transport):
         _LOGGER.debug("dq_query - request: %s", question)
         response = self._bridge.db_query(question)
         _LOGGER.debug("dq_query - response: %s", response)
-        return self._bridge.db_query(response)
+        return response
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:
         return self._bridge.add_file(file)
