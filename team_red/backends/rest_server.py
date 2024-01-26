@@ -6,6 +6,7 @@ from fastapi import APIRouter, FastAPI
 
 from team_red.backends.bridge import Bridge
 from team_red.config import CONFIG
+from team_red.transport import QAQuestion
 
 from ..transport import (
     DocumentSource,
@@ -30,6 +31,9 @@ class RestServer(Transport):
         self.router.add_api_route(f"{prefix}/qa/query", self.qa_query, methods=["POST"])
         self.router.add_api_route(
             f"{prefix}/qa/db_query", self.db_query, methods=["POST"]
+        )
+        self.router.add_api_route(
+            f"{prefix}/qa/db_embedding", self.db_embedding, methods=["POST"]
         )
         self.router.add_api_route(f"{prefix}/qa/file", self.add_file, methods=["POST"])
         self.router.add_api_route(
@@ -56,6 +60,9 @@ class RestServer(Transport):
         response = self._bridge.db_query(question)
         _LOGGER.debug("dq_query - response: %s", response)
         return response
+
+    def db_embedding(self, question: QAQuestion) -> List[float]:
+        return self._bridge.db_embedding(question)
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:
         return self._bridge.add_file(file)
