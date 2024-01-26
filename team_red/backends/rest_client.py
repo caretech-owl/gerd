@@ -5,7 +5,6 @@ import requests
 from pydantic import TypeAdapter
 
 from team_red.config import CONFIG
-from team_red.transport import QAQuestion
 
 from ..transport import (
     DocumentSource,
