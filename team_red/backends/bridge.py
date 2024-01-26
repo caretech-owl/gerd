@@ -4,6 +4,7 @@ from typing import Dict, List, Optional
 from team_red.config import CONFIG
 from team_red.gen import GenerationService
 from team_red.qa import QAService
+from team_red.transport import QAQuestion
 
 from ..transport import (
     DocumentSource,
@@ -42,6 +43,9 @@ class Bridge(Transport):
 
     def db_query(self, question: QAQuestion) -> List[DocumentSource]:
         return self.qa.db_query(question)
+
+    def db_embedding(self, question: QAQuestion) -> List[float]:
+        return self.qa.db_embedding(question)
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:
         return self.qa.add_file(file)

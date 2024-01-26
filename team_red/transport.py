@@ -48,6 +48,9 @@ class Transport(Protocol):
     def db_query(self, question: QAQuestion) -> List[DocumentSource]:
         pass
 
+    def db_embedding(self, question: QAQuestion) -> List[float]:
+        pass
+
     def add_file(self, file: QAFileUpload) -> QAAnswer:
         pass
 

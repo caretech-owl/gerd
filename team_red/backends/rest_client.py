@@ -5,6 +5,7 @@ import requests
 from pydantic import TypeAdapter
 
 from team_red.config import CONFIG
+from team_red.transport import QAQuestion
 
 from ..transport import (
     DocumentSource,
@@ -44,6 +45,17 @@ class RestClient(Transport):
         )
         _LOGGER.debug("db_query - response: %s", response.json())
         return TypeAdapter(List[DocumentSource]).validate_python(response.json())
+
+    def db_embedding(self, question: QAQuestion) -> List[float]:
+        request = question.model_dump_json()
+        _LOGGER.debug("db_embedding - request: %s", request)
+        response = requests.post(
+            f"{self._url}/qa/db_embedding",
+            data=question.model_dump_json(),
+            timeout=self.timeout,
+        )
+        _LOGGER.debug("db_embedding - response: %s", response.json())
+        return TypeAdapter(List[float]).validate_python(response.json())
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:
         return QAAnswer.model_validate(
