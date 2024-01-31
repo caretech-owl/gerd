@@ -6,7 +6,7 @@ from team_red.config import CONFIG
 
 TEST_PATH = Path(__file__).resolve().parent
 DATA_PATH = Path(TEST_PATH, "data")
-GRASCCO_PATH = Path(DATA_PATH, "grascco")
+GRASCCO_PATH = Path(DATA_PATH, "grascco", "raw")
 
 
 @pytest.fixture(scope="session", autouse=True)
