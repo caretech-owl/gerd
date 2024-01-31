@@ -39,11 +39,12 @@ def test_query(qa_service_cajal: QAService) -> None:
 
 
 def test_db_query(qa_service_cajal: QAService) -> None:
-    q = QAQuestion(question="Wer ist der Patient?")
+    q = QAQuestion(question="Wer ist der Patient?", max_sources=3)
     res = qa_service_cajal.db_query(q)
     assert len(res) == q.max_sources
     assert res[0].name == "Cajal.txt"
     assert len(res[0].content) <= CONFIG.qa.embedding.chunk_size
+    assert res[0] != res[1]  # return values should not be the same
     q = QAQuestion(question="Wie heißt das Krankenhaus", max_sources=1)
     res = qa_service_cajal.db_query(q)
     assert len(res) == q.max_sources
