@@ -23,7 +23,16 @@ class PromptConfig(BaseModel):
     def parameters(self) -> List[str]:
         field_names = {fn for _, fn, _, _ in Formatter().parse(self.text)
                        if fn is not None}
-        return sorted(field_names)
+        custom_order=['attending_physician',
+                     'hospital',
+                     'patient_name',
+                     'patient_birth_date',
+                     'patient_address',
+                     'date_of_stay',
+                     'anamnesis',
+                     'diagnosis',
+                     'treatment',]
+        return sorted(field_names, key=custom_order.index)
 
 
 # Default values chosen by https://github.com/marella/ctransformers#config
