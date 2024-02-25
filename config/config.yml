@@ -15,12 +15,6 @@ gen:
     context_length: 2048
     prompt:
       path: "prompts/gen.txt"
-  features:
-    continuation:
-      model:
-        <<: *gen_model
-        prompt:
-          path: "prompts/gen_con.txt"
 qa:
   model: &qa_model
     name: "TheBloke/leo-hessianai-7B-chat-GGUF"

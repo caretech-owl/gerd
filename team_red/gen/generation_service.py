@@ -20,6 +20,7 @@ class GenerationService:
             model_path_or_repo_id = self._config.model.name,
             model_file = self._config.model.file,
             model_type = self._config.model.type,
+            context_length = self._config.model.context_length
         )
         return model
 
