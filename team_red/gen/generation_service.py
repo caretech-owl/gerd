@@ -20,6 +20,7 @@ class GenerationService:
             model_path_or_repo_id = self._config.model.name,
             model_file = self._config.model.file,
             model_type = self._config.model.type,
+            context_length = self._config.model.context_length
         )
         return model
 
@@ -32,6 +33,27 @@ class GenerationService:
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:
         resolved = self._config.model.prompt.text.format(**parameters)
+        _LOGGER.debug(
+            "\n====== Resolved prompt =====\n\n%s\n\n=============================",
+            resolved,
+        )
+        response = self._model(
+            resolved,
+            stop = "<|im_end|>",
+            max_new_tokens = self._config.model.max_new_tokens,
+            top_p = self._config.model.top_p,
+            top_k = self._config.model.top_k,
+            temperature = self._config.model.temperature,
+            repetition_penalty = self._config.model.repetition_penalty,
+        )
+        _LOGGER.debug(
+            "\n====== Response =====\n\n%s\n\n=============================", response
+        )
+        return GenResponse(text=response)
+    
+    def gen_continue(self, parameters: Dict[str, str]) -> GenResponse:
+        continue_prompt = self._config.features.continuation.model.prompt.text
+        resolved = continue_prompt.format(**parameters)
         _LOGGER.debug(
             "\n====== Resolved prompt =====\n\n%s\n\n=============================",
             resolved,

@@ -10,9 +10,16 @@ _LOGGER.addHandler(logging.NullHandler())
 
 _field_labels = {
     "history": "Patientengeschichte",
-    "doctor_name": "Name des behandelnden Hausarztes",
+    "attending_physician": "Name des behandelnden Hausarztes",
     "patient_name": "Name des Patienten",
     "hospital": "Name des Krankenhauses",
+    "date_of_stay": "Datum des Aufenthalts",
+    "diagnosis": "Diagnose",
+    "anamnesis": "Anamnese",
+    "findings": "Befunde",
+    "treatment": "Behandlung",
+    "patient_birth_date": "Geburtsdatum des Patienten",
+    "patient_address": "Adresse des Patienten",
 }
 
 logging.basicConfig(level=logging.DEBUG)
@@ -33,6 +40,15 @@ def generate(*fields: gr.Textbox) -> str:
             raise gr.Error(msg)
         params[key] = value
     response = TRANSPORTER.generate(params)
+    return [response.text,
+            gr.TextArea(label="Dokument", interactive=True),
+            gr.Button("Dokument kontinuieren", visible=True)]
+
+
+def gen_continue(document: gr.TextArea) -> str:
+    params = {}
+    params['document'] = document
+    response = TRANSPORTER.gen_continue(params)
     return response.text
 
 
@@ -48,10 +64,11 @@ with demo:
         fields.append(gr.Textbox(key, visible=False))
         fields.append(gr.Textbox(_field_labels.get(key, key), visible=False))
         fields.append(gr.Textbox(label=_field_labels.get(key, key)))
-    output = gr.TextArea(label="Dokument")
+    output = gr.TextArea(label="Dokument", interactive=False)
     submit_button = gr.Button("Generiere Dokument")
-    submit_button.click(fn=generate, inputs=fields, outputs=output)
-
+    continue_button = gr.Button("Kontinuiere Dokument", visible=False)
+    submit_button.click(fn=generate, inputs=fields, outputs=[output, output, continue_button])
+    continue_button.click(fn=gen_continue, inputs=output, outputs=output)
 
 if __name__ == "__main__":
     demo.launch()
