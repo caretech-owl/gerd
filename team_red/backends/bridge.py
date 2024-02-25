@@ -60,6 +60,3 @@ class Bridge(Transport):
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:
         return self.gen.generate(parameters)
-    
-    def gen_continue(self, parameters: Dict[str, str]) -> GenResponse:
-        return self.gen.gen_continue(parameters)
