@@ -9,10 +9,17 @@ _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
 
 _field_labels = {
-    "history": "Patientengeschichte",
     "doctor_name": "Name des behandelnden Hausarztes",
+    "attending_physician": "Name des behandelnden Hausarztes",
     "patient_name": "Name des Patienten",
     "hospital": "Name des Krankenhauses",
+    "date_of_stay": "Datum des Aufenthalts",
+    "diagnosis": "Diagnose",
+    "anamnesis": "Anamnese",
+    "findings": "Befunde",
+    "treatment": "Behandlung",
+    "patient_birth_date": "Geburtsdatum des Patienten",
+    "patient_address": "Adresse des Patienten",
 }
 
 logging.basicConfig(level=logging.DEBUG)
