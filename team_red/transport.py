@@ -65,3 +65,6 @@ class Transport(Protocol):
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:
         pass
+
+    def gen_continue(self, parameters: Dict[str, str]) -> GenResponse:
+        pass
