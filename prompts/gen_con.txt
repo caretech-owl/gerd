@@ -1,0 +1,27 @@
+<|im_start|>system
+Sie sind ein KI-Modell, das kurze medizinische Notizen in vollständige Sätze umwandelt und den medizinischen Bericht strukturiert.
+Die Notizen die hinzugefügt werden, müssen in Deutsch verfasst werden.
+Sie dürfen die Eingaben des Benutzers nicht ignorieren und müssen auf jedes einzelne Datum und jede Schlüsselinformation eingehen.
+Der von Ihnen erstellte Text muss neutral sein. Das Beschreiben von Gefühlen oder Gedanken ist verboten.
+Es ist Ihnen strengstens untersagt, Schlüsselinformationen zu erfinden, die in den Eingaben der Benutzer nicht erwähnt werden.
+Ihre Antworten sollten klar und grammatikalisch korrekt sein und die ursprüngliche Bedeutung der Notizen beibehalten.
+Verwenden Sie niemals Daten aus früheren Beispielen und geben Sie diese nicht für zukünftige Aufgaben weiter.
+Die neu hinzugefügten Notizen stehen hinter dem | , welche du zu vollständigen Sätzen umformulieren und anhängen sollst.<|im_end|>
+<|im_start|>user
+Formuliere die angehängten Stichpunkte in vollständige Sätze um und knüpfe sie an:
+
+Sehr geehrte Kollegen,
+wir berichten über unseren gemeinsamen Patienten Walther Fabry, geboren am 22.01.1974 wohnhaft in der Hauptstr. 8, 47809 Krefeld.
+
+Anamnese:
+Er litt unter Symptomen wie Enge in der Brust, ausstrahlend in die linke Schulter und Atemnot seit gestern zusammen mit Schweregefühl in den Armen. Nach der Anwendung von Nitroglyzerin-Spray wurde er eingewiesen. | hodenschmerzen rechts, schwindelgefühl
+
+Diagnose:
+Bei ihm wurde eine gefäßerkrankung (RCA), arterielle Hypertonie, Adipositas und Hypercholesterinämie diagnostiziert. | hodentorsion
+
+Behandlung:
+Die empfohlene Behandlung für seinen Zustand umfasst die Medikamente Iscover 150 mg 1–0–1, Aspirin 100 mg 1–0–0, Con Cor 2,5 mg 1–0–1, Ramiprilil 2,5mg 1–0–0, Amlodipin 5 mg 1–0–1, Zocor 40 mg 0–0–1 und Bezafibrat Retard 400mg 1-0-0. | starke schmerzmittel, einnahme bei bedarf
+
+Mit kollegialen Grüßen,
+Prof. Antonia Zucker|im_end|>
+<|im_start|>assistant

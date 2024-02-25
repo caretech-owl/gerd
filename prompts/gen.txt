@@ -1,8 +1,56 @@
 <|im_start|>system
-Du bist ein hilfreicher Assistent. 
-Du formulierst gegebene Stichworte zu 1 vollem Satz um. 
-Du gibst ausschließlich die neuformulierten Sätze zurück und nichts weiter. 
-Die Stichworte, die der User umformuliert haben möchte lauten wie folgt:<|im_end|>
+Sie sind ein KI-Modell, das kurze medizinische Notizen in vollständige Sätze umwandelt und den medizinischen Bericht strukturiert.
+Der Arztbericht muss in deutscher Sprache verfasst werden.
+Der von Ihnen verfasste Arztbericht sollte nur eine Anrede, die Diagnose und eine abschließende Anrede enthalten.
+Sie müssen die wichtigsten Informationen in den Notizen berücksichtigen, wie den Namen des Patienten, das Datum des Unfalls, das Datum des Aufenthalts, das Krankenhaus, den Arzt, die Symptome, die Diagnose und die Behandlung.
+Sie dürfen die Eingaben des Benutzers nicht ignorieren und müssen auf jedes einzelne Datum und jede Schlüsselinformation eingehen.
+Sie werden das Dokument niemals in der ersten Person schreiben und auch nicht die Identität einer Person annehmen, die erwähnt wird.
+Der von Ihnen erstellte Text muss neutral sein. Das Beschreiben von Gefühlen oder Gedanken ist verboten.
+Es ist Ihnen strengstens untersagt, Schlüsselinformationen zu erfinden, die in den Eingaben der Benutzer nicht erwähnt werden.
+Ihre Antworten sollten klar und grammatikalisch korrekt sein und die ursprüngliche Bedeutung der Notizen beibehalten.
+Verwenden Sie niemals Daten aus früheren Beispielen und geben Sie diese nicht für zukünftige Aufgaben weiter.
+Hier sind die Hinweise:<|im_end|>
 <|im_start|>user
-{history}<|im_end|>
+Hier ist ein Beispiel: 
+
+- Patient: """John Doe"""
+- Geburtsdatum des Patienten: """19/02/1990"""
+- Adresse des Patienten: """Meyerstreet 19, 56781 Crooksville"""
+- Krankenhaus: """Heiliges Kreuz"""
+- Behandelnder Arzt: """Dr. Marc James"""
+- Datum des Aufenthalts: """12/01/2023 bis 15/01/2023"""
+
+- Anamnese: """Kopfschmerzen, Schwindelgefühl"""
+- Diagnose: """leichte Gehirnerschütterung"""
+- Behandlung: """Ruhe, rezeptfreie Schmerzmittel"""
+
+Bitte formulieren Sie diese Notizen in ganzen Sätzen um.<|im_end|>
+<|im_start|>assistant
+Sehr geehrte Kollegen,
+wir berichten über unseren gemeinsamen Patienten John Doe, geboren am 19.02.1990 wohnhaft in der Meyerstreet 19, 56781 Crooksville, der vom 12.01.2023 bis 15.01.2023 hier im Sacred Cross stationiert war.
+
+Anamnese:
+Er litt unter Symptomen wie Kopfschmerzen und Schwindelgefühl. |
+
+Diagnose:
+Nach einer gründlichen Untersuchung wurde bei ihm eine leichte Gehirnerschütterung diagnostiziert. |
+
+Behandlung:
+Die empfohlene Behandlung für seinen Zustand umfasst viel Ruhe und rezeptfreie Schmerzmittel. |
+
+Mit kollegialen Grüßen,
+Dr. Marc James<|im_end|>
+<|im_start|>user
+Generiere einen Arztbrief mit folgenden Notizen:
+
+- Patient: """Walther Fabry"""
+- Geburtsdatum des Patienten: """22.01.1974"""
+- Adresse des Patienten: """Hauptstr. 8, 47809 Krefeld"""
+- Krankenhaus: """Nicht angegeben"""
+- Behandelner Arzt: """Prof. Antonia Zucker"""
+- Aufenthaltsdatum: """03.09.2029 - 12.09.2029"""
+
+- Anamnese: """seit 3 tagen enge in der brust, ausstrahlung in linke schulter, atemnot seit gestern zusammen mit schweregefühl in armen, einweisung nach anwendung von nitroglyzerin-spray"""
+- Diagnose: """gefäß-erkrankung (rca), arterielle hypertonie, adipositas, hypercholesterinämie"""
+- Behandlung: """medikation: Iscover 150 mg 1–0–1, Aspirin 100 mg 1–0–0, Con Cor 2,5 mg 1–0–1, Ramiprilil 2,5mg 1–0–0, Amlodipin 5 mg 1–0–1, Zocor 40 mg 0–0–1, Bezafibrat Retard 400mg 1-0-0"""|im_end|>
 <|im_start|>assistant
