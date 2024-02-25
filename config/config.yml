@@ -3,16 +3,24 @@ logging:
   level: "debug" # options: debug, info, warn, error, none
 gen:
   model:
-    name: "TheBloke/leo-hessianai-7B-chat-GGUF"
-    file: "leo-hessianai-7b-chat.Q5_K_M.gguf"
+  model: &gen_model
+    name: "TheBloke/em_german_leo_mistral-GGUF"
+    file: "em_german_leo_mistral.Q5_K_M.gguf"
     type: "llama"
-    temperature: 0.5
+    temperature: 0
     top_k: 100
     top_p: 0.95
-    max_new_tokens: 100
+    max_new_tokens: 512
     repetition_penalty: 1.1
+    context_length: 2048
     prompt:
       path: "prompts/gen.txt"
+  features:
+    continuation:
+      model:
+        <<: *gen_model
+        prompt:
+          path: "prompts/gen_con.txt"
 qa:
   model: &qa_model
     name: "TheBloke/leo-hessianai-7B-chat-GGUF"
