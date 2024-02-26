@@ -31,7 +31,8 @@ class PromptConfig(BaseModel):
                      'date_of_stay',
                      'anamnesis',
                      'diagnosis',
-                     'treatment',]
+                     'treatment',
+                     'medication',]
         return sorted(field_names, key=custom_order.index)
 
 
