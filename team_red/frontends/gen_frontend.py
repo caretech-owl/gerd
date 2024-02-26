@@ -18,6 +18,7 @@ _field_labels = {
     "anamnesis": "Anamnese",
     "findings": "Befunde",
     "treatment": "Behandlung",
+    "medication": "Medikation",
     "patient_birth_date": "Geburtsdatum des Patienten",
     "patient_address": "Adresse des Patienten",
 }
