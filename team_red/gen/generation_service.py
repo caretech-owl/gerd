@@ -54,7 +54,7 @@ class GenerationService:
     def get_prompt(self) -> PromptConfig:
         return self._config.model.prompt
     
-    def model_response(self, resolved: str):
+    def gen_model_response(self, resolved: str):
         model_response = self._model(
             resolved,
             stop = "<|im_end|>",
@@ -62,6 +62,18 @@ class GenerationService:
             top_p = self._config.model.top_p,
             top_k = self._config.model.top_k,
             temperature = self._config.model.temperature,
+            repetition_penalty = self._config.model.repetition_penalty,
+        )
+        return model_response
+    
+    def con_model_response(self, resolved: str):
+        model_response = self._model(
+            resolved,
+            stop = "<|im_end|>",
+            max_new_tokens = self._config.features.continuation.model.max_new_tokens,
+            top_p = self._config.features.continuation.model.top_p,
+            top_k = self._config.features.continuation.model.top_k,
+            temperature = self._config.features.continuation.model.temperature,
             repetition_penalty = self._config.model.repetition_penalty,
         )
         return model_response
@@ -73,12 +85,11 @@ class GenerationService:
             "\n====== Resolved prompt =====\n\n%s\n\n=============================",
             resolved,
         )
-        response = self.model_response(resolved)
+        response = self.gen_model_response(resolved)
         _LOGGER.debug(
             "\n====== Response =====\n\n%s\n\n=============================", response
         )
         return GenResponse(text=response)
-
 
     def gen_continue(self, parameters: Dict) -> GenResponse:
         fmt = PartialFormatter()
@@ -88,7 +99,7 @@ class GenerationService:
             "\n====== Resolved prompt =====\n\n%s\n\n=============================",
             resolved,
         )
-        response = self.model_response(resolved)
+        response = self.con_model_response(resolved)
         _LOGGER.debug(
             "\n====== Response =====\n\n%s\n\n=============================", response
         )

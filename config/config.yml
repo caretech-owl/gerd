@@ -18,6 +18,10 @@ gen:
     continuation:
       model:
         <<: *gen_model
+        temperature: 0.5
+        top_k: 100
+        top_p: 0.95
+        max_new_tokens: 512
         prompt:
           path: "prompts/gen_con.txt"
 qa:
