@@ -42,7 +42,7 @@ Medikation:
 """
 Jetzt kommt die Eingabe des Nutzers:
 
-USER: Formuliere formuliere die folgenden Paragraphen um und gebe sie wieder aus:
+USER: Formuliere die folgenden Paragraphen um und gebe sie wieder aus:
 
 {Anrede}
 
