@@ -1,60 +1,48 @@
-Sie sind ein KI-Modell, das kurze medizinische Notizen in vollständige Sätze umwandelt und den medizinischen Bericht strukturiert.
-Der Arztbericht muss in deutscher Sprache verfasst werden.
-Der von Ihnen verfasste Arztbericht sollte nur eine Anrede, die Diagnose und eine abschließende Anrede enthalten.
-Sie müssen die wichtigsten Informationen in den Notizen berücksichtigen, wie den Namen des Patienten, das Datum des Unfalls, das Datum des Aufenthalts, das Krankenhaus, den Arzt, die Symptome, die Diagnose und die Behandlung.
-Sie dürfen die Eingaben des Benutzers nicht ignorieren und müssen auf jedes einzelne Datum und jede Schlüsselinformation eingehen.
-Sie werden das Dokument niemals in der ersten Person schreiben und auch nicht die Identität einer Person annehmen, die erwähnt wird.
-Der von Ihnen erstellte Text muss neutral sein. Das Beschreiben von Gefühlen oder Gedanken ist verboten.
-Es ist Ihnen strengstens untersagt, Schlüsselinformationen zu erfinden, die in den Eingaben der Benutzer nicht erwähnt werden.
-Ihre Antworten sollten klar und grammatikalisch korrekt sein und die ursprüngliche Bedeutung der Notizen beibehalten.
-Verwenden Sie niemals Daten aus früheren Beispielen und geben Sie diese nicht für zukünftige Aufgaben weiter.
+Du bist ein hilfreicher Assistent. 
+USER:
+-- Name: Finn Münt
+-- Geburtsdatum: 12.12.1999
+-- Adresse: Kurt-Schumacher-Straße 16, 33615 Bielefeld
+-- Aufnahmedatum: 10.10.2023
+-- Entlassdatum: 11.03.2024
+-- Behandelnder Arzt: Dr. Christoph Ostrau
 
-Hier ist ein Beispiel: 
+-- Anamnese:
+- Vorstellung für routinemäßige kardiologische Nachkontrolle
+- Bekannte koronare 3-Gefäßerkrankung
+- Gute Alltagsbelastbarkeit (4 Stockwerke Treppensteigen möglich, NYHA I)
+- Keine Angina Pectoris oder Belastungsdyspnoe in den letzten Wochen
+- Gelegentlicher orthostatischer Schwinel nach Belastung
+- Stabiler kardialer Verlauf insgesamt
 
-- Patient: """John Doe"""
-- Geburtsdatum des Patienten: """19/02/1990"""
-- Adresse des Patienten: """Meyerstreet 19, 56781 Crooksville"""
-- Krankenhaus: """Heiliges Kreuz"""
-- Behandelnder Arzt: """Dr. Marc James"""
-- Datum des Aufenthalts: """12/01/2023 bis 15/01/2023"""
+-- Befunde:
+Körperlicher Untersuchungsbefund:
+AZ: gut
+EZ: 164 cm, 64 kg
+HF: 60/min
+RR: 145/80 mmHg
+Keine Zyanose, Anämiezeichen oder Ikterus. Kopf/Hals unauffällig. Schilddrüse o.p.B.
 
-- Anamnese: """Kopfschmerzen, Schwindelgefühl"""
-- Diagnose: """leichte Gehirnerschütterung"""
-- Behandlung: """Ruhe"""
-- Medikation: """rezeptfreies Schmerzmittel, Aspirin 100mg 1-0-0"
+-- Diagnosen:
+- Koronare 3-Gefäßerkrankung mit 25% Hauptstammstenose
+- Kompletter Linksschenkelblock
+- AV-Block I° (ED 30.09.2062)
+- Benigne Prostatahyperplasie
+- Z.n. Karpaltunnelsyndrom, OP 15.10.2040
 
-Sehr geehrte Kollegen,
-wir berichten über unseren gemeinsamen Patienten John Doe, geboren am 19.02.1990 wohnhaft in der Meyerstreet 19, 56781 Crooksville, der vom 12.01.2023 bis 15.01.2023 hier im Sacred Cross stationiert war.
+-- Zusammenfassung:
+- Routine kardiologische Nachuntersuchung für bekannte koronare 3-Gefäßerkrankung
+- Patient berichtet von klinisch stabilen kardialen Verlauf
+- Echokardiographie: gute systolische Pumpfunktion der linken Herzkammer, Hypokinesie septal apikal ohne bedeutsame Klappenfehler
+- Keine wesentlichen Unterschiede im Vergleich zum Vorbefund
+- Belastungs-EKG bis 100 Watt: keine Anzeichen für belastungsinduzierte Myokardischämie oder höhergradige Herzrhythmusstörungen
+- Bei neu aufgetretenen Hypokinesien und erhöhtem kardiovaskulärem Risikoprofil wird Koronarangiographie empfohlen (Termin: 22.01.2045)
+- Patient wird gebeten, sich am 14.01.2072 zur Aufklärung und Laboruntersuchung vorzustellen
+- Konsequente Einstellung kardiovaskulärer Risikofaktoren gemäß aktuellen Leitlinien
+- Regelmäßige körperliche Aktivität (3-4 Mal pro Woche, 40-50 Minuten) empfohlen (z.B. Radfahren, Schwimmen, Ergometertraining)
+- Regelmäßige hausärztliche Kontrollen
 
-Anamnese:
-Er litt unter Symptomen wie Kopfschmerzen und Schwindelgefühl.
-
-Diagnose:
-Nach einer gründlichen Untersuchung wurde bei ihm eine leichte Gehirnerschütterung diagnostiziert.
-
-Behandlung:
-Die empfohlene Behandlung für seinen Zustand umfasst viel Ruhe.
-
-Medikation:
-    - Rezeptfreies Schmerzmittel bei Bedarf
-    - Aspirin 100mg täglich Morgens
-
-
-Mit kollegialen Grüßen,
-Dr. Marc James
-
-USER: Generiere einen Arztbrief mit folgenden Notizen:
-
-- Patient: """Walther Fabry"""
-- Geburtsdatum des Patienten: """22.01.1974"""
-- Adresse des Patienten: """Hauptstr. 8, 47809 Krefeld"""
-- Krankenhaus: """Sankt Christophus-Krankenhaus"""
-- Behandelner Arzt: """Prof. Antonia Zucker"""
-- Aufenthaltsdatum: """03.09.2029 - 12.09.2029"""
-
-- Anamnese: """seit 3 tagen enge in der brust, ausstrahlung in linke schulter, atemnot seit gestern zusammen mit schweregefühl in armen, einweisung nach anwendung von nitroglyzerin-spray"""
-- Diagnose: """gefäßerkrankung (rca), arterielle hypertonie, adipositas, hypercholesterinämie"""
-- Behandlung: """einnahme mehrerer medikamente. nachkontrolle in 2 wochen"""
-- Medikation: """Iscover 150 mg 1–0–1, Aspirin 100 mg 1–0–0, Con Cor 2,5 mg 1–0–1, Ramiprilil 2,5mg 1–0–0, Amlodipin 5 mg 1–0–1, Zocor 40 mg 0–0–1, Bezafibrat Retard 400mg 1-0-0"""
-
+-- Medikation
+Smarties 100 mg 1-2-3
+Pommes 200 g 0-1-0
 ASSISTANT:
