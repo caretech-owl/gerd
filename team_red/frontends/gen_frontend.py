@@ -1,5 +1,5 @@
 import logging
-from typing import Iterable, Tuple, Dict
+from typing import Iterable, Tuple
 
 import gradio as gr
 
@@ -42,7 +42,7 @@ def _pairwise(
     return zip(a, a, a)
 
 
-def generate(*fields: gr.Textbox) -> Tuple[str, str, gr.TextArea, gr.Button]:
+def generate(*fields: gr.Textbox) -> list:
     params = {}
     for key, name, value in _pairwise(fields):
         if not value:
@@ -50,13 +50,13 @@ def generate(*fields: gr.Textbox) -> Tuple[str, str, gr.TextArea, gr.Button]:
             raise gr.Error(msg)
         params[key] = value
     response = TRANSPORTER.generate(params)
-    return (response.text,
+    return [response.text,
             response.text,
             gr.TextArea(label="Dokument", interactive=True),
-            gr.Button("Kontinuiere Dokument", visible=True))
+            gr.Button("Kontinuiere Dokument", visible=True)]
 
 
-def compare_paragraphs(src_doc: str, mod_doc: str) -> Dict[str, str]:
+def compare_paragraphs(src_doc: str, mod_doc: str) -> dict:
     mod_parts = {}
     src_doc_split = src_doc.split("\n\n")
     mod_doc_split = mod_doc.split("\n\n")
@@ -67,14 +67,14 @@ def compare_paragraphs(src_doc: str, mod_doc: str) -> Dict[str, str]:
     return mod_parts
 
 
-def insert_paragraphs(src_doc: str, new_para: Dict[str, str]) -> str:
+def insert_paragraphs(src_doc: str, new_para: dict) -> str:
     for section_order, mod_para in new_para.items():
         split_doc = src_doc.split("\n\n")[sections.index(section_order)]
         src_doc = src_doc.replace(split_doc, mod_para)
     return src_doc
 
 
-def response_parser(response: str) -> Dict[str, str]:
+def response_parser(response: str) -> dict:
     parsed_response = {}
     split_response = response.split("\n\n")
     for paragraph in split_response:
@@ -85,12 +85,12 @@ def response_parser(response: str) -> Dict[str, str]:
     return parsed_response
 
 
-def gen_continue(src_doc: str, mod_doc: str) -> Tuple[str, str]:
+def gen_continue(src_doc: str, mod_doc: str) -> list:
     params = compare_paragraphs(src_doc, mod_doc)
     response = TRANSPORTER.gen_continue(params)
     parsed_response = response_parser(response.text)
     updated_document = insert_paragraphs(src_doc, parsed_response)
-    return (updated_document, updated_document)
+    return [updated_document, updated_document]
 
 
 demo = gr.Blocks()
