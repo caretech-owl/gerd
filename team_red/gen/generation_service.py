@@ -75,7 +75,7 @@ class GenerationService:
         )
         return GenResponse(text=response)
 
-    def gen_continue(self, parameters: Dict) -> GenResponse:
+    def gen_continue(self, parameters: Dict[str, str]) -> GenResponse:
         fmt = PartialFormatter()
         continue_prompt = self._config.features.continuation.model.prompt.text
         resolved = fmt.format(continue_prompt, **parameters)
