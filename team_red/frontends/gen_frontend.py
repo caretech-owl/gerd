@@ -1,6 +1,5 @@
 import logging
 from typing import Iterable, Tuple
-import re, difflib
 
 import gradio as gr
 
@@ -43,7 +42,7 @@ def _pairwise(
     return zip(a, a, a)
 
 
-def generate(*fields: gr.Textbox) -> str:
+def generate(*fields: gr.Textbox) -> list:
     params = {}
     for key, name, value in _pairwise(fields):
         if not value:
@@ -57,24 +56,25 @@ def generate(*fields: gr.Textbox) -> str:
             gr.Button("Kontinuiere Dokument", visible=True)]
 
 
-def compare_paragraphs(src_doc, mod_doc):
+def compare_paragraphs(src_doc: str, mod_doc: str) -> dict:
     mod_parts = {}
-    src_doc = src_doc.split("\n\n")
-    mod_doc = mod_doc.split("\n\n")
-    for section_order, src_para in zip(sections, src_doc):
-        mod_para = mod_doc[sections.index(section_order)]
+    src_doc_split = src_doc.split("\n\n")
+    mod_doc_split = mod_doc.split("\n\n")
+    for section_order, src_para in zip(sections, src_doc_split):
+        mod_para = mod_doc_split[sections.index(section_order)]
         if src_para != mod_para:
             mod_parts[section_order] = mod_para
     return mod_parts
 
 
-def insert_paragraphs(src_doc, new_para):
+def insert_paragraphs(src_doc: str, new_para: dict) -> str:
     for section_order, mod_para in new_para.items():
-        src_doc = src_doc.replace(src_doc.split("\n\n")[sections.index(section_order)], mod_para)
+        split_doc = src_doc.split("\n\n")[sections.index(section_order)]
+        src_doc = src_doc.replace(split_doc, mod_para)
     return src_doc
 
 
-def response_parser(response):
+def response_parser(response: str) -> dict:
     parsed_response = {}
     split_response = response.split("\n\n")
     for paragraph in split_response:
@@ -85,7 +85,7 @@ def response_parser(response):
     return parsed_response
 
 
-def gen_continue(src_doc, mod_doc):
+def gen_continue(src_doc: str, mod_doc: str) -> list:
     params = compare_paragraphs(src_doc, mod_doc)
     response = TRANSPORTER.gen_continue(params)
     parsed_response = response_parser(response.text)
@@ -109,8 +109,12 @@ with demo:
     output = gr.TextArea(label="Dokument", interactive=False)
     submit_button = gr.Button("Generiere Dokument")
     continuation_button = gr.Button("Kontinuiere Dokument", visible=False)
-    submit_button.click(fn=generate, inputs=fields, outputs=[output, temp_output, output, continuation_button])
-    continuation_button.click(fn=gen_continue, inputs=[temp_output, output], outputs=[output, temp_output])
+    submit_button.click(fn=generate,
+                        inputs=fields,
+                        outputs=[output, temp_output, output, continuation_button])
+    continuation_button.click(fn=gen_continue,
+                              inputs=[temp_output, output],
+                              outputs=[output, temp_output])
 
 
 if __name__ == "__main__":
