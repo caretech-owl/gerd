@@ -45,16 +45,14 @@ Dr. Marc James
 
 USER: Generiere einen Arztbrief mit folgenden Notizen:
 
-- Patient: """Walther Fabry"""
-- Geburtsdatum des Patienten: """22.01.1974"""
-- Adresse des Patienten: """Hauptstr. 8, 47809 Krefeld"""
-- Krankenhaus: """Sankt Christophus-Krankenhaus"""
-- Behandelner Arzt: """Prof. Antonia Zucker"""
-- Aufenthaltsdatum: """03.09.2029 - 12.09.2029"""
+- Patient: """{patient_name}"""
+- Geburtsdatum des Patienten: """{patient_birth_date}"""
+- Adresse des Patienten: """{patient_address}"""
+- Krankenhaus: """{hospital}"""
+- Behandelner Arzt: """{attending_physician}"""
+- Aufenthaltsdatum: """{date_of_stay}"""
 
-- Anamnese: """seit 3 tagen enge in der brust, ausstrahlung in linke schulter, atemnot seit gestern zusammen mit schweregefühl in armen, einweisung nach anwendung von nitroglyzerin-spray"""
-- Diagnose: """gefäßerkrankung (rca), arterielle hypertonie, adipositas, hypercholesterinämie"""
-- Behandlung: """einnahme mehrerer medikamente. nachkontrolle in 2 wochen"""
-- Medikation: """Iscover 150 mg 1–0–1, Aspirin 100 mg 1–0–0, Con Cor 2,5 mg 1–0–1, Ramiprilil 2,5mg 1–0–0, Amlodipin 5 mg 1–0–1, Zocor 40 mg 0–0–1, Bezafibrat Retard 400mg 1-0-0"""
-
-ASSISTANT:
+- Anamnese: """{anamnesis}"""
+- Diagnose: """{diagnosis}"""
+- Behandlung: """{treatment}"""
+- Medikation: """{medication}"""
