@@ -84,7 +84,7 @@ class RestServer(Transport):
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:
         return self._bridge.generate(parameters)
-    
+
     def gen_continue(self, parameters: Dict[str, str]) -> GenResponse:
         return self._bridge.gen_continue(parameters)
 
