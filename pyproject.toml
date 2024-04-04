@@ -29,6 +29,7 @@ pydantic = "^2.4.2"
 pydantic-settings = "^2.0.3"
 poethepoet = "^0.24.2"
 gradio = "^4.1.2"
+requests = "^2.31.0"
 
 [tool.poetry.group.dev]
 optional = true
