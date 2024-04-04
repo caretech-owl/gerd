@@ -102,3 +102,12 @@ class RestClient(Transport):
                 timeout=self.timeout,
             ).json()
         )
+    
+    def gen_continue(self, parameters: Dict[str, str]) -> GenResponse:
+        return GenResponse.model_validate(
+            requests.post(
+                f"{self._url}/gen/gen_continue",
+                json=parameters,
+                timeout=self.timeout,
+            ).json()
+        )

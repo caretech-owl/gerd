@@ -51,6 +51,9 @@ class RestServer(Transport):
         self.router.add_api_route(
             f"{prefix}/gen/generate", self.generate, methods=["POST"]
         )
+        self.router.add_api_route(
+            f"{prefix}/gen/gen_continue", self.gen_continue, methods=["POST"]
+        )
 
     def qa_query(self, question: QAQuestion) -> QAAnswer:
         return self._bridge.qa_query(question)
@@ -81,6 +84,9 @@ class RestServer(Transport):
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:
         return self._bridge.generate(parameters)
+    
+    def gen_continue(self, parameters: Dict[str, str]) -> GenResponse:
+        return self._bridge.gen_continue(parameters)
 
 
 app = FastAPI()
