@@ -117,8 +117,7 @@ class QAService:
         qa_query_prompt = self._config.model.prompt
 
         context_list = [doc for doc in self._vectorstore.search(
-            #question.question,
-            "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,",
+            question.question,
             search_type=question.search_strategy,
             k=question.max_sources
         )]
