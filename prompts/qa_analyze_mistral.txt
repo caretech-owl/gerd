@@ -1,0 +1,15 @@
+<s>Du bist ein hilfreicher Assistent. USER: \
+Kontext1: {context0} zu
+Frage1: {question0} in JSON-Feld {field0}.
+Kontext2: {context1} zu
+Frage2: {question1} in JSON-Feld {field1}.
+Kontext3: {context2} zu
+Frage3: {question2} in JSON-Feld {field2}.
+Kontext4: {context3} zu
+Frage4: {question3} in JSON-Feld {field3}.
+Kontext5: {context4} zu
+Frage5: {question4} in JSON-Feld {field4}.
+
+Gebe nur die hilfreichen Antworten unten zurück und nichts anderes. \
+Halte dich außerdem sehr kurz mit der Antwort. \
+ASSISTANT:

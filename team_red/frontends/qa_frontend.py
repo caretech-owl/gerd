@@ -26,6 +26,41 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
             )
             raise gr.Error(msg)
         return qa_res.answer
+    elif search_type == "Analyze":
+        qa_res = TRANSPORTER.analyze_query()
+        if qa_res.status != 200:
+            msg = (
+                f"Query was unsuccessful: {qa_res.error_msg}"
+                f" (Error Code {qa_res.status})"
+            )
+            raise gr.Error(msg)
+
+        qa_res_dic = {key: value for key, value in vars(qa_res).items()
+                      if value is not None
+                      and value != ""
+                      and key not in qa_res.__class__.__dict__
+                      and key != "sources"
+                      and key != "status"
+        }
+        qa_res_str = ", ".join(f"{key}={value}" for key, value in qa_res_dic.items())
+        return qa_res_str
+    elif search_type == "Analyze mult.":
+        qa_res = TRANSPORTER.analyze_mult_prompts_query()
+        if qa_res.status != 200:
+            msg = (
+                f"Query was unsuccessful: {qa_res.error_msg}"
+                f" (Error Code {qa_res.status})"
+            )
+            raise gr.Error(msg)
+
+        qa_res_dic = {key: value for key, value in vars(qa_res).items()
+                      if value is not None
+                      and value != ""
+                      and key not in qa_res.__class__.__dict__
+                      and key != "sources"
+                      and key != "status"}
+        qa_res_str = ", ".join(f"{key}={value}" for key, value in qa_res_dic.items())
+        return qa_res_str
     db_res = TRANSPORTER.db_query(q)
     if not db_res:
         msg = f"Database query returned empty!"
@@ -81,7 +116,7 @@ with demo:
             file_upload = gr.File(file_count="single", file_types=[".txt"])
         with gr.Column(scale=1):
             type_radio = gr.Radio(
-                choices=["LLM", "VectorDB"],
+                choices=["LLM", "Analyze", "Analyze mult.", "VectorDB"],
                 value="LLM",
                 label="Suchmodus",
                 interactive=True,
