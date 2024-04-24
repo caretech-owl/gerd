@@ -29,9 +29,13 @@ qa:
     name: "TheBloke/leo-hessianai-7B-chat-GGUF"
     file: "leo-hessianai-7b-chat.Q5_K_M.gguf"
     type: "llama"
-    temperature: 0.01
+    temperature: 0.001
     max_new_tokens: 128
     context_length: 512
+    top_k: 100
+    top_p: 0.95
+    max_new_tokens: 1024
+    context_length: 2048
     prompt:
       path: "prompts/qa.txt"
   features:
@@ -41,14 +45,20 @@ qa:
         <<: *qa_model
         prompt:
           path: "prompts/qa_fact_checking.txt"
+    analyze:
+      model:
+        <<: *qa_model
+        prompt:
+          path: "prompts/qa_analyze_single_mistral.txt"
     return_source: true
   embedding:
     chunk_size: 256
     chunk_overlap: 25
     vector_count: 2
     model:
-      name: "sentence-transformers/all-MiniLM-L6-v2"
-    db_path: "vectorstore/db_faiss"
+      name: "sentence-transformers/distiluse-base-multilingual-cased-v1"
+    #db_path: "vectorstore/db_faiss"
+    db_path: ""
 server:
   host: localhost
   port: 8888

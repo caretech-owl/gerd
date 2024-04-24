@@ -11,6 +11,7 @@ from ..transport import (
     GenResponse,
     PromptConfig,
     QAAnswer,
+    QAAnalyzeAnswer,
     QAFileUpload,
     QAQuestion,
     Transport,
@@ -40,6 +41,12 @@ class Bridge(Transport):
 
     def qa_query(self, question: QAQuestion) -> QAAnswer:
         return self.qa.query(question)
+
+    def analyze_query(self) -> QAAnalyzeAnswer:
+        return self.qa.analyze_query()
+
+    def analyze_mult_prompts_query(self) -> QAAnalyzeAnswer:
+        return self.qa.analyze_mult_prompts_query()
 
     def db_query(self, question: QAQuestion) -> List[DocumentSource]:
         return self.qa.db_query(question)
