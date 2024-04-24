@@ -3,8 +3,9 @@ import logging
 from os import unlink
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import TYPE_CHECKING, Iterable, List, Optional, Protocol, Dict
+from typing import TYPE_CHECKING, Dict, Iterable, List, Optional, Protocol
 
+from ctransformers import AutoModelForCausalLM
 from langchain.chains.retrieval_qa.base import BaseRetrievalQA
 from langchain.docstore.document import Document
 from langchain.document_loaders import PyPDFLoader, TextLoader
@@ -13,16 +14,14 @@ from langchain.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 
-from ctransformers import AutoModelForCausalLM
-
 from team_red.llm import build_llm
 from team_red.models.qa import QAConfig
 from team_red.transport import (
     DocumentSource,
     FileTypes,
     PromptConfig,
-    QAAnswer,
     QAAnalyzeAnswer,
+    QAAnswer,
     QAFileUpload,
     QAQuestion,
 )
@@ -104,11 +103,10 @@ class QAService:
         return self._vectorstore.embeddings.embed_documents([question.question])[0]
 
     def query(self, question: QAQuestion) -> QAAnswer:
-        if not self._database:
-            if not self._vectorstore:
-                msg = "No vector store initialized! Upload documents first."
-                _LOGGER.error(msg)
-                return QAAnswer(status=404, error_msg=msg)
+        if not self._vectorstore:
+            msg = "No vector store initialized! Upload documents first."
+            _LOGGER.error(msg)
+            return QAAnswer(status=404, error_msg=msg)
 
         self._model = self._init_model()
 
@@ -121,11 +119,12 @@ class QAService:
             search_type=question.search_strategy,
             k=question.max_sources
         )]
-            
+
         parameters["context"] = " ".join(doc.page_content for doc in context_list)
         parameters["question"] = question.question
 
-        if "context" not in qa_query_prompt.parameters or "question"  not in qa_query_prompt.parameters:
+        if ("context" not in qa_query_prompt.parameters
+            or "question"  not in qa_query_prompt.parameters):
                 msg = "Prompt does not include '{context}' or '{question}' variable."
                 _LOGGER.error(msg)
                 return QAAnalyzeAnswer(status=404, error_msg=msg)
@@ -153,10 +152,10 @@ class QAService:
 
         try:
             answer_json = json.loads(response)["answer"]
-                
-            if answer_json == None:
+
+            if answer_json is None:
                 answer_json = ""
-        except:
+        except BaseException:
             answer_json = ""
 
         answer = QAAnswer(answer=answer_json)
@@ -188,24 +187,28 @@ class QAService:
         return answer
 
     def analyze_query(self) -> QAAnalyzeAnswer:
-        if not self._database:
-            if not self._vectorstore:
-                msg = "No vector store initialized! Upload documents first."
-                _LOGGER.error(msg)
-                return QAAnalyzeAnswer(status=404, error_msg=msg)
+        if not self._vectorstore:
+            msg = "No vector store initialized! Upload documents first."
+            _LOGGER.error(msg)
+            return QAAnalyzeAnswer(status=404, error_msg=msg)
 
         self._model = self._init_model()
 
         qa_analyze_prompt = self._config.features.analyze.model.prompt
 
         questions_model_dict : Dict[str, str] = {
-            "Wie heißt der Patient?" : "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,", 
-            "Wann hat der Patient Geburstag?" : "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,",
-            "Wie heißt der Arzt?":"Mit freundlichen kollegialen Grüßen, Prof, Dr", 
-            "Wann wurde der Patient bei uns aufgenommen?" : "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren",
-            "Wann wurde der Patient bei uns entlassen?" : "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren"
+            "Wie heißt der Patient?" :
+            "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,", # noqa E501
+            "Wann hat der Patient Geburstag?" :
+            "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,", # noqa E501
+            "Wie heißt der Arzt?":
+            "Mit freundlichen kollegialen Grüßen, Prof, Dr",
+            "Wann wurde der Patient bei uns aufgenommen?" :
+            "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren",
+            "Wann wurde der Patient bei uns entlassen?" :
+            "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren"
         }
-        
+
         fields: Dict[str, str] = {
             "Wie heißt der Patient?": "patient_name",
             "Wann hat der Patient Geburstag?": "patient_date_of_birth",
@@ -213,7 +216,7 @@ class QAService:
             "Wann wurde der Patient bei uns aufgenommen?": "recording_date",
             "Wann wurde der Patient bei uns entlassen?": "release_date",
         }
-        
+
         questions_dict : Dict[str, str] = {}
         parameters: Dict[str, str] = {}
         question_counter : int = 0
@@ -224,16 +227,22 @@ class QAService:
                 search_type="similarity",
                 k=3
                 )]
-            
-            parameters["context" + str(question_counter)] = " ".join(doc.page_content for doc in questions_dict[question_m])
+
+            parameters["context" + str(question_counter)] = " ".join(
+                doc.page_content for doc in questions_dict[question_m]
+            )
             parameters["question" + str(question_counter)] = question_m
             parameters["field" + str(question_counter)] = fields[question_m]
-            
-            if "context" + str(question_counter) not in qa_analyze_prompt.parameters or "question" + str(question_counter) not in qa_analyze_prompt.parameters:
-                msg = "Prompt does not include '{context" + str(question_counter) + "}' or '{question" + str(question_counter) + "}' variable."
+
+            if ("context" + str(question_counter) not in qa_analyze_prompt.parameters
+                or "question" + str(question_counter)
+                not in qa_analyze_prompt.parameters):
+                msg = ("Prompt does not include '{context"
+                + str(question_counter) + "}' or '{question"
+                + str(question_counter) + "}' variable.")
                 _LOGGER.error(msg)
                 return QAAnalyzeAnswer(status=404, error_msg=msg)
-                
+
             question_counter = question_counter + 1
 
         resolved = qa_analyze_prompt.text.format(**parameters)
@@ -257,12 +266,12 @@ class QAService:
         # convert json to QAAnalyzerAnswerclass
         try:
             answer_dict = json.loads(response)
-                
-            if answer_dict != None:
+
+            if answer_dict is not None:
                 answer = QAAnalyzeAnswer(**answer_dict)
             else:
                 answer = QAAnalyzeAnswer()
-        except:
+        except BaseException:
             answer = QAAnalyzeAnswer()
 
         if self._config.features.return_source:
@@ -283,58 +292,58 @@ class QAService:
 
         _LOGGER.warning("\n==== Answer ====\n\n%s\n===============", answer)
         return answer
-    
+
     def analyze_mult_prompts_query(self) -> QAAnalyzeAnswer:
-        if not self._database:
-            if not self._vectorstore:
-                msg = "No vector store initialized! Upload documents first."
-                _LOGGER.error(msg)
-                return QAAnalyzeAnswer(status=404, error_msg=msg)
-        
+        if not self._vectorstore:
+            msg = "No vector store initialized! Upload documents first."
+            _LOGGER.error(msg)
+            return QAAnalyzeAnswer(status=404, error_msg=msg)
+
         self._model = self._init_model()
 
         qa_analyze_prompt = self._config.features.analyze.model.prompt
 
-        questions : List[str] = [
-            "Wie heißt der Patient?", 
-            "Wann hat der Patient Geburstag?", 
-            "Wie heißt der Arzt?", 
-            "Wann wurde der Patient bei uns aufgenommen?", 
-            "Wann wurde der Patient bei uns entlassen?"]
-        
         questions_model_dict : Dict[str, str] = {
-            "Wie heißt der Patient?" : "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,", 
-            "Wann hat der Patient Geburstag?" : "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,",
-            "Wie heißt der Arzt?":"Mit freundlichen kollegialen Grüßen, Prof, Dr", 
-            "Wann wurde der Patient bei uns aufgenommen?" : "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren",
-            "Wann wurde der Patient bei uns entlassen?" : "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren"}
-    
-        
-        fields: Dict[str, str]= {"Wie heißt der Patient?" : "patient_name", "Wann hat der Patient Geburstag?" : "patient_date_of_birth", "Wie heißt der Arzt?" : "attending_doctor", "Wann wurde der Patient bei uns aufgenommen?" : "recording_date", "Wann wurde der Patient bei uns entlassen?" : "release_date"}
+            "Wie heißt der Patient?" :
+            "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,", # noqa: E501
+            "Wann hat der Patient Geburstag?" :
+            "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,", # noqa: E501
+            "Wie heißt der Arzt?" :
+            "Mit freundlichen kollegialen Grüßen, Prof, Dr",
+            "Wann wurde der Patient bei uns aufgenommen?" :
+            "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren",
+            "Wann wurde der Patient bei uns entlassen?" :
+            "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren"}
+
+
+        fields: Dict[str, str]= {
+            "Wie heißt der Patient?" : "patient_name",
+            "Wann hat der Patient Geburstag?" : "patient_date_of_birth",
+            "Wie heißt der Arzt?" : "attending_doctor",
+            "Wann wurde der Patient bei uns aufgenommen?" : "recording_date",
+            "Wann wurde der Patient bei uns entlassen?" : "release_date"}
         questions_dict : Dict[str, str] = {}
         parameters: Dict[str, str] = {}
         answer_dict: Dict[str, str] = {}
-        # for question in questions:
-        #     questionsDict[question] = [doc.page_content for doc in self._vectorstore.search(
-        #         questionsmodelDict[question],
-        #         search_type="similarity",
-        #         k=3
-        #         )]
+
         for question_m, question_v in questions_model_dict.items():
             questions_dict[question_m] = [doc for doc in self._vectorstore.search(
                 question_v,
                 search_type="similarity",
                 k=3
-                )]    
+                )]
 
-            parameters["context"] = " ".join(doc.page_content for doc in questions_dict[question_m])
+            parameters["context"] = " ".join(
+                doc.page_content for doc in questions_dict[question_m]
+            )
             parameters["question"] = question_m
-            
-            if "context" not in qa_analyze_prompt.parameters or "question"  not in qa_analyze_prompt.parameters:
+
+            if ("context" not in qa_analyze_prompt.parameters
+                or "question"  not in qa_analyze_prompt.parameters):
                 msg = "Prompt does not include '{context}' or '{question}' variable."
                 _LOGGER.error(msg)
                 return QAAnalyzeAnswer(status=404, error_msg=msg)
-                
+
 
             resolved = qa_analyze_prompt.text.format(**parameters)
 
@@ -351,12 +360,12 @@ class QAService:
             response = response.replace("\t", "").replace("\n", "")
             try:
                 answer = json.loads(response)["answer"]
-                
-                if answer != None:
+
+                if answer is not None:
                     answer_dict[fields[question_m]] = answer
                 else:
                     answer_dict[fields[question_m]] = ""
-            except:
+            except BaseException:
                 answer_dict[fields[question_m]] = ""
 
             _LOGGER.info(
@@ -435,7 +444,7 @@ class QAService:
         if self._config.embedding.db_path:
             self._vectorstore.save_local(self._config.embedding.db_path)
         return QAAnswer()
-    
+
     def _init_model(self) -> AutoModelForCausalLM:
         return AutoModelForCausalLM.from_pretrained(
                 model_path_or_repo_id = self._config.model.name,
