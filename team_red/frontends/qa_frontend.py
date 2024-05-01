@@ -97,6 +97,11 @@ def upload(file_path: str, progress: Optional[gr.Progress] = None) -> None:
         raise gr.Error(msg)
     progress(100, desc="Fertig!")
 
+def handle_inp_textbox(search_type: str) -> bool: 
+    if search_type == "LLM" or search_type == "VectorDB":
+        return gr.update(interactive=True, placeholder="Wie heißt der Patient?")
+    return gr.update(interactive=False, placeholder="")
+
 
 def set_prompt(prompt: str, progress: Optional[gr.Progress] = None) -> None:
     if progress is None:
@@ -142,6 +147,7 @@ with demo:
     inp = gr.Textbox(
         label="Stellen Sie eine Frage:", placeholder="Wie heißt der Patient?"
     )
+    type_radio.change(fn=handle_inp_textbox, inputs=type_radio, outputs=inp)
     out = gr.Textbox(label="Antwort")
     file_upload.change(fn=upload, inputs=file_upload, outputs=out)
     btn = gr.Button("Frage stellen")
