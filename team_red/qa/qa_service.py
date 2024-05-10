@@ -69,7 +69,6 @@ class QAService:
             model_kwargs={"device": self._config.device},
         )
         self._vectorstore: Optional[VectorStore] = None
-        self._database: Optional[BaseRetrievalQA] = None
         self._fact_checker_db: Optional[BaseRetrievalQA] = None
         if (
             config.embedding.db_path
@@ -365,7 +364,6 @@ class QAService:
 
     def set_prompt(self, config: PromptConfig) -> PromptConfig:
         self._config.model.prompt = config
-        self._database = self._setup_dbqa(self._config.model.prompt)
         return self._config.model.prompt
 
     def get_prompt(self) -> PromptConfig:
@@ -449,31 +447,6 @@ class QAService:
                 ) for doc in docs]
 
         return answer_sources
-
-    def _setup_dbqa(self, prompt: PromptConfig) -> BaseRetrievalQA:
-        if "context" not in prompt.parameters:
-            _LOGGER.warning(
-                "Prompt does not include '{context}' variable."
-                "It will be appened to the prompt."
-            )
-            prompt.text += "\n\n{context}"
-        _LOGGER.info(
-            "\n===== Setup dbqa with prompt ====\n\n%s\n\n====================",
-            prompt.text,
-        )
-        qa_prompt = PromptTemplate(
-            template=prompt.text,
-            input_variables=prompt.parameters,
-        )
-        dbqa = build_retrieval_qa(
-            self._llm,
-            qa_prompt,
-            self._vectorstore,
-            self._config.embedding.vector_count,
-            self._config.features.return_source,
-        )
-
-        return dbqa
 
     def _setup_dbqa_fact_checking(self, prompt: PromptConfig) -> BaseRetrievalQA:
         _LOGGER.info("Setup fact checking...")
