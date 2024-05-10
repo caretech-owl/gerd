@@ -15,6 +15,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 
 from team_red.llm import build_llm
+from team_red.models.model import ModelConfig
 from team_red.models.qa import QAConfig
 from team_red.transport import (
     DocumentSource,
@@ -108,17 +109,17 @@ class QAService:
             _LOGGER.error(msg)
             return QAAnswer(status=404, error_msg=msg)
 
-        self._model = self._init_model()
+        self._model = self._init_model(self._config.model)
 
         parameters: Dict[str, str] = {}
         context_list: List[Document]
         qa_query_prompt = self._config.model.prompt
 
-        context_list = [doc for doc in self._vectorstore.search(
+        context_list = list(self._vectorstore.search(
             question.question,
             search_type=question.search_strategy,
             k=question.max_sources
-        )]
+        ))
 
         parameters["context"] = " ".join(doc.page_content for doc in context_list)
         parameters["question"] = question.question
@@ -129,18 +130,9 @@ class QAService:
                 _LOGGER.error(msg)
                 return QAAnalyzeAnswer(status=404, error_msg=msg)
 
-        resolved = qa_query_prompt.text.format(**parameters)
+        formatted_prompt = qa_query_prompt.text.format(**parameters)
 
-        response = self._model(
-            resolved,
-            #stop = "</s>",
-            stop = "<|im_end|>",
-            max_new_tokens = self._config.model.max_new_tokens,
-            top_p = self._config.model.top_p,
-            top_k = self._config.model.top_k,
-            temperature = self._config.model.temperature,
-            repetition_penalty = self._config.model.repetition_penalty,
-        )
+        response = self._query_model(self._config.model, formatted_prompt)
 
         _LOGGER.info(
             "\n===== Modelresult ====\n\n%s\n\n====================",
@@ -161,14 +153,8 @@ class QAService:
         answer = QAAnswer(answer=answer_json)
 
         if self._config.features.return_source:
-            for doc in response.get("source_documents", []):
-                answer.sources.append(
-                    DocumentSource(
-                        content=doc.page_content,
-                        name=doc.metadata.get("source", "unknown"),
-                        page=doc.metadata.get("page", 1),
-                    )
-                )
+            answer.sources = self._collect_source_docs(question.question, context_list)
+
         if self._config.features.fact_checking.enabled is True:
             if not self._fact_checker_db:
                 self._fact_checker_db = self._setup_dbqa_fact_checking(
@@ -183,6 +169,10 @@ class QAService:
                         page=doc.metadata.get("page", 1),
                     )
                 )
+            answer.sources.append(
+                self._collect_source_docs(
+                    response.get("source_documents", [])))
+
         _LOGGER.debug("\n==== Answer ====\n\n%s\n===============", answer)
         return answer
 
@@ -192,9 +182,10 @@ class QAService:
             _LOGGER.error(msg)
             return QAAnalyzeAnswer(status=404, error_msg=msg)
 
-        self._model = self._init_model()
+        config = self._config.features.analyze
+        self._model = self._init_model(config.model)
 
-        qa_analyze_prompt = self._config.features.analyze.model.prompt
+        qa_analyze_prompt = config.model.prompt
 
         questions_model_dict : Dict[str, str] = {
             "Wie heißt der Patient?" :
@@ -222,11 +213,11 @@ class QAService:
         question_counter : int = 0
 
         for question_m, question_v in questions_model_dict.items():
-            questions_dict[question_m] = [doc for doc in self._vectorstore.search(
+            questions_dict[question_m] = list(self._vectorstore.search(
                 question_v,
                 search_type="similarity",
                 k=3
-                )]
+                ))
 
             parameters["context" + str(question_counter)] = " ".join(
                 doc.page_content for doc in questions_dict[question_m]
@@ -245,18 +236,12 @@ class QAService:
 
             question_counter = question_counter + 1
 
-        resolved = qa_analyze_prompt.text.format(**parameters)
+        formatted_prompt = qa_analyze_prompt.text.format(**parameters)
 
-        response = self._model(
-            resolved,
-            stop = "</s>",
-            #stop = "<|im_end|>",
-            max_new_tokens = self._config.model.max_new_tokens,
-            top_p = self._config.model.top_p,
-            top_k = self._config.model.top_k,
-            temperature = self._config.model.temperature,
-            repetition_penalty = self._config.model.repetition_penalty,
-        )
+        response = self._query_model(config.model, formatted_prompt)
+
+        if response is not None:
+            response = response.replace('"""', '"')
 
         _LOGGER.info(
             "\n===== Modelresult ====\n\n%s\n\n====================",
@@ -268,23 +253,21 @@ class QAService:
             answer_dict = json.loads(response)
 
             if answer_dict is not None:
+                if (answer_dict["attending_doctor"] is not None
+                    and answer_dict["attending_doctor"] != ""
+                    and "[" not in answer_dict["attending_doctor"]):
+                    answer_dict["attending_doctor"] = [answer_dict["attending_doctor"]]
                 answer = QAAnalyzeAnswer(**answer_dict)
             else:
                 answer = QAAnalyzeAnswer()
-        except BaseException:
+        except BaseException as err:
+            _LOGGER.error(err)
             answer = QAAnalyzeAnswer()
 
         if self._config.features.return_source:
             for question in questions_dict:
-                for doc in questions_dict[question]:
-                    answer.sources.append(
-                        DocumentSource(
-                            question=question,
-                            content=doc.page_content,
-                            name=doc.metadata.get("source", "unknown"),
-                            page=doc.metadata.get("page", 1),
-                        )
-                    )
+                answer.sources = self._collect_source_docs(
+                    question, questions_dict[question])
             _LOGGER.info(
            "\n===== Sources ====\n\n%s\n\n====================",
            answer.sources
@@ -299,9 +282,10 @@ class QAService:
             _LOGGER.error(msg)
             return QAAnalyzeAnswer(status=404, error_msg=msg)
 
-        self._model = self._init_model()
+        config = self._config.features.analyze_mult_prompts
+        self._model = self._init_model(config.model)
 
-        qa_analyze_prompt = self._config.features.analyze.model.prompt
+        qa_analyze_mult_prompts = config.model.prompt
 
         questions_model_dict : Dict[str, str] = {
             "Wie heißt der Patient?" :
@@ -327,37 +311,32 @@ class QAService:
         answer_dict: Dict[str, str] = {}
 
         for question_m, question_v in questions_model_dict.items():
-            questions_dict[question_m] = [doc for doc in self._vectorstore.search(
+            questions_dict[question_m] = list(self._vectorstore.search(
                 question_v,
                 search_type="similarity",
                 k=3
-                )]
+                ))
 
             parameters["context"] = " ".join(
                 doc.page_content for doc in questions_dict[question_m]
             )
             parameters["question"] = question_m
 
-            if ("context" not in qa_analyze_prompt.parameters
-                or "question"  not in qa_analyze_prompt.parameters):
+            if ("context" not in qa_analyze_mult_prompts.parameters
+                or "question"  not in qa_analyze_mult_prompts.parameters):
                 msg = "Prompt does not include '{context}' or '{question}' variable."
                 _LOGGER.error(msg)
                 return QAAnalyzeAnswer(status=404, error_msg=msg)
 
 
-            resolved = qa_analyze_prompt.text.format(**parameters)
+            formatted_prompt = qa_analyze_mult_prompts.text.format(**parameters)
 
-            response = self._model(
-                resolved,
-                stop = "</s>",
-                max_new_tokens = self._config.model.max_new_tokens,
-                top_p = self._config.model.top_p,
-                top_k = self._config.model.top_k,
-                temperature = self._config.model.temperature,
-                repetition_penalty = self._config.model.repetition_penalty,
-            )
+            response = self._query_model(config.model, formatted_prompt)
 
-            response = response.replace("\t", "").replace("\n", "")
+            if response is not None:
+                response = response.replace('"""', '"')
+                response = response.replace("\t", "").replace("\n", "")
+
             try:
                 answer = json.loads(response)["answer"]
 
@@ -376,19 +355,9 @@ class QAService:
         answer = QAAnalyzeAnswer(**answer_dict)
 
         if self._config.features.return_source:
-                    for question in questions_dict:
-                        for doc in questions_dict[question]:
-                            answer.sources.append(
-                                DocumentSource(
-                                    question=question,
-                                    content=doc.page_content,
-                                    name=doc.metadata.get("source", "unknown"),
-                                    page=doc.metadata.get("page", 1),
-                                )
-                            )
-                    _LOGGER.info(
-                "\n===== Sources ====\n\n%s\n\n====================",
-                answer.sources
+            for question in questions_dict:
+                answer.sources = self._collect_source_docs(
+                    question, questions_dict[question]
                 )
 
         _LOGGER.warning("\n==== Answer ====\n\n%s\n===============", answer)
@@ -445,13 +414,41 @@ class QAService:
             self._vectorstore.save_local(self._config.embedding.db_path)
         return QAAnswer()
 
-    def _init_model(self) -> AutoModelForCausalLM:
+    def _init_model(self, model_config: ModelConfig) -> AutoModelForCausalLM:
         return AutoModelForCausalLM.from_pretrained(
-                model_path_or_repo_id = self._config.model.name,
-                model_file = self._config.model.file,
-                model_type = self._config.model.type,
-                context_length = self._config.model.context_length
+                model_path_or_repo_id = model_config.name,
+                model_file = model_config.file,
+                model_type = model_config.type,
+                context_length = model_config.context_length
                 )
+
+    def _query_model(self, model_config: ModelConfig, prompt: str) -> str:
+        if  not self._model:
+            return ""
+
+        return self._model(
+                prompt,
+                stop = model_config.stop,
+                max_new_tokens = model_config.max_new_tokens,
+                top_p = model_config.top_p,
+                top_k = model_config.top_k,
+                temperature = model_config.temperature,
+                repetition_penalty = model_config.repetition_penalty,
+            )
+
+    def _collect_source_docs(
+            self, question_str: str, docs: List[Document]
+            ) -> List[DocumentSource]:
+        answer_sources : List[DocumentSource] = []
+
+        answer_sources = [DocumentSource(
+                question=question_str,
+                content=doc.page_content,
+                name=doc.metadata.get("source", "unknown"),
+                page=doc.metadata.get("page", 1),
+                ) for doc in docs]
+
+        return answer_sources
 
     def _setup_dbqa(self, prompt: PromptConfig) -> BaseRetrievalQA:
         if "context" not in prompt.parameters:

@@ -29,13 +29,12 @@ qa:
     name: "TheBloke/leo-hessianai-7B-chat-GGUF"
     file: "leo-hessianai-7b-chat.Q5_K_M.gguf"
     type: "llama"
-    temperature: 0.001
-    max_new_tokens: 128
-    context_length: 512
-    top_k: 100
-    top_p: 0.95
+    temperature: 0
     max_new_tokens: 1024
     context_length: 2048
+    top_k: 100
+    top_p: 0.95
+    stop: ["<|im_end|>"]
     prompt:
       path: "prompts/qa.txt"
   features:
@@ -48,8 +47,14 @@ qa:
     analyze:
       model:
         <<: *qa_model
+        context_length: 4096
         prompt:
-          path: "prompts/qa_analyze_single_mistral.txt"
+          path: "prompts/qa_analyze.txt"
+    analyze_mult_prompts:
+      model:
+        <<: *qa_model
+        prompt:
+          path: "prompts/qa.txt"
     return_source: true
   embedding:
     chunk_size: 256
