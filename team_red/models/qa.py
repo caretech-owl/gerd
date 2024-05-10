@@ -23,6 +23,7 @@ class AnalyzeConfig(BaseModel):
 class QAFeaturesConfig(BaseModel):
     fact_checking: FactCheckingConfig
     analyze: AnalyzeConfig
+    analyze_mult_prompts: AnalyzeConfig
     return_source: bool
 
 
