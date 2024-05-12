@@ -4,7 +4,7 @@ from typing import Dict, List, Optional
 from team_red.config import CONFIG
 from team_red.gen import GenerationService
 from team_red.qa import QAService
-from team_red.transport import QAQuestion
+from team_red.transport import QAModesEnum, QAQuestion
 
 from ..transport import (
     DocumentSource,
@@ -63,11 +63,11 @@ class Bridge(Transport):
     def get_gen_prompt(self) -> PromptConfig:
         return self.gen.get_prompt()
 
-    def set_qa_prompt(self, config: PromptConfig) -> PromptConfig:
-        return self.qa.set_prompt(config)
+    def set_qa_prompt(self, config: PromptConfig, qa_mode: QAModesEnum) -> PromptConfig:
+        return self.qa.set_prompt(config, qa_mode)
 
-    def get_qa_prompt(self) -> PromptConfig:
-        return self.qa.get_prompt()
+    def get_qa_prompt(self, qa_mode: QAModesEnum) -> PromptConfig:
+        return self.qa.get_prompt(qa_mode)
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:
         return self.gen.generate(parameters)

@@ -73,6 +73,11 @@ class QAAnalyzeAnswer(BaseModel):
     route: str = ""
     strength: str = ""
 
+class QAModesEnum(Enum):
+    NONE = 0,
+    SEARCH = 1,
+    ANALYZE = 2,
+    ANALYZE_MULT_PROMPTS = 3,
 
 class FileTypes(Enum):
     TEXT = "txt"
@@ -109,10 +114,10 @@ class Transport(Protocol):
     def get_gen_prompt(self) -> PromptConfig:
         pass
 
-    def set_qa_prompt(self, config: PromptConfig) -> PromptConfig:
+    def set_qa_prompt(self, config: PromptConfig, qa_mode: QAModesEnum) -> PromptConfig:
         pass
 
-    def get_qa_prompt(self) -> PromptConfig:
+    def get_qa_prompt(self, qa_mode: QAModesEnum) -> PromptConfig:
         pass
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:

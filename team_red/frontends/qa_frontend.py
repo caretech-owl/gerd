@@ -1,17 +1,29 @@
 import logging
 import pathlib
-from typing import Optional
+from typing import Dict, Optional
 
 import gradio as gr
 
 from team_red.backend import TRANSPORTER
-from team_red.transport import PromptConfig, QAFileUpload, QAQuestion
+from team_red.transport import PromptConfig, QAFileUpload, QAModesEnum, QAQuestion
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
 
 logging.basicConfig(level=logging.DEBUG)
 
+qa_modes_dict : Dict[str, QAModesEnum] = {
+    "LLM": QAModesEnum.SEARCH,
+    "Analyze": QAModesEnum.ANALYZE,
+    "Analyze mult.": QAModesEnum.ANALYZE_MULT_PROMPTS,
+    "VectorDB": QAModesEnum.NONE,
+}
+
+def get_qa_mode(search_type: str) -> QAModesEnum:
+    if search_type in qa_modes_dict:
+        return qa_modes_dict[search_type]
+    else:
+        return QAModesEnum.NONE
 
 def query(question: str, search_type: str, k_source: int, search_strategy: str) -> str:
     q = QAQuestion(
@@ -97,17 +109,18 @@ def upload(file_path: str, progress: Optional[gr.Progress] = None) -> None:
         raise gr.Error(msg)
     progress(100, desc="Fertig!")
 
-def handle_inp_textbox(search_type: str) -> bool: 
+def handle_selection_change(search_type: str) -> bool:
     if search_type == "LLM" or search_type == "VectorDB":
-        return gr.update(interactive=True, placeholder="Wie heißt der Patient?")
-    return gr.update(interactive=False, placeholder="")
+        return [gr.update(interactive=True, placeholder="Wie heißt der Patient?"), gr.update(value=TRANSPORTER.get_qa_prompt(get_qa_mode(search_type)).text)]
+    return [gr.update(interactive=False, placeholder=""), gr.update(value=TRANSPORTER.get_qa_prompt(get_qa_mode(search_type)).text)]
 
 
-def set_prompt(prompt: str, progress: Optional[gr.Progress] = None) -> None:
+def set_prompt(prompt: str, search_type: str, progress: Optional[gr.Progress] = None) -> None:
     if progress is None:
         progress = gr.Progress()
     progress(0, "Aktualisiere Prompt...")
-    _ = TRANSPORTER.set_qa_prompt(PromptConfig(text=prompt))
+
+    _ = TRANSPORTER.set_qa_prompt(PromptConfig(text=prompt), get_qa_mode(search_type))
     progress(100, "Fertig!")
 
 
@@ -141,13 +154,13 @@ with demo:
                 label="Suchmodus",
             )
     prompt = gr.TextArea(
-        value=TRANSPORTER.get_qa_prompt().text, interactive=True, label="Prompt"
+        value=TRANSPORTER.get_qa_prompt(get_qa_mode(type_radio.value)).text, interactive=True, label="Prompt"
     )
     prompt_submit = gr.Button("Aktualisiere Prompt")
     inp = gr.Textbox(
         label="Stellen Sie eine Frage:", placeholder="Wie heißt der Patient?"
     )
-    type_radio.change(fn=handle_inp_textbox, inputs=type_radio, outputs=inp)
+    type_radio.change(fn=handle_selection_change, inputs=type_radio, outputs=[inp, prompt])
     out = gr.Textbox(label="Antwort")
     file_upload.change(fn=upload, inputs=file_upload, outputs=out)
     btn = gr.Button("Frage stellen")
@@ -157,7 +170,7 @@ with demo:
     inp.submit(
         fn=query, inputs=[inp, type_radio, k_slider, strategy_dropdown], outputs=out
     )
-    prompt_submit.click(fn=set_prompt, inputs=prompt, outputs=out)
+    prompt_submit.click(fn=set_prompt, inputs=[prompt, type_radio], outputs=out)
 
 if __name__ == "__main__":
     demo.launch()
