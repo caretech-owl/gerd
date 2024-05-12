@@ -1,5 +1,6 @@
 import json
 import logging
+from enum import Enum
 from os import unlink
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -23,6 +24,7 @@ from team_red.transport import (
     PromptConfig,
     QAAnalyzeAnswer,
     QAAnswer,
+    QAModesEnum,
     QAFileUpload,
     QAQuestion,
 )
@@ -59,7 +61,6 @@ class VectorStore(Protocol):
 
     embeddings: VectorEmbeddings
 
-
 class QAService:
     def __init__(self, config: QAConfig) -> None:
         self._config = config
@@ -86,6 +87,7 @@ class QAService:
             return []
         return [
             DocumentSource(
+                question=question.question,
                 content=doc.page_content,
                 name=doc.metadata.get("source", "unknown"),
                 page=doc.metadata.get("page", 1),
@@ -140,6 +142,8 @@ class QAService:
 
         if response is not None:
             response = response.replace('"""', '"')
+            if ("["  in response or "]"  in response):
+                response = response.replace('[', '').replace(']', '')
 
         try:
             answer_json = json.loads(response)["answer"]
@@ -256,6 +260,8 @@ class QAService:
                     and answer_dict["attending_doctor"] != ""
                     and "[" not in answer_dict["attending_doctor"]):
                     answer_dict["attending_doctor"] = [answer_dict["attending_doctor"]]
+                else:
+                    answer_dict["attending_doctor"] = []
                 answer = QAAnalyzeAnswer(**answer_dict)
             else:
                 answer = QAAnalyzeAnswer()
@@ -265,7 +271,7 @@ class QAService:
 
         if self._config.features.return_source:
             for question in questions_dict:
-                answer.sources = self._collect_source_docs(
+                answer.sources = answer.sources + self._collect_source_docs(
                     question, questions_dict[question])
             _LOGGER.info(
            "\n===== Sources ====\n\n%s\n\n====================",
@@ -355,19 +361,33 @@ class QAService:
 
         if self._config.features.return_source:
             for question in questions_dict:
-                answer.sources = self._collect_source_docs(
+                answer.sources = answer.sources + self._collect_source_docs(
                     question, questions_dict[question]
                 )
 
         _LOGGER.warning("\n==== Answer ====\n\n%s\n===============", answer)
         return answer
 
-    def set_prompt(self, config: PromptConfig) -> PromptConfig:
-        self._config.model.prompt = config
-        return self._config.model.prompt
+    def set_prompt(self, config: PromptConfig, qa_mode: QAModesEnum) -> PromptConfig:
+        if qa_mode == QAModesEnum.SEARCH:
+            self._config.model.prompt = config
+            return self._config.model.prompt
+        elif qa_mode == QAModesEnum.ANALYZE:
+            self._config.features.analyze.model.prompt = config
+            return self._config.features.analyze.model.prompt
+        elif qa_mode == QAModesEnum.ANALYZE_MULT_PROMPTS:
+            self._config.features.analyze_mult_prompts.model.prompt = config
+            return self._config.features.analyze_mult_prompts.model.prompt
+        return PromptConfig()
 
-    def get_prompt(self) -> PromptConfig:
-        return self._config.model.prompt
+    def get_prompt(self, qa_mode: QAModesEnum) -> PromptConfig:
+        if qa_mode == QAModesEnum.SEARCH:
+            return self._config.model.prompt
+        elif qa_mode == QAModesEnum.ANALYZE:
+            return self._config.features.analyze.model.prompt
+        elif qa_mode == QAModesEnum.ANALYZE_MULT_PROMPTS:
+            return self._config.features.analyze_mult_prompts.model.prompt
+        return PromptConfig()
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:
         documents: Optional[List[Document]] = None
