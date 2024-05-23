@@ -109,13 +109,30 @@ def upload(file_path: str, progress: Optional[gr.Progress] = None) -> None:
         raise gr.Error(msg)
     progress(100, desc="Fertig!")
 
-def handle_selection_change(search_type: str) -> bool:
+def handle_type_radio_selection_change(search_type: str) -> bool:
     if search_type == "LLM" or search_type == "VectorDB":
-        return [gr.update(interactive=True, placeholder="Wie heißt der Patient?"), gr.update(value=TRANSPORTER.get_qa_prompt(get_qa_mode(search_type)).text)]
-    return [gr.update(interactive=False, placeholder=""), gr.update(value=TRANSPORTER.get_qa_prompt(get_qa_mode(search_type)).text)]
+        return [gr.update(interactive=True,
+                          placeholder="Wie heißt der Patient?"),
+                gr.update(value=TRANSPORTER.get_qa_prompt(
+                    get_qa_mode(search_type)).text)
+                ]
+    return [gr.update(interactive=False,
+                      placeholder=""),
+            gr.update(value=TRANSPORTER.get_qa_prompt(
+                get_qa_mode(search_type)).text)
+            ]
 
+def handle_developer_mode_checkbox_change(check: bool) -> bool:
+    return [gr.update(visible=check),
+            gr.update(visible=check),
+            gr.update(visible=check),
+            gr.update(visible=check),
+            gr.update(choices=["LLM", "Analyze", "Analyze mult.", "VectorDB"]
+                      if check else ["LLM", "Analyze mult."])]
 
-def set_prompt(prompt: str, search_type: str, progress: Optional[gr.Progress] = None) -> None:
+def set_prompt(
+        prompt: str, search_type: str, progress: Optional[gr.Progress] = None
+        ) -> None:
     if progress is None:
         progress = gr.Progress()
     progress(0, "Aktualisiere Prompt...")
@@ -128,11 +145,19 @@ demo = gr.Blocks(title="Entlassbriefe QA")
 
 
 with demo:
+    developer_mode : bool = False
+
     gr.Markdown("# Entlassbriefe QA")
+
     with gr.Row():
         with gr.Column(scale=1):
             file_upload = gr.File(file_count="single", file_types=[".txt"])
         with gr.Column(scale=1):
+            developer_checkbox = gr.Checkbox(
+                info="Aktivieren/Deaktivieren von zusätzlichen Modi",
+                label="Developermode",
+                value = True
+            )
             type_radio = gr.Radio(
                 choices=["LLM", "Analyze", "Analyze mult.", "VectorDB"],
                 value="LLM",
@@ -151,16 +176,21 @@ with demo:
                 choices=["similarity", "mmr"],
                 value="similarity",
                 interactive=True,
-                label="Suchmodus",
+                label="Suchmodus"
             )
+
+
     prompt = gr.TextArea(
-        value=TRANSPORTER.get_qa_prompt(get_qa_mode(type_radio.value)).text, interactive=True, label="Prompt"
+        value=TRANSPORTER.get_qa_prompt(
+            get_qa_mode(type_radio.value)).text, interactive=True, label="Prompt"
     )
     prompt_submit = gr.Button("Aktualisiere Prompt")
     inp = gr.Textbox(
         label="Stellen Sie eine Frage:", placeholder="Wie heißt der Patient?"
     )
-    type_radio.change(fn=handle_selection_change, inputs=type_radio, outputs=[inp, prompt])
+    type_radio.change(fn=handle_type_radio_selection_change,
+                      inputs=type_radio, outputs=[inp, prompt]
+    )
     out = gr.Textbox(label="Antwort")
     file_upload.change(fn=upload, inputs=file_upload, outputs=out)
     btn = gr.Button("Frage stellen")
@@ -171,6 +201,12 @@ with demo:
         fn=query, inputs=[inp, type_radio, k_slider, strategy_dropdown], outputs=out
     )
     prompt_submit.click(fn=set_prompt, inputs=[prompt, type_radio], outputs=out)
+
+    developer_checkbox.change(
+        fn=handle_developer_mode_checkbox_change,
+        inputs=developer_checkbox,
+        outputs=[prompt, prompt_submit, k_slider, strategy_dropdown, type_radio]
+        )
 
 if __name__ == "__main__":
     demo.launch()
