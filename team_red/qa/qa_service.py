@@ -1,6 +1,5 @@
 import json
 import logging
-from enum import Enum
 from os import unlink
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -135,7 +134,7 @@ class QAService:
 
         response = self._query_model(self._config.model, formatted_prompt)
 
-        _LOGGER.info(
+        _LOGGER.warning(
             "\n===== Modelresult ====\n\n%s\n\n====================",
             response
         )
@@ -157,6 +156,7 @@ class QAService:
 
         if self._config.features.return_source:
             answer.sources = self._collect_source_docs(question.question, context_list)
+            answer.model_response = response
 
         if self._config.features.fact_checking.enabled is True:
             if not self._fact_checker_db:
@@ -254,14 +254,15 @@ class QAService:
         # convert json to QAAnalyzerAnswerclass
         try:
             answer_dict = json.loads(response)
-
+            _LOGGER.info(type(answer_dict["attending_doctors"]))
             if answer_dict is not None:
-                if (answer_dict["attending_doctor"] is not None
-                    and answer_dict["attending_doctor"] != ""
-                    and "[" not in answer_dict["attending_doctor"]):
-                    answer_dict["attending_doctor"] = [answer_dict["attending_doctor"]]
-                else:
-                    answer_dict["attending_doctor"] = []
+                if (answer_dict["attending_doctors"] is not None
+                    and answer_dict["attending_doctors"] != ""
+                    and "[" not in answer_dict["attending_doctors"] 
+                    and type(answer_dict["attending_doctors"]) == str):
+                    answer_dict["attending_doctors"] = [answer_dict["attending_doctors"]]
+                elif answer_dict["attending_doctors"] is None or answer_dict["attending_doctors"] == "":
+                    answer_dict["attending_doctors"] = []
                 answer = QAAnalyzeAnswer(**answer_dict)
             else:
                 answer = QAAnalyzeAnswer()
@@ -270,6 +271,8 @@ class QAService:
             answer = QAAnalyzeAnswer()
 
         if self._config.features.return_source:
+            answer.model_response = response
+            answer.prompt = formatted_prompt
             for question in questions_dict:
                 answer.sources = answer.sources + self._collect_source_docs(
                     question, questions_dict[question])
@@ -308,12 +311,13 @@ class QAService:
         fields: Dict[str, str]= {
             "Wie heißt der Patient?" : "patient_name",
             "Wann hat der Patient Geburstag?" : "patient_date_of_birth",
-            "Wie heißt der Arzt?" : "attending_doctor",
+            "Wie heißt der Arzt?" : "attending_doctors",
             "Wann wurde der Patient bei uns aufgenommen?" : "recording_date",
             "Wann wurde der Patient bei uns entlassen?" : "release_date"}
         questions_dict : Dict[str, str] = {}
         parameters: Dict[str, str] = {}
         answer_dict: Dict[str, str] = {}
+        responses: str = ""
 
         for question_m, question_v in questions_model_dict.items():
             questions_dict[question_m] = list(self._vectorstore.search(
@@ -342,15 +346,22 @@ class QAService:
                 response = response.replace('"""', '"')
                 response = response.replace("\t", "").replace("\n", "")
 
+            responses = responses + "; " + question_m + ": " + response
+
             try:
                 answer = json.loads(response)["answer"]
-
-                if answer is not None:
+                
+                if answer is not None and fields[question_m] == "attending_doctors" and "[" not in response:
+                    answer_dict[fields[question_m]] = [answer]
+                elif answer is not None:
                     answer_dict[fields[question_m]] = answer
                 else:
                     answer_dict[fields[question_m]] = ""
             except BaseException:
-                answer_dict[fields[question_m]] = ""
+                if fields[question_m] == "attending_doctors":
+                    answer_dict[fields[question_m]] = []
+                else:
+                    answer_dict[fields[question_m]] = ""
 
             _LOGGER.info(
                 "\n===== Modelresult ====\n\n%s\n\n====================",
@@ -360,6 +371,7 @@ class QAService:
         answer = QAAnalyzeAnswer(**answer_dict)
 
         if self._config.features.return_source:
+            answer.model_response = responses
             for question in questions_dict:
                 answer.sources = answer.sources + self._collect_source_docs(
                     question, questions_dict[question]

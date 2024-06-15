@@ -30,6 +30,7 @@ class QAAnswer(BaseModel):
     error_msg: str = ""
     answer: str = ""
     sources: List[DocumentSource] = []
+    model_response: str = ""
 
 class QAAnalyzeAnswer(BaseModel):
     status: int = 200
@@ -54,7 +55,7 @@ class QAAnalyzeAnswer(BaseModel):
     # Context
     recording_date: str = ""
     recording_duration: str = ""
-    attending_doctor: List[str] = []
+    attending_doctors: List[str] = []
     release_date: str = ""
     family_doctor: str = ""
     institution: str = ""
@@ -72,6 +73,9 @@ class QAAnalyzeAnswer(BaseModel):
     reason: str = ""
     route: str = ""
     strength: str = ""
+    model_response: str = ""
+    prompt: str = ""
+
 
 class QAModesEnum(Enum):
     NONE = 0,
