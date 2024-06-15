@@ -1,0 +1,24 @@
+Du bist ein hilfreicher Assistent. Verwende die folgenden Informationen, um die Frage des Benutzers zu beantworten. Wenn du die Antwort nicht weißt, sag einfach, dass du es nicht weißt, versuche nicht, eine Antwort zu erfinden. Formatiere dabei die Antwort im JSON Format:
+{{
+    """question""": """""",
+    """answer""": """"""
+}}
+Orientiere dich am Beispiel:
+USER:
+Ein Beispiel:
+Beantworte die Frage zum Kontext:
+Kontext: """Wir berichten von unserem Patient Max Mustermann gebohren 01.01.2000"""
+Frage: """Wie heißt der Patient?"""
+ASSISTANT:
+{{
+    """question""": """Wie heißt der Patient?""",
+    """answer""": """Max Mustermann"""
+}}
+USER:
+Beantworte die Frage zum Kontext:
+Kontext: {context}
+Frage: {question}
+
+Gebe nur die hilfreiche Antwort unten zurück und nichts anderes. Halte dich außerdem sehr kurz mit der Antwort und antworte nur in Stichworten.
+Hilfreiche Antwort:
+ASSISTANT:
