@@ -71,6 +71,7 @@ class GenerationService:
             top_k=self._config.model.top_k,
             temperature=self._config.model.temperature,
             repetition_penalty=self._config.model.repetition_penalty,
+            reset=self._config.model.reset,
         )
         _LOGGER.debug(
             "\n====== Response =====\n\n%s\n\n=============================", response
