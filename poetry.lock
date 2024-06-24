@@ -4024,5 +4024,5 @@ gpu = ["faiss-gpu"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.12, <3.13"
-content-hash = "09a3c285f3a779532cfd5ad0508be5ab24c8158e42d57f41e5653dee3c616591"
+python-versions = ">=3.12, <4.0"
+content-hash = "eff0b62b0a5ef858d493a926d776a221acab3c520d52c22c2e50079259f41b06"

@@ -14,7 +14,7 @@ torch = [
     { version = ">=2.0.0, !=2.0.1", platform = "!darwin", source = "torch_cpu" },
     { version = ">=2.0.0, !=2.0.1", platform = "darwin", source = "PyPI" },
 ]
-python = ">=3.12, <3.13"
+python = ">=3.12, <4.0"
 transformers = "^4.41.2"
 ctransformers = "^0.2.27"
 faiss-cpu = { version = "~1.7.4", optional = true }
