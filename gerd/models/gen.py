@@ -8,7 +8,7 @@ class ContinuationConfig(BaseModel):
 
 
 class GenerationFeaturesConfig(BaseModel):
-    continuation: ContinuationConfig
+    continuation: ContinuationConfig | None = None
 
 
 class GenerationConfig(BaseModel):
