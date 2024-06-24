@@ -1,8 +1,8 @@
 import pytest
 
-from team_red.config import CONFIG
-from team_red.qa import QAService
-from team_red.transport import FileTypes, QAFileUpload, QAQuestion
+from gerd.config import CONFIG
+from gerd.qa import QAService
+from gerd.transport import FileTypes, QAFileUpload, QAQuestion
 
 
 @pytest.fixture()

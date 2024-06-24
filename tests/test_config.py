@@ -1,4 +1,4 @@
-from team_red.config import Settings
+from gerd.config import Settings
 
 
 def test_config() -> None:

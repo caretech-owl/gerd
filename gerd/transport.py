@@ -3,7 +3,7 @@ from typing import Dict, List, Protocol
 
 from pydantic import BaseModel
 
-from team_red.models.model import PromptConfig
+from gerd.models.model import PromptConfig
 
 
 class GenResponse(BaseModel):

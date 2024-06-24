@@ -3,7 +3,7 @@ from typing import Dict, Iterable, Tuple
 
 import gradio as gr
 
-from team_red.backend import TRANSPORTER
+from gerd.backend import TRANSPORTER
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
@@ -23,20 +23,13 @@ _field_labels = {
     "patient_address": "Adresse des Patienten",
 }
 
-sections = [
-    "Anrede",
-    "Anamnese",
-    "Diagnose",
-    "Behandlung",
-    "Medikation",
-    "Grußformel"
-]
+sections = ["Anrede", "Anamnese", "Diagnose", "Behandlung", "Medikation", "Grußformel"]
 
 logging.basicConfig(level=logging.DEBUG)
 
 
 def _pairwise(
-    fields: Tuple[gr.Textbox, ...]
+    fields: Tuple[gr.Textbox, ...],
 ) -> Iterable[Tuple[gr.Textbox, gr.Textbox, gr.Textbox]]:
     a = iter(fields)
     return zip(a, a, a)
@@ -50,10 +43,12 @@ def generate(*fields: gr.Textbox) -> Tuple[str, str, gr.TextArea, gr.Button]:
             raise gr.Error(msg)
         params[key] = value
     response = TRANSPORTER.generate(params)
-    return (response.text,
-            response.text,
-            gr.TextArea(label="Dokument", interactive=True),
-            gr.Button("Kontinuiere Dokument", visible=True))
+    return (
+        response.text,
+        response.text,
+        gr.TextArea(label="Dokument", interactive=True),
+        gr.Button("Kontinuiere Dokument", visible=True),
+    )
 
 
 def compare_paragraphs(src_doc: str, mod_doc: str) -> Dict[str, str]:
@@ -109,12 +104,14 @@ with demo:
     output = gr.TextArea(label="Dokument", interactive=False)
     submit_button = gr.Button("Generiere Dokument")
     continuation_button = gr.Button("Kontinuiere Dokument", visible=False)
-    submit_button.click(fn=generate,
-                        inputs=fields,
-                        outputs=[output, temp_output, output, continuation_button])
-    continuation_button.click(fn=gen_continue,
-                              inputs=[temp_output, output],
-                              outputs=[output, temp_output])
+    submit_button.click(
+        fn=generate,
+        inputs=fields,
+        outputs=[output, temp_output, output, continuation_button],
+    )
+    continuation_button.click(
+        fn=gen_continue, inputs=[temp_output, output], outputs=[output, temp_output]
+    )
 
 
 if __name__ == "__main__":

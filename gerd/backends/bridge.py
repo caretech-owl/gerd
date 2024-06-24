@@ -1,10 +1,10 @@
 import logging
 from typing import Dict, List, Optional
 
-from team_red.config import CONFIG
-from team_red.gen import GenerationService
-from team_red.qa import QAService
-from team_red.transport import QAQuestion
+from gerd.config import CONFIG
+from gerd.gen import GenerationService
+from gerd.qa import QAService
+from gerd.transport import QAQuestion
 
 from ..transport import (
     DocumentSource,

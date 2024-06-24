@@ -3,11 +3,12 @@
         Module: Open-source LLM Setup
 ===========================================
 """
+
 import logging
 
 from langchain.llms import CTransformers
 
-from team_red.models.model import ModelConfig
+from gerd.models.model import ModelConfig
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
@@ -26,7 +27,7 @@ def build_llm(model: ModelConfig) -> CTransformers:  # type: ignore[no-any-unimp
             "top_p": model.top_p,
             "top_k": model.top_k,
             "repetition_penalty": model.repetition_penalty,
-            "last_n_tokens": model.last_n_tokens
+            "last_n_tokens": model.last_n_tokens,
         },
     )
 

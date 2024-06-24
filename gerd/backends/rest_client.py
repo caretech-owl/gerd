@@ -4,8 +4,8 @@ from typing import Dict, List
 import requests
 from pydantic import TypeAdapter
 
-from team_red.config import CONFIG
-from team_red.transport import QAQuestion
+from gerd.config import CONFIG
+from gerd.transport import QAQuestion
 
 from ..transport import (
     DocumentSource,

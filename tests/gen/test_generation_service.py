@@ -1,8 +1,8 @@
 import pytest
 
-from team_red.config import CONFIG
-from team_red.gen.generation_service import GenerationService
-from team_red.transport import PromptConfig
+from gerd.config import CONFIG
+from gerd.gen.generation_service import GenerationService
+from gerd.transport import PromptConfig
 
 
 @pytest.fixture()

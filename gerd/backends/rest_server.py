@@ -4,9 +4,9 @@ from typing import Dict, List
 import uvicorn
 from fastapi import APIRouter, FastAPI
 
-from team_red.backends.bridge import Bridge
-from team_red.config import CONFIG
-from team_red.transport import QAQuestion
+from gerd.backends.bridge import Bridge
+from gerd.config import CONFIG
+from gerd.transport import QAQuestion
 
 from ..transport import (
     DocumentSource,
@@ -96,7 +96,7 @@ app.include_router(rest_server.router)
 
 if __name__ == "__main__":
     uvicorn.run(
-        "team_red.backends.rest_server:app",
+        "gerd.backends.rest_server:app",
         host=CONFIG.server.host,
         port=CONFIG.server.port,
         reload=True,

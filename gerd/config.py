@@ -9,10 +9,10 @@ from pydantic_settings import (
 )
 from yaml import safe_load
 
-from team_red.models.gen import GenerationConfig
-from team_red.models.logging import LoggingConfig
-from team_red.models.qa import QAConfig
-from team_red.models.server import ServerConfig
+from gerd.models.gen import GenerationConfig
+from gerd.models.logging import LoggingConfig
+from gerd.models.qa import QAConfig
+from gerd.models.server import ServerConfig
 
 PROJECT_DIR = Path(__file__).parent.parent
 

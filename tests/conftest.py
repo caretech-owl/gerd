@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from team_red.config import CONFIG
+from gerd.config import CONFIG
 
 TEST_PATH = Path(__file__).resolve().parent
 DATA_PATH = Path(TEST_PATH, "data")

@@ -13,9 +13,9 @@ from langchain.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 
-from team_red.llm import build_llm
-from team_red.models.qa import QAConfig
-from team_red.transport import (
+from gerd.llm import build_llm
+from gerd.models.qa import QAConfig
+from gerd.transport import (
     DocumentSource,
     FileTypes,
     PromptConfig,
@@ -23,7 +23,7 @@ from team_red.transport import (
     QAFileUpload,
     QAQuestion,
 )
-from team_red.utils import build_retrieval_qa
+from gerd.utils import build_retrieval_qa
 
 if TYPE_CHECKING:
     from langchain.document_loaders.base import BaseLoader

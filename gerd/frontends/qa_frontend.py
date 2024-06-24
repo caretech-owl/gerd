@@ -4,8 +4,8 @@ from typing import Optional
 
 import gradio as gr
 
-from team_red.backend import TRANSPORTER
-from team_red.transport import PromptConfig, QAFileUpload, QAQuestion
+from gerd.backend import TRANSPORTER
+from gerd.transport import PromptConfig, QAFileUpload, QAQuestion
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())

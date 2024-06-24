@@ -21,22 +21,28 @@ class PromptConfig(BaseModel):
     @computed_field  # type: ignore[misc]
     @property
     def parameters(self) -> List[str]:
-        field_names = {fn: None for _, fn, _, _ in Formatter().parse(self.text)
-                       if fn is not None}
-        custom_order=['attending_physician',
-                     'hospital',
-                     'patient_name',
-                     'patient_birth_date',
-                     'patient_address',
-                     'date_of_stay',
-                     'anamnesis',
-                     'diagnosis',
-                     'treatment',
-                     'medication',]
-        return sorted(field_names.keys(),
-                      key=lambda key: (custom_order.index(key)
-                                       if key in custom_order else len(custom_order),
-                                       list(field_names.keys()).index(key)))
+        field_names = {
+            fn: None for _, fn, _, _ in Formatter().parse(self.text) if fn is not None
+        }
+        custom_order = [
+            "attending_physician",
+            "hospital",
+            "patient_name",
+            "patient_birth_date",
+            "patient_address",
+            "date_of_stay",
+            "anamnesis",
+            "diagnosis",
+            "treatment",
+            "medication",
+        ]
+        return sorted(
+            field_names.keys(),
+            key=lambda key: (
+                custom_order.index(key) if key in custom_order else len(custom_order),
+                list(field_names.keys()).index(key),
+            ),
+        )
 
 
 # Default values chosen by https://github.com/marella/ctransformers#config
