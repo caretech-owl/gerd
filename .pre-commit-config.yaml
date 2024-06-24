@@ -1,18 +1,18 @@
 default_language_version:
-    python: python3.11
+    python: python3.12
 
 repos:
   - repo: https://github.com/python-poetry/poetry
-    rev: 1.7.0
+    rev: 1.8.3
     hooks:
       - id: poetry-check
       - id: poetry-lock
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.6.26
+    rev: v1.7.1
     hooks:
       - id: actionlint
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.4
+    rev: v0.4.10
     hooks:
       - id: ruff-format
       - id: ruff
