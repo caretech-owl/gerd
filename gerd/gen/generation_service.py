@@ -65,7 +65,7 @@ class GenerationService:
         )
         response = self._model(
             resolved,
-            stop="<|im_end|>",
+            stop=self._config.model.stop,
             max_new_tokens=self._config.model.max_new_tokens,
             top_p=self._config.model.top_p,
             top_k=self._config.model.top_k,
@@ -87,7 +87,7 @@ class GenerationService:
         )
         response = self._model(
             resolved,
-            stop="<|im_end|>",
+            stop=self._config.features.model.stop,
             max_new_tokens=self._config.features.continuation.model.max_new_tokens,
             top_p=self._config.features.continuation.model.top_p,
             top_k=self._config.features.continuation.model.top_k,
