@@ -10,6 +10,7 @@ class GenResponse(BaseModel):
     status: int = 200
     text: str = ""
     error_msg: str = ""
+    prompt: str | None = None
 
 
 class QAQuestion(BaseModel):

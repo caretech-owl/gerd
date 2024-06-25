@@ -56,7 +56,9 @@ class GenerationService:
     def get_prompt(self) -> PromptConfig:
         return self._config.model.prompt
 
-    def generate(self, parameters: Dict[str, str]) -> GenResponse:
+    def generate(
+        self, parameters: Dict[str, str], add_prompt: bool = False
+    ) -> GenResponse:
         generate_prompt = self._config.model.prompt.text
         resolved = generate_prompt.format(**parameters)
         _LOGGER.debug(
@@ -76,7 +78,7 @@ class GenerationService:
         _LOGGER.debug(
             "\n====== Response =====\n\n%s\n\n=============================", response
         )
-        return GenResponse(text=response)
+        return GenResponse(text=response, prompt=resolved if add_prompt else None)
 
     def gen_continue(self, parameters: Dict[str, str]) -> GenResponse:
         fmt = PartialFormatter()
