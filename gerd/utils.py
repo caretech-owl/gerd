@@ -6,9 +6,9 @@
 
 from langchain.chains import RetrievalQA
 from langchain.chains.retrieval_qa.base import BaseRetrievalQA
-from langchain.llms import CTransformers
 from langchain.prompts import PromptTemplate
-from langchain.vectorstores import FAISS
+from langchain_community.llms import CTransformers
+from langchain_community.vectorstores import FAISS
 
 from .config import CONFIG
 

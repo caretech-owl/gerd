@@ -6,7 +6,7 @@
 
 import logging
 
-from langchain.llms import CTransformers
+from langchain_community.llms import CTransformers
 
 from gerd.models.model import ModelConfig
 

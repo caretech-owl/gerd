@@ -141,3 +141,6 @@ data/*.pdf
 
 # do not upload encrypted secrets
 *.secrets.yml
+
+# no ide specific stuff
+.vscode

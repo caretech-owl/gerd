@@ -7,11 +7,11 @@ from typing import TYPE_CHECKING, Iterable, List, Optional, Protocol
 
 from langchain.chains.retrieval_qa.base import BaseRetrievalQA
 from langchain.docstore.document import Document
-from langchain.document_loaders import PyPDFLoader, TextLoader
-from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import FAISS
+from langchain_community.document_loaders import PyPDFLoader, TextLoader
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
 
 from gerd.llm import build_llm
 from gerd.models.qa import QAConfig

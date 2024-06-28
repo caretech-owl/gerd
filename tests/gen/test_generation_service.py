@@ -41,3 +41,17 @@ def test_generate(gen_service: GenerationService) -> None:
     assert response.status == 200
     assert response.error_msg == ""
     assert response.text
+
+
+def test_jinja_prompt(gen_service: GenerationService) -> None:
+    _ = gen_service.set_prompt(PromptConfig(path="tests/data/simple_prompt.jinja"))
+    response = gen_service.generate(
+        {
+            "task": "Halte dich so kurz wie möglich und sag "
+            "das Wort 'hallo'! Das Wort 'hallo' muss in "
+            "der Ausgabe erscheinen."
+        }
+    )
+    assert response.status == 200
+    assert response.error_msg == ""
+    assert "hallo" in response.text.lower()
