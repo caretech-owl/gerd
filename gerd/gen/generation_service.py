@@ -1,6 +1,6 @@
 import logging
 import string
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from ctransformers import AutoModelForCausalLM
 
@@ -59,8 +59,12 @@ class GenerationService:
     def generate(
         self, parameters: Dict[str, str], add_prompt: bool = False
     ) -> GenResponse:
-        generate_prompt = self._config.model.prompt.text
-        resolved = generate_prompt.format(**parameters)
+        template = self._config.model.prompt.template
+        resolved = (
+            template.render(**parameters)
+            if template
+            else self._config.model.prompt.text.format(**parameters)
+        )
         _LOGGER.debug(
             "\n====== Resolved prompt =====\n\n%s\n\n=============================",
             resolved,
