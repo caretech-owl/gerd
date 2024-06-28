@@ -1,21 +1,19 @@
+from functools import cached_property
 from pathlib import Path
 from string import Formatter
 from typing import Any, List, Optional
 
-from jinja2 import Environment, FileSystemLoader, Template
+from jinja2 import Environment, FileSystemLoader, Template, meta
 from pydantic import (
     BaseModel,
     ConfigDict,
-    FieldSerializationInfo,
     ValidationError,
     computed_field,
-    field_serializer,
 )
 
 
 class PromptConfig(BaseModel):
     text: str = ""
-    template: Template | None = None
     path: Optional[str] = None
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -26,28 +24,31 @@ class PromptConfig(BaseModel):
             if Path(self.path).exists():
                 with path.open("r", encoding="utf-8") as f:
                     self.text = f.read()
-                    if path.suffix == ".jinja":
-                        loader = FileSystemLoader(searchpath=str(path.parent))
-                        env = Environment(loader=loader, autoescape=True)
-                        self.template = env.get_template(path.name)
             else:
                 msg = f"Prompt text is not set and '{self.path}' does not exist!"
                 raise ValidationError(msg)
 
-    @field_serializer("template")
-    def serialize_template(
-        self, template: Template | None, _info: FieldSerializationInfo
-    ) -> str:
-        if template:
-            return Path(template.filename).read_text()
+    @cached_property
+    def template(self) -> Template | None:
+        if not self.path:
+            return Template(self.text)
+        path = Path(self.path)
+        if path.suffix == ".jinja":
+            loader = FileSystemLoader(searchpath=str(path.parent))
+            env = Environment(loader=loader, autoescape=True)
+            return env.get_template(path.name)
         return None
 
     @computed_field  # type: ignore[misc]
     @property
     def parameters(self) -> List[str]:
-        field_names = {
-            fn: None for _, fn, _, _ in Formatter().parse(self.text) if fn is not None
-        }
+        field_names = (
+            {fn for _, fn, _, _ in Formatter().parse(self.text) if fn is not None}
+            if not self.template
+            else meta.find_undeclared_variables(
+                Environment(autoescape=True).parse(self.text)
+            )
+        )
         custom_order = [
             "attending_physician",
             "hospital",
@@ -61,10 +62,10 @@ class PromptConfig(BaseModel):
             "medication",
         ]
         return sorted(
-            field_names.keys(),
+            field_names,
             key=lambda key: (
                 custom_order.index(key) if key in custom_order else len(custom_order),
-                list(field_names.keys()).index(key),
+                list(field_names).index(key),
             ),
         )
 
