@@ -110,16 +110,33 @@ def upload(file_path: str, progress: Optional[gr.Progress] = None) -> None:
     progress(100, desc="Fertig!")
 
 def handle_type_radio_selection_change(search_type: str) -> bool:
-    if search_type == "LLM" or search_type == "VectorDB":
+    is_interactive : bool = False
+    placeholder: str = ""
+    prompt: str = ""
+
+    if search_type == "LLM":
         return [gr.update(interactive=True,
                           placeholder="Wie heißt der Patient?"),
                 gr.update(value=TRANSPORTER.get_qa_prompt(
-                    get_qa_mode(search_type)).text)
+                    get_qa_mode(search_type)).text),
+                gr.update(interactive=False),
+                gr.update(interactive=False)
                 ]
+    elif search_type == "VectorDB":
+        return [gr.update(interactive=True,
+                          placeholder="Wie heißt der Patient?"),
+                gr.update(value=TRANSPORTER.get_qa_prompt(
+                    get_qa_mode(search_type)).text),
+                gr.update(interactive=True),
+                gr.update(interactive=True)
+                ]
+    
     return [gr.update(interactive=False,
                       placeholder=""),
             gr.update(value=TRANSPORTER.get_qa_prompt(
-                get_qa_mode(search_type)).text)
+                get_qa_mode(search_type)).text),
+                gr.update(interactive=False),
+                gr.update(interactive=False)
             ]
 
 def handle_developer_mode_checkbox_change(check: bool) -> bool:
@@ -169,13 +186,13 @@ with demo:
                 maximum=10,
                 step=1,
                 value=3,
-                interactive=True,
+                interactive=False,
                 label="Quellenanzahl",
             )
             strategy_dropdown = gr.Dropdown(
                 choices=["similarity", "mmr"],
                 value="similarity",
-                interactive=True,
+                interactive=False,
                 label="Suchmodus"
             )
 
@@ -189,7 +206,7 @@ with demo:
         label="Stellen Sie eine Frage:", placeholder="Wie heißt der Patient?"
     )
     type_radio.change(fn=handle_type_radio_selection_change,
-                      inputs=type_radio, outputs=[inp, prompt]
+                      inputs=type_radio, outputs=[inp, prompt, k_slider, strategy_dropdown]
     )
     out = gr.Textbox(label="Antwort")
     file_upload.change(fn=upload, inputs=file_upload, outputs=out)
