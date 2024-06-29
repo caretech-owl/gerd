@@ -130,7 +130,7 @@ def handle_type_radio_selection_change(search_type: str) -> bool:
                 gr.update(interactive=True),
                 gr.update(interactive=True)
                 ]
-    
+
     return [gr.update(interactive=False,
                       placeholder=""),
             gr.update(value=TRANSPORTER.get_qa_prompt(
@@ -206,7 +206,8 @@ with demo:
         label="Stellen Sie eine Frage:", placeholder="Wie heißt der Patient?"
     )
     type_radio.change(fn=handle_type_radio_selection_change,
-                      inputs=type_radio, outputs=[inp, prompt, k_slider, strategy_dropdown]
+                      inputs=type_radio,
+                      outputs=[inp, prompt, k_slider, strategy_dropdown]
     )
     out = gr.Textbox(label="Antwort")
     file_upload.change(fn=upload, inputs=file_upload, outputs=out)
