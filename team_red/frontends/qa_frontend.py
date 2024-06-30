@@ -115,10 +115,6 @@ def upload(file_path: str, progress: Optional[gr.Progress] = None) -> None:
     progress(100, desc="Fertig!")
 
 def handle_type_radio_selection_change(search_type: str) -> bool:
-    is_interactive : bool = False
-    placeholder: str = ""
-    prompt: str = ""
-
     if search_type == "LLM":
         return [gr.update(interactive=True,
                           placeholder="Wie heißt der Patient?"),
