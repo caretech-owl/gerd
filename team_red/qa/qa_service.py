@@ -3,7 +3,7 @@ import logging
 from os import unlink
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import TYPE_CHECKING, Dict, Iterable, List, Optional, Protocol
+from typing import TYPE_CHECKING, Dict, Iterable, List, Optional, Protocol, Tuple
 
 from ctransformers import AutoModelForCausalLM
 from langchain.chains.retrieval_qa.base import BaseRetrievalQA
@@ -23,8 +23,8 @@ from team_red.transport import (
     PromptConfig,
     QAAnalyzeAnswer,
     QAAnswer,
-    QAModesEnum,
     QAFileUpload,
+    QAModesEnum,
     QAQuestion,
 )
 from team_red.utils import build_retrieval_qa
@@ -134,7 +134,7 @@ class QAService:
 
         response = self._query_model(self._config.model, formatted_prompt)
 
-        _LOGGER.warning(
+        _LOGGER.info(
             "\n===== Modelresult ====\n\n%s\n\n====================",
             response
         )
@@ -164,14 +164,7 @@ class QAService:
                     self._config.features.fact_checking.model.prompt
                 )
             response = self._fact_checker_db({"query": response["result"]})
-            for doc in response.get("source_documents", []):
-                answer.sources.append(
-                    DocumentSource(
-                        content=doc.page_content,
-                        name=doc.metadata.get("source", "unknown"),
-                        page=doc.metadata.get("page", 1),
-                    )
-                )
+
             answer.sources.append(
                 self._collect_source_docs(
                     response.get("source_documents", [])))
@@ -187,8 +180,6 @@ class QAService:
 
         config = self._config.features.analyze
         self._model = self._init_model(config.model)
-
-        qa_analyze_prompt = config.model.prompt
 
         questions_model_dict : Dict[str, str] = {
             "Wie heißt der Patient?" :
@@ -215,6 +206,17 @@ class QAService:
         parameters: Dict[str, str] = {}
         question_counter : int = 0
 
+        qa_analyze_prompt = config.model.prompt
+        for i in range(0, len(questions_model_dict)):
+            if ("context" + str(i) not in qa_analyze_prompt.parameters
+                or "question" + str(i)
+                not in qa_analyze_prompt.parameters):
+                msg = ("Prompt does not include '{context"
+                + str(i) + "}' or '{question"
+                + str(i) + "}' variable.")
+                _LOGGER.error(msg)
+                return QAAnalyzeAnswer(status=404, error_msg=msg)
+
         for question_m, question_v in questions_model_dict.items():
             questions_dict[question_m] = list(self._vectorstore.search(
                 question_v,
@@ -228,15 +230,6 @@ class QAService:
             parameters["question" + str(question_counter)] = question_m
             parameters["field" + str(question_counter)] = fields[question_m]
 
-            if ("context" + str(question_counter) not in qa_analyze_prompt.parameters
-                or "question" + str(question_counter)
-                not in qa_analyze_prompt.parameters):
-                msg = ("Prompt does not include '{context"
-                + str(question_counter) + "}' or '{question"
-                + str(question_counter) + "}' variable.")
-                _LOGGER.error(msg)
-                return QAAnalyzeAnswer(status=404, error_msg=msg)
-
             question_counter = question_counter + 1
 
         formatted_prompt = qa_analyze_prompt.text.format(**parameters)
@@ -244,7 +237,7 @@ class QAService:
         response = self._query_model(config.model, formatted_prompt)
 
         if response is not None:
-            response = response.replace('"""', '"')
+            response = self._clean_response(response)
 
         _LOGGER.info(
             "\n===== Modelresult ====\n\n%s\n\n====================",
@@ -252,23 +245,7 @@ class QAService:
         )
 
         # convert json to QAAnalyzerAnswerclass
-        try:
-            answer_dict = json.loads(response)
-            _LOGGER.info(type(answer_dict["attending_doctors"]))
-            if answer_dict is not None:
-                if (answer_dict["attending_doctors"] is not None
-                    and answer_dict["attending_doctors"] != ""
-                    and "[" not in answer_dict["attending_doctors"] 
-                    and type(answer_dict["attending_doctors"]) == str):
-                    answer_dict["attending_doctors"] = [answer_dict["attending_doctors"]]
-                elif answer_dict["attending_doctors"] is None or answer_dict["attending_doctors"] == "":
-                    answer_dict["attending_doctors"] = []
-                answer = QAAnalyzeAnswer(**answer_dict)
-            else:
-                answer = QAAnalyzeAnswer()
-        except BaseException as err:
-            _LOGGER.error(err)
-            answer = QAAnalyzeAnswer()
+        answer = self._format_response_analyze(response)
 
         if self._config.features.return_source:
             answer.model_response = response
@@ -291,9 +268,15 @@ class QAService:
             return QAAnalyzeAnswer(status=404, error_msg=msg)
 
         config = self._config.features.analyze_mult_prompts
-        self._model = self._init_model(config.model)
 
         qa_analyze_mult_prompts = config.model.prompt
+        if ("context" not in qa_analyze_mult_prompts.parameters
+                or "question"  not in qa_analyze_mult_prompts.parameters):
+                msg = "Prompt does not include '{context}' or '{question}' variable."
+                _LOGGER.error(msg)
+                return QAAnalyzeAnswer(status=404, error_msg=msg)
+
+        self._model = self._init_model(config.model)
 
         questions_model_dict : Dict[str, str] = {
             "Wie heißt der Patient?" :
@@ -306,8 +289,6 @@ class QAService:
             "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren",
             "Wann wurde der Patient bei uns entlassen?" :
             "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren"}
-
-
         fields: Dict[str, str]= {
             "Wie heißt der Patient?" : "patient_name",
             "Wann hat der Patient Geburstag?" : "patient_date_of_birth",
@@ -315,53 +296,23 @@ class QAService:
             "Wann wurde der Patient bei uns aufgenommen?" : "recording_date",
             "Wann wurde der Patient bei uns entlassen?" : "release_date"}
         questions_dict : Dict[str, str] = {}
-        parameters: Dict[str, str] = {}
         answer_dict: Dict[str, str] = {}
         responses: str = ""
 
         for question_m, question_v in questions_model_dict.items():
-            questions_dict[question_m] = list(self._vectorstore.search(
-                question_v,
-                search_type="similarity",
-                k=3
-                ))
-
-            parameters["context"] = " ".join(
-                doc.page_content for doc in questions_dict[question_m]
-            )
-            parameters["question"] = question_m
-
-            if ("context" not in qa_analyze_mult_prompts.parameters
-                or "question"  not in qa_analyze_mult_prompts.parameters):
-                msg = "Prompt does not include '{context}' or '{question}' variable."
-                _LOGGER.error(msg)
-                return QAAnalyzeAnswer(status=404, error_msg=msg)
-
-
-            formatted_prompt = qa_analyze_mult_prompts.text.format(**parameters)
+            questions_dict, formatted_prompt = self._create_analyze_mult_prompt(
+                question_m, question_v, qa_analyze_mult_prompts.text)
 
             response = self._query_model(config.model, formatted_prompt)
 
             if response is not None:
-                response = response.replace('"""', '"')
-                response = response.replace("\t", "").replace("\n", "")
+                response = self._clean_response(response)
 
-            responses = responses + "; " + question_m + ": " + response
+                if self._config.features.return_source:
+                    responses = responses + "; " + question_m + ": " + response
 
-            try:
-                answer = json.loads(response)["answer"]
-                
-                if answer is not None and fields[question_m] == "attending_doctors" and "[" not in response:
-                    answer_dict[fields[question_m]] = [answer]
-                elif answer is not None:
-                    answer_dict[fields[question_m]] = answer
-                else:
-                    answer_dict[fields[question_m]] = ""
-            except BaseException:
-                if fields[question_m] == "attending_doctors":
-                    answer_dict[fields[question_m]] = []
-                else:
-                    answer_dict[fields[question_m]] = ""
+            answer_dict[fields[question_m]] = self._format_response_analyze_mult_prompt(
+                response, fields[question_m])
 
             _LOGGER.info(
                 "\n===== Modelresult ====\n\n%s\n\n====================",
@@ -466,6 +417,57 @@ class QAService:
                 repetition_penalty = model_config.repetition_penalty,
             )
 
+    def _create_analyze_mult_prompt(
+            self, model_q: str, vector_q: str, prompt: str
+            ) -> Tuple[Dict[str, str], str]:
+        parameters: Dict[str, str] = {}
+        questions_dict : Dict[str, str] = {}
+
+        questions_dict[model_q] = list(self._vectorstore.search(
+                vector_q,
+                search_type="similarity",
+                k=3
+                ))
+
+        parameters["context"] = " ".join(
+            doc.page_content for doc in questions_dict[model_q]
+        )
+        parameters["question"] = model_q
+
+        return [questions_dict, prompt.format(**parameters)]
+
+    def _format_response_analyze_mult_prompt(
+            self, response: str, field: str) -> str | List[str]:
+        try:
+            answer = json.loads(response)["answer"]
+
+            if field == "attending_doctors":
+                return self._format_attending_doctors(answer)
+            elif answer is not None:
+                return answer
+            else:
+                return ""
+        except BaseException:
+            if field == "attending_doctors":
+                return []
+            else:
+                return ""
+
+    def _format_response_analyze(self, response: str) -> QAAnalyzeAnswer:
+        try:
+            answer_dict = json.loads(response)
+
+            if answer_dict is not None:
+                answer_dict["attending_doctors"] = self._format_attending_doctors(
+                    answer_dict["attending_doctors"])
+
+                return QAAnalyzeAnswer(**answer_dict)
+            else:
+                return QAAnalyzeAnswer()
+        except BaseException as err:
+            _LOGGER.error(err)
+            return QAAnalyzeAnswer()
+
     def _collect_source_docs(
             self, question_str: str, docs: List[Document]
             ) -> List[DocumentSource]:
@@ -479,6 +481,24 @@ class QAService:
                 ) for doc in docs]
 
         return answer_sources
+
+    def _clean_response(self, response : str) -> str:
+        response = response.replace(
+            '"""', '"').replace(
+            "\t", "").replace(
+            "\n", "")
+        return response
+
+    def _format_attending_doctors(self, attending_doctors: str) -> List[str]:
+        if (attending_doctors is not None
+                and "[" not in attending_doctors
+                and isinstance(attending_doctors), str):
+            return [attending_doctors]
+        elif attending_doctors is not None and attending_doctors != "":
+            return attending_doctors
+        else:
+            return []
+
 
     def _setup_dbqa_fact_checking(self, prompt: PromptConfig) -> BaseRetrievalQA:
         _LOGGER.info("Setup fact checking...")
