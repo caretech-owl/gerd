@@ -53,6 +53,8 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
                       and key not in qa_res.__class__.__dict__
                       and key != "sources"
                       and key != "status"
+                      and key != "model_response"
+                      and key != "prompt"
         }
         qa_res_str = ", ".join(f"{key}={value}" for key, value in qa_res_dic.items())
         return qa_res_str
@@ -70,7 +72,10 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
                       and value != ""
                       and key not in qa_res.__class__.__dict__
                       and key != "sources"
-                      and key != "status"}
+                      and key != "status"
+                      and key != "model_response"
+                      and key != "prompt"
+        }
         qa_res_str = ", ".join(f"{key}={value}" for key, value in qa_res_dic.items())
         return qa_res_str
     db_res = TRANSPORTER.db_query(q)
@@ -158,7 +163,7 @@ def set_prompt(
     progress(100, "Fertig!")
 
 
-demo = gr.Blocks(title="Entlassbriefe QA")
+demo = gr.Blocks(title="Entlassbriefe QA", theme=gr.themes.Monochrome())
 
 
 with demo:
