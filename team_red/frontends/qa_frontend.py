@@ -163,7 +163,7 @@ def set_prompt(
     progress(100, "Fertig!")
 
 
-demo = gr.Blocks(title="Entlassbriefe QA", theme=gr.themes.Monochrome())
+demo = gr.Blocks(title="Entlassbriefe QA")
 
 
 with demo:
