@@ -492,7 +492,7 @@ class QAService:
     def _format_attending_doctors(self, attending_doctors: str) -> List[str]:
         if (attending_doctors is not None
                 and "[" not in attending_doctors
-                and isinstance(attending_doctors), str):
+                and isinstance(attending_doctors, str)):
             return [attending_doctors]
         elif attending_doctors is not None and attending_doctors != "":
             return attending_doctors
