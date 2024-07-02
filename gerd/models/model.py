@@ -7,6 +7,7 @@ from jinja2 import Environment, FileSystemLoader, Template, meta
 from pydantic import (
     BaseModel,
     ConfigDict,
+    Field,
     ValidationError,
     computed_field,
 )
@@ -14,7 +15,10 @@ from pydantic import (
 
 class PromptConfig(BaseModel):
     text: Optional[str] = None
-    template: Optional[Template] = None
+    template: Optional[Template] = Field(
+        exclude=True,
+        default=None,
+    )
     path: Optional[str] = None
     is_template: bool = False
 
