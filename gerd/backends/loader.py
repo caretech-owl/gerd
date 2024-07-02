@@ -42,7 +42,7 @@ def load_llama_cpp_model(model: ModelConfig) -> Llama:
     return Llama.from_pretrained(
         repo_id=model.name,
         filename=model.file,
-        context_length=model.context_length,
+        n_ctx=model.context_length,
     )
 
 
