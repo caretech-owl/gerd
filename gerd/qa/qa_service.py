@@ -73,8 +73,8 @@ class QAService:
 
     def query(self, question: QAQuestion) -> QAAnswer:
         if not self._database:
-            # if not self._vectorstore:
-            #     return QAAnswer(error_msg="No database available!", status=404)
+            if not self._vectorstore:
+                return QAAnswer(error_msg="No database available!", status=404)
             self._database = Rag(
                 self._llm,
                 self._config.model,

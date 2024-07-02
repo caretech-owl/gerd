@@ -91,15 +91,15 @@ class Rag:
             prompt.text += "\n\n{context}"
 
     def query(self, question: QAQuestion) -> QAAnswer:
-        # docs = self.store.search(
-        #     question.question,
-        #     search_type=question.search_strategy,
-        #     k=question.max_sources,
-        # )
-        # context = "\n".join(doc.page_content for doc in docs)
-        # resolved = self.prompt.text.format(context=context, question=question.question)
-        response = self.model(
+        docs = self.store.search(
             question.question,
+            search_type=question.search_strategy,
+            k=question.max_sources,
+        )
+        context = "\n".join(doc.page_content for doc in docs)
+        resolved = self.prompt.text.format(context=context, question=question.question)
+        response = self.model(
+            resolved,
             max_tokens=self.model_config.max_new_tokens,
             stop=self.model_config.stop,
             top_p=self.model_config.top_p,
@@ -108,13 +108,13 @@ class Rag:
             repeat_penalty=self.model_config.repetition_penalty,
         )["choices"][0]["text"]
         answer = QAAnswer(answer=response)
-        # if self.return_source:
-        #     for doc in docs:
-        #         answer.sources.append(
-        #             DocumentSource(
-        #                 content=doc.page_content,
-        #                 name=doc.metadata.get("source", "unknown"),
-        #                 page=doc.metadata.get("page", 1),
-        #             )
-        #         )
+        if self.return_source:
+            for doc in docs:
+                answer.sources.append(
+                    DocumentSource(
+                        content=doc.page_content,
+                        name=doc.metadata.get("source", "unknown"),
+                        page=doc.metadata.get("page", 1),
+                    )
+                )
         return answer
