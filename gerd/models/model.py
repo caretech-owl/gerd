@@ -13,38 +13,36 @@ from pydantic import (
 
 
 class PromptConfig(BaseModel):
-    text: str = ""
+    text: Optional[str] = None
+    template: Optional[Template] = None
     path: Optional[str] = None
+    is_template: bool = False
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def model_post_init(self, __context: Any) -> None:  # noqa: ANN401
-        if not self.text and self.path is not None:
+        if not self.text and self.path:
             path = Path(self.path)
-            if Path(self.path).exists():
+            if path.exists():
                 with path.open("r", encoding="utf-8") as f:
                     self.text = f.read()
+                    if self.is_template or path.suffix == ".jinja":
+                        self.is_template = True
+                        loader = FileSystemLoader(path.parent)
+                        env = Environment(loader=loader, autoescape=True)
+                        self.template = env.get_template(path.name)
             else:
                 msg = f"Prompt text is not set and '{self.path}' does not exist!"
                 raise ValidationError(msg)
-
-    @cached_property
-    def template(self) -> Template | None:
-        if not self.path:
-            return Template(self.text)
-        path = Path(self.path)
-        if path.suffix == ".jinja":
-            loader = FileSystemLoader(searchpath=str(path.parent))
-            env = Environment(loader=loader, autoescape=True)
-            return env.get_template(path.name)
-        return None
+        elif self.text and self.is_template:
+            self.template = Environment(autoescape=True).from_string(self.text)
 
     @computed_field  # type: ignore[misc]
     @property
     def parameters(self) -> List[str]:
         field_names = (
             {fn for _, fn, _, _ in Formatter().parse(self.text) if fn is not None}
-            if not self.template
+            if not self.is_template
             else meta.find_undeclared_variables(
                 Environment(autoescape=True).parse(self.text)
             )
@@ -74,7 +72,6 @@ class PromptConfig(BaseModel):
 class ModelConfig(BaseModel):
     name: str
     prompt: PromptConfig = PromptConfig()
-    type: Optional[str] = None
     file: Optional[str] = None
     top_k: int = 40
     top_p: float = 0.95

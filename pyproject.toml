@@ -16,11 +16,10 @@ torch = [
 ]
 python = ">=3.12, <4.0"
 transformers = "^4.41.2"
-ctransformers = "^0.2.27"
 faiss-cpu = { version = "~1.7.4", optional = true }
 faiss-gpu = { version = "~1.7.2", optional = true }
 ipykernel = "^6.29.4"
-langchain = "^0.2.5"
+langchain = "^0.2.6"
 pypdf = "^4.2.0"
 sentence-transformers = "^3.0.1"
 uvicorn = "^0.30.1"
@@ -31,6 +30,8 @@ fastapi = "^0.111.0"
 requests = "^2.32.3"
 jinja2 = "^3.1.4"
 langchain-community = "^0.2.6"
+llama-cpp-python = "^0.2.80"
+langchain-huggingface = "^0.0.3"
 
 [tool.poetry.group.dev]
 optional = true
@@ -56,7 +57,7 @@ name = "PyPI"
 priority = "primary"
 
 [tool.poe.tasks]
-test = "poetry run pytest"
+test = "poetry run pytest -x"
 qa = "poetry run gradio team_red/frontends/qa_frontend.py"
 gen = "poetry run gradio team_red/frontends/gen_frontend.py"
 server = "poetry run python -m gerd.backends.rest_server"

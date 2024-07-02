@@ -21,9 +21,9 @@ def test_jinja() -> None:
 
 def test_text_parameters() -> None:
     config = PromptConfig(text="A {value} prompt {test}.")
-    assert config.parameters == ["value", "test"]
+    assert config.parameters == ["test", "value"]
 
 
 def test_jinja_parameters() -> None:
-    config = PromptConfig(text="A {{ value }} prompt {{ test }}")
-    assert config.parameters == ["value", "test"]
+    config = PromptConfig(text="A {{ value }} prompt {{ test }}", is_template=True)
+    assert config.parameters == ["test", "value"]
