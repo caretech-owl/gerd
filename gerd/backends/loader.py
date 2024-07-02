@@ -43,6 +43,7 @@ def load_model_from_config(model: ModelConfig) -> Llama:
         repo_id=model.name,
         filename=model.file,
         n_ctx=model.context_length,
+        n_gpu_layers=model.gpu_layers,
     )
 
 
