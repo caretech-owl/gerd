@@ -38,7 +38,7 @@ class VectorStore(Protocol):
     embeddings: VectorEmbeddings
 
 
-def load_llama_cpp_model(model: ModelConfig) -> Llama:
+def load_model_from_config(model: ModelConfig) -> Llama:
     return Llama.from_pretrained(
         repo_id=model.name,
         filename=model.file,

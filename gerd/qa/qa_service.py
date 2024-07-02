@@ -12,7 +12,7 @@ from gerd.backends.loader import (
     VectorStore,
     create_faiss,
     load_faiss,
-    load_llama_cpp_model,
+    load_model_from_config,
 )
 from gerd.models.qa import QAConfig
 from gerd.transport import (
@@ -36,7 +36,7 @@ _LOGGER.addHandler(logging.NullHandler())
 class QAService:
     def __init__(self, config: QAConfig) -> None:
         self._config = config
-        self._llm = load_llama_cpp_model(config.model)
+        self._llm = load_model_from_config(config.model)
         self._vectorstore: Optional[VectorStore] = None
         self._database: Optional[Rag] = None
         if (

@@ -2,7 +2,7 @@ import logging
 import string
 from typing import Any, Dict
 
-from gerd.backends.loader import load_llama_cpp_model
+from gerd.backends.loader import load_model_from_config
 from gerd.models.gen import GenerationConfig
 from gerd.models.model import PromptConfig
 from gerd.transport import GenResponse
@@ -37,7 +37,7 @@ class PartialFormatter(string.Formatter):
 class GenerationService:
     def __init__(self, config: GenerationConfig) -> None:
         self._config = config
-        self._model = load_llama_cpp_model(self._config.model)
+        self._model = load_model_from_config(self._config.model)
 
     def set_prompt(self, config: PromptConfig) -> PromptConfig:
         self._config.model.prompt = config
