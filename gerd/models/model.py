@@ -63,11 +63,12 @@ class PromptConfig(BaseModel):
             "treatment",
             "medication",
         ]
+        sorted_field_names = sorted(field_names)
         return sorted(
             field_names,
             key=lambda key: (
                 custom_order.index(key) if key in custom_order else len(custom_order),
-                list(field_names).index(key),
+                sorted_field_names.index(key),
             ),
         )
 
