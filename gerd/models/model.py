@@ -89,6 +89,6 @@ class ModelConfig(BaseModel):
     stream: bool = False
     reset: bool = False
     batch_size: int = 8
-    threads: int = -1
+    threads: Optional[int] = None
     context_length: int = 0  # Currently only LLaMA, MPT and Falcon
     gpu_layers: int = 0
