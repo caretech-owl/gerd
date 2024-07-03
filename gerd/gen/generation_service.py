@@ -59,17 +59,7 @@ class GenerationService:
             "\n====== Resolved prompt =====\n\n%s\n\n=============================",
             resolved,
         )
-        if self._config.model.reset:
-            self._model.reset()
-        response = self._model(
-            resolved,
-            stop=self._config.model.stop,
-            max_tokens=self._config.model.max_new_tokens,
-            top_p=self._config.model.top_p,
-            top_k=self._config.model.top_k,
-            temperature=self._config.model.temperature,
-            repeat_penalty=self._config.model.repetition_penalty,
-        )['choices'][0]['text']
+        response = self._model.generate(resolved)
         _LOGGER.debug(
             "\n====== Response =====\n\n%s\n\n=============================", response
         )
@@ -83,15 +73,7 @@ class GenerationService:
             "\n====== Resolved prompt =====\n\n%s\n\n=============================",
             resolved,
         )
-        response = self._model(
-            resolved,
-            stop=self._config.features.model.stop,
-            max_new_tokens=self._config.features.continuation.model.max_new_tokens,
-            top_p=self._config.features.continuation.model.top_p,
-            top_k=self._config.features.continuation.model.top_k,
-            temperature=self._config.features.continuation.model.temperature,
-            repetition_penalty=self._config.model.repetition_penalty,
-        )
+        response = self._model.generate(resolved)
         _LOGGER.debug(
             "\n====== Response =====\n\n%s\n\n=============================", response
         )

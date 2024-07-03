@@ -8,12 +8,9 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
 
 from gerd.backends.loader import (
-    Rag,
-    VectorStore,
-    create_faiss,
-    load_faiss,
     load_model_from_config,
 )
+from gerd.backends.rag import Rag, VectorStore, create_faiss, load_faiss
 from gerd.models.qa import QAConfig
 from gerd.transport import (
     DocumentSource,

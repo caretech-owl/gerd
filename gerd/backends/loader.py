@@ -1,122 +1,79 @@
+import abc
 import logging
-from pathlib import Path
-from typing import Iterable, Protocol
 
-from langchain.docstore.document import Document
-from langchain_community.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEmbeddings
-from llama_cpp import Llama
-
-from gerd.models.model import ModelConfig, PromptConfig
-from gerd.transport import DocumentSource, QAAnswer, QAQuestion
+from gerd.models.model import ModelConfig
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
 
 
-class VectorEmbeddings(Protocol):
-    def embed_documents(self, documents: list[str]) -> list[list[float]]:
+class LLM:
+    @abc.abstractmethod
+    def generate(self, prompt: str) -> str:
         pass
 
 
-class VectorStore(Protocol):
-    def merge_from(self, vector_store: "VectorStore") -> None:
-        pass
+class LlamaCppLLM(LLM):
+    def __init__(self, config: ModelConfig) -> None:
+        from llama_cpp import Llama
 
-    def save_local(self, path: str) -> None:
-        pass
-
-    def add_texts(
-        self,
-        texts: Iterable[str],
-    ) -> list[str]:
-        pass
-
-    def search(self, query: str, search_type: str, k: int) -> list[Document]:
-        pass
-
-    embeddings: VectorEmbeddings
-
-
-def load_model_from_config(model: ModelConfig) -> Llama:
-    return Llama.from_pretrained(
-        repo_id=model.name,
-        filename=model.file,
-        n_ctx=model.context_length,
-        n_gpu_layers=model.gpu_layers,
-        n_threads=model.threads,
-    )
-
-
-def create_faiss(
-    documents: list[Document], model_name: str, device: str
-) -> VectorStore:
-    return FAISS.from_documents(
-        documents,
-        HuggingFaceEmbeddings(
-            model_name=model_name,
-            model_kwargs={"device": device},
-        ),
-    )
-
-
-def load_faiss(dp_path: Path, model_name: str, device: str) -> VectorStore:
-    return FAISS.load_local(
-        dp_path,
-        HuggingFaceEmbeddings(
-            model_name=model_name,
-            model_kwargs={"device": device},
-        ),
-    )
-
-
-class Rag:
-    def __init__(
-        self,
-        model: Llama,
-        model_config: ModelConfig,
-        prompt: PromptConfig,
-        store: VectorStore | None,
-        return_source: bool,
-    ) -> None:
-        self.model = model
-        self.model_config = model_config
-        self.prompt = prompt
-        self.store = store
-        self.return_source = return_source
-
-        if "context" not in prompt.parameters:
-            _LOGGER.warning(
-                "Prompt does not include '{context}' variable."
-                "It will be appened to the prompt."
-            )
-            prompt.text += "\n\n{context}"
-
-    def query(self, question: QAQuestion) -> QAAnswer:
-        docs = self.store.search(
-            question.question,
-            search_type=question.search_strategy,
-            k=question.max_sources,
+        self._config = config
+        self._model = Llama.from_pretrained(
+            repo_id=config.name,
+            filename=config.file,
+            n_ctx=config.context_length,
+            n_gpu_layers=config.gpu_layers,
+            n_threads=config.threads,
         )
-        context = "\n".join(doc.page_content for doc in docs)
-        resolved = self.prompt.text.format(context=context, question=question.question)
-        response = self.model(
-            resolved,
-            max_tokens=self.model_config.max_new_tokens,
-            stop=self.model_config.stop,
-            top_p=self.model_config.top_p,
-            top_k=self.model_config.top_k,
-            temperature=self.model_config.temperature,
-            repeat_penalty=self.model_config.repetition_penalty,
+
+    def generate(self, prompt: str) -> str:
+        if self._config.reset:
+            self._model.reset()
+
+        output = self._model(
+            prompt,
+            stop=self._config.stop,
+            max_tokens=self._config.max_new_tokens,
+            top_p=self._config.top_p,
+            top_k=self._config.top_k,
+            temperature=self._config.temperature,
+            repeat_penalty=self._config.repetition_penalty,
         )["choices"][0]["text"]
-        answer = QAAnswer(answer=response)
-        if self.return_source:
-            for doc in docs:
-                answer.sources.append(
-                    DocumentSource(
-                        content=doc.page_content,
-                        name=doc.metadata.get("source", "unknown"),
-                        page=doc.metadata.get("page", 1),
-                    )
-                )
-        return answer
+
+        return output
+
+class TransformerLLM(LLM):
+    def __init__(self, config: ModelConfig) -> None:
+        from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+
+        self._config = config
+        self._tokenizer = AutoTokenizer.from_pretrained(config.name)
+        self._model = AutoModelForCausalLM.from_pretrained(config.name)
+
+        self._pipe = pipeline(
+            task="text-generation",
+            model=self._model,
+            tokenizer=self._tokenizer,
+            pad_token_id=self._tokenizer.pad_token_id,
+            eos_token_id=self._tokenizer.eos_token_id,
+            device_map="auto",
+            framework="pt",
+        )
+
+    def generate(self, prompt: str) -> str:
+        output = self._pipe(
+            prompt,
+            maxe_new_tokens=self._config.max_new_tokens,
+            reptition_penalty=self._config.repetition_penalty,
+            top_k=self._config.top_k,
+            top_p=self._config.top_p,
+            temperature=self._config.temperature,
+        )[0]["generated_text"]
+
+        return output
+
+
+def load_model_from_config(config: ModelConfig) -> LLM:
+    if config.file:
+        return LlamaCppLLM(config)
+    return TransformerLLM(config)
