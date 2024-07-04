@@ -87,7 +87,6 @@ class ModelConfig(BaseModel):
     max_new_tokens: int = 256
     stop: Optional[List[str]] = None
     stream: bool = False
-    reset: bool = False
     batch_size: int = 8
     threads: Optional[int] = None
     context_length: int = 0  # Currently only LLaMA, MPT and Falcon

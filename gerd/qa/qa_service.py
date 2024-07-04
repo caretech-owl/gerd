@@ -7,9 +7,7 @@ from typing import TYPE_CHECKING, List, Optional
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
 
-from gerd.backends.loader import (
-    load_model_from_config,
-)
+import gerd.backends.loader as gerd_loader
 from gerd.backends.rag import Rag, VectorStore, create_faiss, load_faiss
 from gerd.models.qa import QAConfig
 from gerd.transport import (
@@ -33,7 +31,7 @@ _LOGGER.addHandler(logging.NullHandler())
 class QAService:
     def __init__(self, config: QAConfig) -> None:
         self._config = config
-        self._llm = load_model_from_config(config.model)
+        self._llm = gerd_loader.load_model_from_config(config.model)
         self._vectorstore: Optional[VectorStore] = None
         self._database: Optional[Rag] = None
         if (

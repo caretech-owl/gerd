@@ -8,9 +8,24 @@ _LOGGER.addHandler(logging.NullHandler())
 
 
 class LLM:
+
+    @abc.abstractmethod
+    def __init__(self, config: ModelConfig) -> None:
+        pass
+
     @abc.abstractmethod
     def generate(self, prompt: str) -> str:
         pass
+
+
+class MockLLM(LLM):
+
+    def __init__(self, config: ModelConfig) -> None:
+        self.ret_value = "MockLLM"
+        pass
+
+    def generate(self, prompt: str) -> str:
+        return self.ret_value
 
 
 class LlamaCppLLM(LLM):
@@ -27,8 +42,6 @@ class LlamaCppLLM(LLM):
         )
 
     def generate(self, prompt: str) -> str:
-        if self._config.reset:
-            self._model.reset()
 
         output = self._model(
             prompt,
@@ -63,11 +76,12 @@ class TransformerLLM(LLM):
     def generate(self, prompt: str) -> str:
         output = self._pipe(
             prompt,
-            maxe_new_tokens=self._config.max_new_tokens,
-            reptition_penalty=self._config.repetition_penalty,
+            max_new_tokens=self._config.max_new_tokens,
+            repetition_penalty=self._config.repetition_penalty,
             top_k=self._config.top_k,
             top_p=self._config.top_p,
             temperature=self._config.temperature,
+            do_sample=True,
         )[0]["generated_text"]
 
         return output

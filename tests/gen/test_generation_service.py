@@ -1,17 +1,28 @@
 import pytest
+from pytest_mock import MockerFixture
 
+from gerd.backends.loader import MockLLM
 from gerd.config import CONFIG
 from gerd.gen.generation_service import GenerationService
 from gerd.transport import PromptConfig
 
 
 @pytest.fixture()
-def gen_service() -> GenerationService:
+def gen_service(mocker: MockerFixture) -> GenerationService:
+    _ = mocker.patch(
+        "gerd.backends.loader.load_model_from_config",
+        return_value=MockLLM(CONFIG.gen.model),
+    )
     return GenerationService(CONFIG.gen)
 
 
-def test_init() -> None:
+def test_init(mocker: MockerFixture) -> None:
+    loader = mocker.patch(
+        "gerd.backends.loader.load_model_from_config",
+        return_value=MockLLM(CONFIG.gen.model),
+    )
     gen = GenerationService(CONFIG.gen)
+    assert loader.called
 
 
 def test_get_prompt(gen_service: GenerationService) -> None:
@@ -47,11 +58,10 @@ def test_jinja_prompt(gen_service: GenerationService) -> None:
     _ = gen_service.set_prompt(PromptConfig(path="tests/data/simple_prompt.jinja"))
     response = gen_service.generate(
         {
-            "task": "Halte dich so kurz wie möglich und sag "
-            "das Wort 'hallo'! Das Wort 'hallo' muss in "
-            "der Ausgabe erscheinen."
-        }
+            "task": "Halte dich so kurz wie möglich."
+        },
+        add_prompt=True
     )
     assert response.status == 200
     assert response.error_msg == ""
-    assert "hallo" in response.text.lower()
+    assert "Halte dich so kurz wie möglich." in response.prompt

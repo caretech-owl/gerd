@@ -1,12 +1,18 @@
 import pytest
+from pytest_mock import MockerFixture
 
+from gerd.backends.loader import MockLLM
 from gerd.config import CONFIG
 from gerd.qa import QAService
 from gerd.transport import FileTypes, QAFileUpload, QAQuestion
 
 
 @pytest.fixture()
-def qa_service() -> QAService:
+def qa_service(mocker: MockerFixture) -> QAService:
+    _ = mocker.patch(
+        "gerd.backends.loader.load_model_from_config",
+        return_value=MockLLM(CONFIG.qa.model),
+    )
     return QAService(CONFIG.qa)
 
 
@@ -17,8 +23,13 @@ def qa_service_cajal(qa_service: QAService, cajal_txt: bytes) -> QAService:
     return qa_service
 
 
-def test_init() -> None:
+def test_init(mocker: MockerFixture) -> None:
+    loader = mocker.patch(
+        "gerd.backends.loader.load_model_from_config",
+        return_value=MockLLM(CONFIG.qa.model),
+    )
     qa = QAService(CONFIG.qa)
+    assert loader.called
 
 
 def test_query_without_document(qa_service: QAService) -> None:
