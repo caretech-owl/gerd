@@ -20,15 +20,22 @@ qa_modes_dict : Dict[str, QAModesEnum] = {
 }
 
 def get_qa_mode(search_type: str) -> QAModesEnum:
+    """
+    Get QAMode from string
+    """
     if search_type in qa_modes_dict:
         return qa_modes_dict[search_type]
     else:
         return QAModesEnum.NONE
 
 def query(question: str, search_type: str, k_source: int, search_strategy: str) -> str:
+    """
+    Start the selected QA Mode
+    """
     q = QAQuestion(
         question=question, search_strategy=search_strategy, max_sources=k_source
     )
+    # start search mode
     if search_type == "LLM":
         qa_res = TRANSPORTER.qa_query(q)
         if qa_res.status != 200:
@@ -38,6 +45,7 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
             )
             raise gr.Error(msg)
         return qa_res.answer
+    # start analyze mode
     elif search_type == "Analyze":
         qa_res = TRANSPORTER.analyze_query()
         if qa_res.status != 200:
@@ -46,7 +54,7 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
                 f" (Error Code {qa_res.status})"
             )
             raise gr.Error(msg)
-
+        # remove unwanted fields from answer
         qa_res_dic = {key: value for key, value in vars(qa_res).items()
                       if value is not None
                       and value != ""
@@ -58,6 +66,7 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
         }
         qa_res_str = ", ".join(f"{key}={value}" for key, value in qa_res_dic.items())
         return qa_res_str
+    # start analyze mult prompts mode
     elif search_type == "Analyze mult.":
         qa_res = TRANSPORTER.analyze_mult_prompts_query()
         if qa_res.status != 200:
@@ -66,7 +75,7 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
                 f" (Error Code {qa_res.status})"
             )
             raise gr.Error(msg)
-
+        # remove unwanted fields from answer
         qa_res_dic = {key: value for key, value in vars(qa_res).items()
                       if value is not None
                       and value != ""
@@ -78,6 +87,7 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
         }
         qa_res_str = ", ".join(f"{key}={value}" for key, value in qa_res_dic.items())
         return qa_res_str
+    # start db search mode
     db_res = TRANSPORTER.db_query(q)
     if not db_res:
         msg = f"Database query returned empty!"
@@ -90,6 +100,9 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
 
 
 def upload(file_path: str, progress: Optional[gr.Progress] = None) -> None:
+    """
+    Upload a document to vectorstore
+    """
     if not file_path:
         return
     if progress is None:
@@ -115,6 +128,9 @@ def upload(file_path: str, progress: Optional[gr.Progress] = None) -> None:
     progress(100, desc="Fertig!")
 
 def handle_type_radio_selection_change(search_type: str) -> bool:
+    """
+    Enable/disable gui elements depend on which mode is selected
+    """
     if search_type == "LLM":
         return [gr.update(interactive=True,
                           placeholder="Wie heißt der Patient?"),
@@ -141,6 +157,9 @@ def handle_type_radio_selection_change(search_type: str) -> bool:
             ]
 
 def handle_developer_mode_checkbox_change(check: bool) -> bool:
+    """
+    Enable/disable developermode
+    """
     return [gr.update(visible=check),
             gr.update(visible=check),
             gr.update(visible=check),
@@ -151,6 +170,9 @@ def handle_developer_mode_checkbox_change(check: bool) -> bool:
 def set_prompt(
         prompt: str, search_type: str, progress: Optional[gr.Progress] = None
         ) -> None:
+    """
+    Update the prompt of the selected QA Mode
+    """
     if progress is None:
         progress = gr.Progress()
     progress(0, "Aktualisiere Prompt...")
@@ -163,6 +185,7 @@ demo = gr.Blocks(title="Entlassbriefe QA")
 
 
 with demo:
+    # define the GUI Layout
     developer_mode : bool = False
 
     gr.Markdown("# Entlassbriefe QA")
