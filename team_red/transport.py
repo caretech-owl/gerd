@@ -11,20 +11,20 @@ class GenResponse(BaseModel):
     text: str = ""
     error_msg: str = ""
 
-
+# Dataclass to hold a QAQuestion
 class QAQuestion(BaseModel):
     question: str
     search_strategy: str = "similarity"
     max_sources: int = 3
 
-
+# Dataclass to hold a docsource
 class DocumentSource(BaseModel):
     question: str
     content: str
     name: str
     page: int
 
-
+# Dataclass to hold a QAAnswer
 class QAAnswer(BaseModel):
     status: int = 200
     error_msg: str = ""
@@ -32,6 +32,7 @@ class QAAnswer(BaseModel):
     sources: List[DocumentSource] = []
     model_response: str = ""
 
+# Dataclass to hold a QAAnalyzeAnswer
 class QAAnalyzeAnswer(BaseModel):
     status: int = 200
     error_msg: str = ""
@@ -76,18 +77,19 @@ class QAAnalyzeAnswer(BaseModel):
     model_response: str = ""
     prompt: str = ""
 
-
+# QAModes
 class QAModesEnum(Enum):
     NONE = 0,
     SEARCH = 1,
     ANALYZE = 2,
     ANALYZE_MULT_PROMPTS = 3,
 
+# All supported filetypes
 class FileTypes(Enum):
     TEXT = "txt"
     PDF = "pdf"
 
-
+# Dataclass to hold a fileupload
 class QAFileUpload(BaseModel):
     data: bytes
     name: str
