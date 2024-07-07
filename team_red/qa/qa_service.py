@@ -36,12 +36,12 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
 
-
+# class to generate vectorembeddings
 class VectorEmbeddings(Protocol):
     def embed_documents(self, documents: List[str]) -> List[List[float]]:
         pass
 
-
+# class to perform operations on vectorstore
 class VectorStore(Protocol):
     def merge_from(self, vector_store: "VectorStore") -> None:
         pass
