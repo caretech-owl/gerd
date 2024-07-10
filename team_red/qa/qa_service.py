@@ -5,7 +5,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional, Protocol, Tuple
 
-from ctransformers import AutoModelForCausalLM, LLM
+from ctransformers import LLM, AutoModelForCausalLM
 from langchain.chains.retrieval_qa.base import BaseRetrievalQA
 from langchain.docstore.document import Document
 from langchain.document_loaders import PyPDFLoader, TextLoader
@@ -533,7 +533,7 @@ class QAService:
                 return ""
         except BaseException:
             if field == "attending_doctors":
-                empty_list : List[str] = [] 
+                empty_list : List[str] = []
                 return empty_list
             else:
                 return ""
