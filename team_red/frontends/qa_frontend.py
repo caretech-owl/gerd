@@ -47,18 +47,18 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
         return qa_res.answer
     # start analyze mode
     elif search_type == "Analyze":
-        qa_res = TRANSPORTER.analyze_query()
-        if qa_res.status != 200:
+        qa_analyze_res = TRANSPORTER.analyze_query()
+        if qa_analyze_res.status != 200:
             msg = (
-                f"Query was unsuccessful: {qa_res.error_msg}"
-                f" (Error Code {qa_res.status})"
+                f"Query was unsuccessful: {qa_analyze_res.error_msg}"
+                f" (Error Code {qa_analyze_res.status})"
             )
             raise gr.Error(msg)
         # remove unwanted fields from answer
-        qa_res_dic = {key: value for key, value in vars(qa_res).items()
+        qa_res_dic = {key: value for key, value in vars(qa_analyze_res).items()
                       if value is not None
                       and value != ""
-                      and key not in qa_res.__class__.__dict__
+                      and key not in qa_analyze_res.__class__.__dict__
                       and key != "sources"
                       and key != "status"
                       and key != "model_response"
@@ -68,18 +68,18 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
         return qa_res_str
     # start analyze mult prompts mode
     elif search_type == "Analyze mult.":
-        qa_res = TRANSPORTER.analyze_mult_prompts_query()
-        if qa_res.status != 200:
+        qa_analyze_mult_res = TRANSPORTER.analyze_mult_prompts_query()
+        if qa_analyze_mult_res.status != 200:
             msg = (
-                f"Query was unsuccessful: {qa_res.error_msg}"
-                f" (Error Code {qa_res.status})"
+                f"Query was unsuccessful: {qa_analyze_mult_res.error_msg}"
+                f" (Error Code {qa_analyze_mult_res.status})"
             )
             raise gr.Error(msg)
         # remove unwanted fields from answer
-        qa_res_dic = {key: value for key, value in vars(qa_res).items()
+        qa_res_dic = {key: value for key, value in vars(qa_analyze_mult_res).items()
                       if value is not None
                       and value != ""
-                      and key not in qa_res.__class__.__dict__
+                      and key not in qa_analyze_mult_res.__class__.__dict__
                       and key != "sources"
                       and key != "status"
                       and key != "model_response"
