@@ -3,9 +3,9 @@ import logging
 from os import unlink
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import TYPE_CHECKING, Dict, Iterable, List, Optional, Protocol, Tuple
+from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional, Protocol, Tuple
 
-from ctransformers import AutoModelForCausalLM
+from ctransformers import AutoModelForCausalLM, LLM
 from langchain.chains.retrieval_qa.base import BaseRetrievalQA
 from langchain.docstore.document import Document
 from langchain.document_loaders import PyPDFLoader, TextLoader
@@ -181,7 +181,7 @@ class QAService:
                 self._fact_checker_db = self._setup_dbqa_fact_checking(
                     self._config.features.fact_checking.model.prompt
                 )
-            response_fact = self._fact_checker_db({"query": response["result"]})
+            response_fact = self._fact_checker_db({"query": answer.answer})
 
         _LOGGER.debug("\n==== Answer ====\n\n%s\n===============", answer)
         return answer
@@ -229,7 +229,7 @@ class QAService:
             "Wann wurde der Patient bei uns entlassen?": "release_date",
         }
 
-        questions_dict : Dict[str, str] = {}
+        questions_dict : Dict[str, List[Document]] = {}
         parameters: Dict[str, str] = {}
         question_counter : int = 0
 
@@ -339,8 +339,8 @@ class QAService:
             "Wie heißt der Arzt?" : "attending_doctors",
             "Wann wurde der Patient bei uns aufgenommen?" : "recording_date",
             "Wann wurde der Patient bei uns entlassen?" : "release_date"}
-        questions_dict : Dict[str, str] = {}
-        answer_dict: Dict[str, str] = {}
+        questions_dict : Dict[str, List[Document]] = {}
+        answer_dict: Dict[str, Any] = {}
         responses: str = ""
 
         # load context from vectorstore for each question
@@ -457,7 +457,7 @@ class QAService:
             self._vectorstore.save_local(self._config.embedding.db_path)
         return QAAnswer()
 
-    def _init_model(self, model_config: ModelConfig) -> AutoModelForCausalLM:
+    def _init_model(self, model_config: ModelConfig) -> LLM:  # type: ignore[no-any-unimported]
         """
         Init model from config
         """
@@ -475,7 +475,7 @@ class QAService:
         if  not self._model:
             return ""
 
-        return self._model(
+        return str(self._model(
                 prompt,
                 stop = model_config.stop,
                 max_new_tokens = model_config.max_new_tokens,
@@ -483,11 +483,11 @@ class QAService:
                 top_k = model_config.top_k,
                 temperature = model_config.temperature,
                 repetition_penalty = model_config.repetition_penalty,
-            )
+            ))
 
     def _create_analyze_mult_prompt(
             self, model_q: str, vector_q: str, prompt: str
-            ) -> Tuple[Dict[str, str], str]:
+            ) -> Tuple[Dict[str, List[Document]], str]:
         """
         Create a prompt for the analyze multiple question mode
         and return prompt and context
@@ -495,10 +495,11 @@ class QAService:
         if not self._vectorstore:
             msg = "No vector store initialized! Upload documents first."
             _LOGGER.error(msg)
-            return (Dict[str, str], "")
+            empty_dict: Dict[str, List[Document]] = {}
+            return (empty_dict, "")
 
         parameters: Dict[str, str] = {}
-        questions_dict : Dict[str, str] = {}
+        questions_dict : Dict[str, List[Document]] = {}
 
         questions_dict[model_q] = list(self._vectorstore.search(
                 vector_q,
@@ -511,7 +512,7 @@ class QAService:
         )
         parameters["question"] = model_q
 
-        return [questions_dict, prompt.format(**parameters)]
+        return (questions_dict, prompt.format(**parameters))
 
     def _format_response_analyze_mult_prompt(
             self, response: str, field: str) -> str | List[str]:
@@ -527,12 +528,13 @@ class QAService:
             if field == "attending_doctors":
                 return self._format_attending_doctors(answer)
             elif answer is not None:
-                return answer
+                return str(answer)
             else:
                 return ""
         except BaseException:
             if field == "attending_doctors":
-                return List[str]
+                empty_list : List[str] = [] 
+                return empty_list
             else:
                 return ""
 
