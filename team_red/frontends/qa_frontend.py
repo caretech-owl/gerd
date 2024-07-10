@@ -1,6 +1,6 @@
 import logging
 import pathlib
-from typing import Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import gradio as gr
 
@@ -127,7 +127,7 @@ def upload(file_path: str, progress: Optional[gr.Progress] = None) -> None:
         raise gr.Error(msg)
     progress(100, desc="Fertig!")
 
-def handle_type_radio_selection_change(search_type: str) -> bool:
+def handle_type_radio_selection_change(search_type: str) -> List[Any]:
     """
     Enable/disable gui elements depend on which mode is selected
     """
@@ -156,7 +156,7 @@ def handle_type_radio_selection_change(search_type: str) -> bool:
                 gr.update(interactive=False)
             ]
 
-def handle_developer_mode_checkbox_change(check: bool) -> bool:
+def handle_developer_mode_checkbox_change(check: bool) -> List[Any]:
     """
     Enable/disable developermode
     """
