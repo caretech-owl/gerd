@@ -144,7 +144,7 @@ class QAService:
             or "question"  not in qa_query_prompt.parameters):
                 msg = "Prompt does not include '{context}' or '{question}' variable."
                 _LOGGER.error(msg)
-                return QAAnalyzeAnswer(status=404, error_msg=msg)
+                return QAAnswer(status=404, error_msg=msg)
 
         formatted_prompt = qa_query_prompt.text.format(**parameters)
 
@@ -182,10 +182,6 @@ class QAService:
                     self._config.features.fact_checking.model.prompt
                 )
             response = self._fact_checker_db({"query": response["result"]})
-
-            answer.sources.append(
-                self._collect_source_docs(
-                    response.get("source_documents", [])))
 
         _LOGGER.debug("\n==== Answer ====\n\n%s\n===============", answer)
         return answer
