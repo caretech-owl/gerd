@@ -6,7 +6,7 @@ import pytest
 
 from team_red.config import CONFIG
 from team_red.qa import QAService
-from team_red.transport import QAFileUpload, QAQuestion, QAAnalyzeAnswer
+from team_red.transport import QAFileUpload, QAQuestion
 from tests.conftest import GRASCCO_PATH
 
 QA_PATH = Path(__file__).resolve().parent
@@ -144,7 +144,7 @@ def test_analyze_queries(
                       and key != "sources"
                       and key != "status"}
     qa_res_str = ", ".join(f"{key}={value}" for key, value in qa_res_dic.items())
-    
+
     # write result to file
     with open(Path(QA_PATH, "test_analyze_queries_" +
                    Path(test_file).stem + "_" +
