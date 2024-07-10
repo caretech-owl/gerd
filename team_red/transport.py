@@ -49,7 +49,6 @@ class QAAnalyzeAnswer(BaseModel):
     physical_examination_findings: str = ""
     laboratory: str = ""
     mix: str = ""
-    laboratory: str = ""
     risk_factor_allergy: str = ""
     recommendations: str = ""
     summary: str = ""
