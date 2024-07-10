@@ -181,7 +181,7 @@ class QAService:
                 self._fact_checker_db = self._setup_dbqa_fact_checking(
                     self._config.features.fact_checking.model.prompt
                 )
-            response = self._fact_checker_db({"query": response["result"]})
+            response_fact = self._fact_checker_db({"query": response["result"]})
 
         _LOGGER.debug("\n==== Answer ====\n\n%s\n===============", answer)
         return answer
@@ -492,6 +492,11 @@ class QAService:
         Create a prompt for the analyze multiple question mode
         and return prompt and context
         """
+        if not self._vectorstore:
+            msg = "No vector store initialized! Upload documents first."
+            _LOGGER.error(msg)
+            return (Dict[str, str], "")
+
         parameters: Dict[str, str] = {}
         questions_dict : Dict[str, str] = {}
 
@@ -527,7 +532,7 @@ class QAService:
                 return ""
         except BaseException:
             if field == "attending_doctors":
-                return []
+                return List[str]
             else:
                 return ""
 
@@ -579,7 +584,7 @@ class QAService:
             "\n", "")
         return response
 
-    def _format_attending_doctors(self, attending_doctors: str) -> List[str]:
+    def _format_attending_doctors(self, attending_doctors: str) -> List[str] | str:
         """
         Format the attending_doctors field to list
         """
