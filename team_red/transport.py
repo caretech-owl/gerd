@@ -99,7 +99,7 @@ class Transport(Protocol):
     def qa_query(self, query: QAQuestion) -> QAAnswer:
         pass
 
-    def analyze_query(self) -> QAAnswer:
+    def analyze_query(self) -> QAAnalyzeAnswer:
         pass
 
     def analyze_mult_prompts_query(self) -> QAAnalyzeAnswer:
