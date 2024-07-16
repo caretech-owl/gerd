@@ -11,6 +11,7 @@ from ..transport import (
     DocumentSource,
     GenResponse,
     PromptConfig,
+    QAAnalyzeAnswer,
     QAAnswer,
     QAFileUpload,
     QAModesEnum,
@@ -33,6 +34,22 @@ class RestClient(Transport):
             requests.post(
                 f"{self._url}/qa/query",
                 data=question.model_dump_json(),
+                timeout=self.timeout,
+            ).json()
+        )
+
+    def analyze_query(self) -> QAAnalyzeAnswer:
+        return QAAnalyzeAnswer.model_validate(
+            requests.post(
+                f"{self._url}/qa/query_analyze",
+                timeout=self.timeout,
+            ).json()
+        )
+
+    def analyze_mult_prompts_query(self) -> QAAnalyzeAnswer:
+                return QAAnalyzeAnswer.model_validate(
+            requests.post(
+                f"{self._url}/qa/query_analyze_mult_prompt",
                 timeout=self.timeout,
             ).json()
         )
@@ -93,7 +110,9 @@ class RestClient(Transport):
 
     def get_qa_prompt(self, qa_mode: QAModesEnum) -> PromptConfig:
         return PromptConfig.model_validate(
-            requests.get(f"{self._url}/qa/prompt", timeout=self.timeout, params={"qa_mode": qa_mode.value}).json()
+            requests.get(f"{self._url}/qa/prompt",
+                         timeout=self.timeout,
+                         params={"qa_mode": qa_mode.value}).json()
         )
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:
