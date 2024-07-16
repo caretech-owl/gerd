@@ -92,12 +92,6 @@ class RestClient(Transport):
         )
 
     def get_qa_prompt(self, qa_mode: QAModesEnum) -> PromptConfig:
-        config: PromptConfig = PromptConfig()
-        qa_prompt_config : QAPromptConfig = QAPromptConfig(config=config, mode=qa_mode)
-        #qa_prompt_config.config = config
-        #qa_prompt_config.mode = qa_mode
-        _LOGGER.info("db_query - request: %s", qa_prompt_config.model_dump_json())
-        t = qa_prompt_config.model_dump_json()
         return PromptConfig.model_validate(
             requests.get(f"{self._url}/qa/prompt", timeout=self.timeout, params={"qa_mode": qa_mode.value}).json()
         )
