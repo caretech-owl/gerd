@@ -13,6 +13,8 @@ from ..transport import (
     PromptConfig,
     QAAnswer,
     QAFileUpload,
+    QAModesEnum,
+    QAPromptConfig,
     QAQuestion,
     Transport,
 )
@@ -80,18 +82,24 @@ class RestClient(Transport):
             requests.get(f"{self._url}/gen/prompt", timeout=self.timeout).json()
         )
 
-    def set_qa_prompt(self, config: PromptConfig) -> PromptConfig:
+    def set_qa_prompt(self, config: PromptConfig, qa_mode: QAModesEnum) -> PromptConfig:
         return PromptConfig.model_validate(
             requests.post(
                 f"{self._url}/qa/prompt",
-                data=config.model_dump_json(),
+                data=QAPromptConfig(config=config, mode=qa_mode).model_dump_json(),
                 timeout=self.timeout,
             ).json()
         )
 
-    def get_qa_prompt(self) -> PromptConfig:
+    def get_qa_prompt(self, qa_mode: QAModesEnum) -> PromptConfig:
+        config: PromptConfig = PromptConfig()
+        qa_prompt_config : QAPromptConfig = QAPromptConfig(config=config, mode=qa_mode)
+        #qa_prompt_config.config = config
+        #qa_prompt_config.mode = qa_mode
+        _LOGGER.info("db_query - request: %s", qa_prompt_config.model_dump_json())
+        t = qa_prompt_config.model_dump_json()
         return PromptConfig.model_validate(
-            requests.get(f"{self._url}/qa/prompt", timeout=self.timeout).json()
+            requests.get(f"{self._url}/qa/prompt", timeout=self.timeout, params={"qa_mode": qa_mode.value}).json()
         )
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:

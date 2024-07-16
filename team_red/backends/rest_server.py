@@ -6,7 +6,7 @@ from fastapi import APIRouter, FastAPI
 
 from team_red.backends.bridge import Bridge
 from team_red.config import CONFIG
-from team_red.transport import QAQuestion
+from team_red.transport import QAAnalyzeAnswer, QAQuestion
 
 from ..transport import (
     DocumentSource,
@@ -14,6 +14,8 @@ from ..transport import (
     PromptConfig,
     QAAnswer,
     QAFileUpload,
+    QAModesEnum,
+    QAPromptConfig,
     QAQuestion,
     Transport,
 )
@@ -57,6 +59,12 @@ class RestServer(Transport):
 
     def qa_query(self, question: QAQuestion) -> QAAnswer:
         return self._bridge.qa_query(question)
+    
+    def analyze_query(self) -> QAAnalyzeAnswer:
+        return self._bridge.qa.analyze_query()
+
+    def analyze_mult_prompts_query(self) -> QAAnalyzeAnswer:
+        return self._bridge.qa.analyze_mult_prompts_query()
 
     def db_query(self, question: QAQuestion) -> List[DocumentSource]:
         _LOGGER.debug("dq_query - request: %s", question)
@@ -76,11 +84,11 @@ class RestServer(Transport):
     def get_gen_prompt(self) -> PromptConfig:
         return self._bridge.get_gen_prompt()
 
-    def set_qa_prompt(self, config: PromptConfig) -> PromptConfig:
-        return self._bridge.set_qa_prompt(config)
+    def set_qa_prompt(self, config: QAPromptConfig) -> PromptConfig:
+        return self._bridge.set_qa_prompt(config.config, config.mode)
 
-    def get_qa_prompt(self) -> PromptConfig:
-        return self._bridge.get_qa_prompt()
+    def get_qa_prompt(self, qa_mode: int) -> PromptConfig:
+        return self._bridge.get_qa_prompt(QAModesEnum(qa_mode))
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:
         return self._bridge.generate(parameters)
