@@ -78,10 +78,10 @@ class QAAnalyzeAnswer(BaseModel):
 
 # QAModes
 class QAModesEnum(Enum):
-    NONE = 0,
-    SEARCH = 1,
-    ANALYZE = 2,
-    ANALYZE_MULT_PROMPTS = 3,
+    NONE = 0
+    SEARCH = 1
+    ANALYZE = 2
+    ANALYZE_MULT_PROMPTS = 3
 
 # All supported filetypes
 class FileTypes(Enum):
@@ -93,6 +93,9 @@ class QAFileUpload(BaseModel):
     data: bytes
     name: str
 
+class QAPromptConfig(BaseModel):
+    config: PromptConfig
+    mode: QAModesEnum
 
 class Transport(Protocol):
     def qa_query(self, query: QAQuestion) -> QAAnswer:
