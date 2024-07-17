@@ -28,13 +28,14 @@ class RestClient(Transport):
         super().__init__()
         self._url = f"http://{CONFIG.server.host}:{CONFIG.server.port}{CONFIG.server.api_prefix}"
         self.timeout = 10
+        self.longtimeout = 10000
 
     def qa_query(self, question: QAQuestion) -> QAAnswer:
         return QAAnswer.model_validate(
             requests.post(
                 f"{self._url}/qa/query",
-                data=question.model_dump_json(),
-                timeout=self.timeout,
+                data=question.model_dump_json().encode("utf-8"),
+                timeout=self.longtimeout,
             ).json()
         )
 
@@ -42,7 +43,7 @@ class RestClient(Transport):
         return QAAnalyzeAnswer.model_validate(
             requests.post(
                 f"{self._url}/qa/query_analyze",
-                timeout=self.timeout,
+                timeout=self.longtimeout,
             ).json()
         )
 
@@ -50,7 +51,7 @@ class RestClient(Transport):
                 return QAAnalyzeAnswer.model_validate(
             requests.post(
                 f"{self._url}/qa/query_analyze_mult_prompt",
-                timeout=self.timeout,
+                timeout=self.longtimeout,
             ).json()
         )
 
@@ -70,17 +71,18 @@ class RestClient(Transport):
         _LOGGER.debug("db_embedding - request: %s", request)
         response = requests.post(
             f"{self._url}/qa/db_embedding",
-            data=question.model_dump_json(),
+            data=question.model_dump_json().encode("utf-8"),
             timeout=self.timeout,
         )
         _LOGGER.debug("db_embedding - response: %s", response.json())
         return TypeAdapter(List[float]).validate_python(response.json())
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:
+        t = file.model_dump_json().encode("utf-8")
         return QAAnswer.model_validate(
             requests.post(
                 f"{self._url}/qa/file",
-                data=file.model_dump_json(),
+                data=file.model_dump_json().encode("utf-8"),
                 timeout=self.timeout,
             ).json()
         )
