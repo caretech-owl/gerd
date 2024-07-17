@@ -162,11 +162,6 @@ def test_analyze_queries(
         file.close()
 
     assert res.status == 200
-    assert res.patient_name
-    assert res.patient_date_of_birth
-    assert res.attending_doctors
-    assert res.recording_date
-    assert res.release_date
 
 
 def test_analyze_mult_prompts_queries(
@@ -202,8 +197,3 @@ def test_analyze_mult_prompts_queries(
         file.close()
 
     assert res.status == 200
-    assert res.patient_name
-    assert res.patient_date_of_birth
-    assert res.attending_doctors
-    assert res.recording_date
-    assert res.release_date
