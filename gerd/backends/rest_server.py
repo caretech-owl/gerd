@@ -6,9 +6,7 @@ from fastapi import APIRouter, FastAPI
 
 from gerd.backends.bridge import Bridge
 from gerd.config import CONFIG
-from gerd.transport import QAQuestion
-
-from ..transport import (
+from gerd.transport import (
     DocumentSource,
     GenResponse,
     PromptConfig,
