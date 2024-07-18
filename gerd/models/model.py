@@ -30,13 +30,13 @@ class PromptConfig(BaseModel):
             if path.exists():
                 with path.open("r", encoding="utf-8") as f:
                     self.text = f.read()
-                    if self.is_template or path.suffix == ".jinja":
+                    if self.is_template or path.suffix == ".jinja2":
                         self.is_template = True
                         loader = FileSystemLoader(path.parent)
                         env = Environment(
                             loader=loader,
                             autoescape=select_autoescape(
-                                disabled_extensions=(".jinja",),
+                                disabled_extensions=(".jinja2",),
                                 default_for_string=True,
                                 default=True,
                             ),
