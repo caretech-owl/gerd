@@ -3,7 +3,7 @@ from pathlib import Path
 from string import Formatter
 from typing import Any, List, Optional
 
-from jinja2 import Environment, FileSystemLoader, Template, meta
+from jinja2 import Environment, FileSystemLoader, Template, meta, select_autoescape
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -33,7 +33,14 @@ class PromptConfig(BaseModel):
                     if self.is_template or path.suffix == ".jinja":
                         self.is_template = True
                         loader = FileSystemLoader(path.parent)
-                        env = Environment(loader=loader, autoescape=True)
+                        env = Environment(
+                            loader=loader,
+                            autoescape=select_autoescape(
+                                disabled_extensions=(".jinja",),
+                                default_for_string=True,
+                                default=True,
+                            ),
+                        )
                         self.template = env.get_template(path.name)
             else:
                 msg = f"Prompt text is not set and '{self.path}' does not exist!"
