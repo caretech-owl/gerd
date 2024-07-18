@@ -42,7 +42,9 @@ class QAService:
                 "Load existing vector store from '%s'.", config.embedding.db_path
             )
             self._vectorstore = load_faiss(
-                Path(config.embedding.db_path, "index.faiss")
+                Path(config.embedding.db_path, "index.faiss"),
+                config.embedding.model.name,
+                config.device,
             )
 
     def db_query(self, question: QAQuestion) -> List[DocumentSource]:
