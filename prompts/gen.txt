@@ -56,3 +56,5 @@ USER: Generiere einen Arztbrief mit folgenden Notizen:
 - Diagnose: """{diagnosis}"""
 - Behandlung: """{treatment}"""
 - Medikation: """{medication}"""
+
+ASSISTANT:
