@@ -56,12 +56,27 @@ class LlamaCppLLM(LLM):
         return output
 
 class TransformerLLM(LLM):
+
     def __init__(self, config: ModelConfig) -> None:
+        import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+
+        torch_dtypes: dict[str, torch.dtype] = {
+            "bfloat16": torch.bfloat16,
+            "float16": torch.float16,
+            "float32": torch.float32,
+            "float64": torch.float64,
+        }
+
 
         self._config = config
         self._tokenizer = AutoTokenizer.from_pretrained(config.name)
         self._model = AutoModelForCausalLM.from_pretrained(config.name)
+
+        model_kwargs = {}
+        if config.torch_dtype in torch_dtypes:
+            model_kwargs["torch_dtype"] = torch_dtypes[config.torch_dtype]
+
 
         self._pipe = pipeline(
             task="text-generation",
@@ -70,8 +85,9 @@ class TransformerLLM(LLM):
             pad_token_id=self._tokenizer.pad_token_id,
             eos_token_id=self._tokenizer.eos_token_id,
             # device_map="auto",  # https://github.com/huggingface/transformers/issues/31922
-            device=0 if config.gpu_layers > 0 else -1,
+            device="cuda" if config.gpu_layers > 0 else None,
             framework="pt",
+            model_kwargs=model_kwargs,
         )
 
     def generate(self, prompt: str) -> str:

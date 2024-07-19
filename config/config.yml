@@ -27,7 +27,7 @@ gen:
 qa:
   model: &qa_model
     name: "TheBloke/leo-hessianai-7B-chat-GGUF"
-    file: "leo-hessianai-7b-chat.Q5_K_M.gguf"
+    file: "leo-hessianai-7bp-chat.Q5_K_M.gguf"
     temperature: 0.01
     max_new_tokens: 128
     context_length: 512

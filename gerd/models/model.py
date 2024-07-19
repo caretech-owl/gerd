@@ -98,3 +98,4 @@ class ModelConfig(BaseModel):
     threads: Optional[int] = None
     context_length: int = 0  # Currently only LLaMA, MPT and Falcon
     gpu_layers: int = 0
+    torch_dtype: Optional[str] = None

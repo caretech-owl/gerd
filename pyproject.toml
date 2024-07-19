@@ -16,7 +16,8 @@ torch = [
 ]
 orjson = "=3.10.5"
 python = ">=3.12, <4.0"
-transformers = "^4.41.2"
+# transformers = "^4.41.2"
+transformers = { git = "https://github.com/huggingface/transformers.git", branch = "main" }
 faiss-cpu = { version = "~1.7.4", optional = true }
 faiss-gpu = { version = "~1.7.2", optional = true }
 ipykernel = "^6.29.4"
