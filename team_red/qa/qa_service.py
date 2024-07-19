@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 from os import unlink
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -158,6 +159,9 @@ class QAService:
 
         if response is not None:
             response = response.replace('"""', '"')
+            response = re.sub('/".*""/g', '"', response)
+            response = re.sub('/(?<=:)\s*""(?=.)/g', '"', response)
+
             if ("["  in response or "]"  in response):
                 response = response.replace('[', '').replace(']', '')
         # format the model response in a jsonstructur
