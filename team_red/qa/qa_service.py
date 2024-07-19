@@ -160,7 +160,7 @@ class QAService:
         if response is not None:
             response = response.replace('"""', '"')
             response = re.sub('/".*""/g', '"', response)
-            response = re.sub('/(?<=:)\s*""(?=.)/g', '"', response)
+            response = re.sub('/(?<=:)\s*""(?=.)/g', '"', response) # noqa W605
 
             if ("["  in response or "]"  in response):
                 response = response.replace('[', '').replace(']', '')
