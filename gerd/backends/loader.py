@@ -69,7 +69,8 @@ class TransformerLLM(LLM):
             tokenizer=self._tokenizer,
             pad_token_id=self._tokenizer.pad_token_id,
             eos_token_id=self._tokenizer.eos_token_id,
-            device_map="auto",
+            # device_map="auto",  # https://github.com/huggingface/transformers/issues/31922
+            device=0 if config.gpu_layers > 0 else -1,
             framework="pt",
         )
 
