@@ -79,11 +79,15 @@ class PromptConfig(BaseModel):
             ),
         )
 
+class ModelEndpoint(BaseModel):
+    url: str
+    type: str
 
 # Default values chosen by https://github.com/marella/ctransformers#config
 class ModelConfig(BaseModel):
     name: str
     prompt: PromptConfig = PromptConfig()
+    endpoint: Optional[ModelEndpoint] = None
     file: Optional[str] = None
     top_k: int = 40
     top_p: float = 0.95
