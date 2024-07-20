@@ -8,7 +8,6 @@ _LOGGER.addHandler(logging.NullHandler())
 
 
 class LLM:
-
     @abc.abstractmethod
     def __init__(self, config: ModelConfig) -> None:
         pass
@@ -19,7 +18,6 @@ class LLM:
 
 
 class MockLLM(LLM):
-
     def __init__(self, config: ModelConfig) -> None:
         self.ret_value = "MockLLM"
         pass
@@ -42,7 +40,6 @@ class LlamaCppLLM(LLM):
         )
 
     def generate(self, prompt: str) -> str:
-
         output = self._model(
             prompt,
             stop=self._config.stop,
@@ -55,8 +52,8 @@ class LlamaCppLLM(LLM):
 
         return output
 
-class TransformerLLM(LLM):
 
+class TransformerLLM(LLM):
     def __init__(self, config: ModelConfig) -> None:
         import torch
         from transformers import pipeline
@@ -72,7 +69,6 @@ class TransformerLLM(LLM):
         model_kwargs = {}
         if config.torch_dtype in torch_dtypes:
             model_kwargs["torch_dtype"] = torch_dtypes[config.torch_dtype]
-
 
         self._pipe = pipeline(
             task="text-generation",
@@ -97,7 +93,41 @@ class TransformerLLM(LLM):
         return output
 
 
+class RemoteLLM(LLM):
+    def __init__(self, config: ModelConfig) -> None:
+        self._config = config
+        self._prompt_field = "prompt"
+        self.msg_template = {
+            "temperature": self._config.temperature,
+            "top_k": self._config.top_k,
+            "top_p": self._config.top_p,
+            "repeat_penalty": self._config.repetition_penalty,
+            "n_predict": self._config.max_new_tokens,
+            "stop": self._config.stop or [],
+        }
+
+    def generate(self, prompt: str) -> str:
+        import json
+
+        import requests
+
+        self.msg_template[self._prompt_field] = prompt
+        res = requests.post(
+            self._config.endpoint.url + "/completion",
+            headers={"Content-Type": "application/json"},
+            data=json.dumps(self.msg_template),
+            timeout=300,
+        )
+        if res.status_code == 200:
+            return res.json()["content"]
+        else:
+            _LOGGER.warning("Server returned error code %d", res.status_code)
+        return ""
+
+
 def load_model_from_config(config: ModelConfig) -> LLM:
+    if config.endpoint:
+        return RemoteLLM(config)
     if config.file:
         return LlamaCppLLM(config)
     return TransformerLLM(config)
