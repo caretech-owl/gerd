@@ -161,6 +161,8 @@ class QAService:
             response = response.replace('"""', '"')
             response = re.sub(r'/""\n*(?=(\,|}))/g', '"', response)
             response = re.sub(r'/:\s*""(?=.)/g', ':"', response) # noqa W605
+            response = response.split("{")[1]
+            response = response.split("}")[0]
 
             if ("["  in response or "]"  in response):
                 response = response.replace('[', '').replace(']', '')
