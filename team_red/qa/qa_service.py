@@ -529,6 +529,11 @@ class QAService:
         if len(split) > 1:
             response = split[0]
 
+        if '{' not in response:
+            response = '{' + response
+        if '}' not in response:
+            response = response + '}'
+
         if ("["  in response or "]"  in response):
             response = response.replace('[', '').replace(']', '')
         return response
