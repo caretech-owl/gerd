@@ -158,14 +158,7 @@ class QAService:
         )
 
         if response is not None:
-            response = response.replace('"""', '"')
-            response = re.sub(r'/""\n*(?=(\,|}))/g', '"', response)
-            response = re.sub(r'/:\s*""(?=.)/g', ':"', response) # noqa W605
-            response = response.split("{")[1]
-            response = response.split("}")[0]
-
-            if ("["  in response or "]"  in response):
-                response = response.replace('[', '').replace(']', '')
+            response = self._format_response_query(response)
         # format the model response in a jsonstructur
         try:
             answer_json = json.loads(response)["answer"]
@@ -519,6 +512,26 @@ class QAService:
         parameters["question"] = model_q
 
         return (questions_dict, prompt.format(**parameters))
+
+    def _format_response_query(
+            self, response: str) -> str:
+        """
+        format response for the search mode
+        """
+        response = response.replace('"""', '"')
+        response = re.sub(r'/""\n*(?=(\,|}))/g', '"', response)
+        response = re.sub(r'/:\s*""(?=.)/g', ':"', response) # noqa W605
+        split = response.split("{")
+        if len(split) > 1:
+            response = split[1]
+
+        split = response.split("}")
+        if len(split) > 1:
+            response = split[0]
+
+        if ("["  in response or "]"  in response):
+            response = response.replace('[', '').replace(']', '')
+        return response
 
     def _format_response_analyze_mult_prompt(
             self, response: str, field: str) -> str | List[str]:
