@@ -514,13 +514,15 @@ class QAService:
         return (questions_dict, prompt.format(**parameters))
 
     def _format_response_query(
-            self, response: str) -> str:
+        self, response: str) -> str:
         """
         format response for the search mode
         """
         response = response.replace('"""', '"')
-        response = re.sub(r'/""\n*(?=(\,|}))/g', '"', response)
-        response = re.sub(r'/:\s*""(?=.)/g', ':"', response) # noqa W605
+        response = re.sub(r'""\n*(?=(\,|\\n}|}))', '" ', response)
+        response = re.sub(r'\:\s*""(?=.)', ': "', response) # noqa W605
+        response = re.sub(r'\{\s*""(?=.)', "{ ", response) # noqa W605
+
         split = response.split("{")
         if len(split) > 1:
             response = split[1]
@@ -537,6 +539,7 @@ class QAService:
         if ("["  in response or "]"  in response):
             response = response.replace('[', '').replace(']', '')
         return response
+
 
     def _format_response_analyze_mult_prompt(
             self, response: str, field: str) -> str | List[str]:
