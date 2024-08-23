@@ -1,7 +1,7 @@
 from functools import cached_property
 from pathlib import Path
 from string import Formatter
-from typing import Any, List, Optional
+from typing import Any, List, Optional, TypedDict
 
 from jinja2 import Environment, FileSystemLoader, Template, meta, select_autoescape
 from pydantic import (
@@ -12,6 +12,10 @@ from pydantic import (
     computed_field,
 )
 
+
+class ChatMessage(TypedDict):
+    role: str
+    content: str
 
 class PromptConfig(BaseModel):
     text: Optional[str] = None
