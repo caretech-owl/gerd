@@ -1,7 +1,7 @@
 import abc
 import logging
 
-from gerd.models.model import ModelConfig
+from gerd.models.model import ChatMessage, ModelConfig
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
@@ -16,14 +16,21 @@ class LLM:
     def generate(self, prompt: str) -> str:
         pass
 
+    @abc.abstractmethod
+    def create_chat_completion(self, messages: list[ChatMessage]) -> tuple[str, str]:
+        pass
+
 
 class MockLLM(LLM):
-    def __init__(self, config: ModelConfig) -> None:
+    def __init__(self, _: ModelConfig) -> None:
         self.ret_value = "MockLLM"
         pass
 
-    def generate(self, prompt: str) -> str:
+    def generate(self, _: str) -> str:
         return self.ret_value
+
+    def create_chat_completion(self, _: list[ChatMessage]) -> tuple[str, str]:
+        return ("assistant", self.ret_value)
 
 
 class LlamaCppLLM(LLM):
@@ -51,6 +58,19 @@ class LlamaCppLLM(LLM):
         )["choices"][0]["text"]
 
         return output
+
+    def create_chat_completion(self, messages: list[ChatMessage]) -> tuple[str, str]:
+        res = self._model.create_chat_completion(
+            messages,
+            stop=self._config.stop,
+            max_tokens=self._config.max_new_tokens,
+            top_p=self._config.top_p,
+            top_k=self._config.top_k,
+            temperature=self._config.temperature,
+            repeat_penalty=self._config.repetition_penalty,
+        )
+        msg = res["choices"][0]["message"]
+        return (msg["role"], msg["content"].strip())
 
 
 class TransformerLLM(LLM):
@@ -92,6 +112,9 @@ class TransformerLLM(LLM):
 
         return output
 
+    def create_chat_completion(self, messages: list[ChatMessage]) -> tuple[str, str]:
+        msg = self.generate(messages)[-1]
+        return (msg["role"], msg["content"].strip())
 
 class RemoteLLM(LLM):
     def __init__(self, config: ModelConfig) -> None:
@@ -123,6 +146,25 @@ class RemoteLLM(LLM):
         else:
             _LOGGER.warning("Server returned error code %d", res.status_code)
         return ""
+
+    def create_chat_completion(self, messages: list[ChatMessage]) -> tuple[str, str]:
+        import json
+
+        import requests
+
+        self.msg_template["messages"] = messages
+        res = requests.post(
+            self._config.endpoint.url + "/v1/chat/completions",
+            headers={"Content-Type": "application/json"},
+            data=json.dumps(self.msg_template),
+            timeout=300,
+        )
+        if res.status_code == 200:
+            msg = res.json()["choices"][0]["message"]
+            return (msg["role"], msg["content"].strip())
+        else:
+            _LOGGER.warning("Server returned error code %d", res.status_code)
+        return ("assistant", "")
 
 
 def load_model_from_config(config: ModelConfig) -> LLM:
