@@ -21,3 +21,12 @@ def cajal_txt() -> bytes:
     with p.open("r", encoding="utf-8") as f:
         data = f.read()
     return data
+
+
+@pytest.fixture
+def files_txt(test_file: str) -> bytes:
+    p = Path(GRASCCO_PATH, test_file)
+    assert p.exists()
+    with p.open("r", encoding="utf-8-sig") as f:
+        data = f.read()
+    return data

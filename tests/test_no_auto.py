@@ -4,11 +4,12 @@ from gerd.backends.loader import LlamaCppLLM, TransformerLLM
 from gerd.config import CONFIG
 from gerd.gen.generation_service import GenerationService
 
-pytest.mark.skip("Should only be run manually")
+
+@pytest.mark.skip("Should only be run manually")
 def test_fail() -> None:
     pytest.fail("This test should not be executed.")
 
-pytest.mark.skip("Should only be run manually")
+@pytest.mark.skip("Should only be run manually")
 def test_generation_transformers() -> None:
     config = CONFIG.model_copy(deep=True)
     config.gen.model.name = "distilbert/distilgpt2"
@@ -23,7 +24,7 @@ def test_generation_transformers() -> None:
     assert res.prompt == "Say please!"
     assert res.text
 
-pytest.mark.skip("Should only be run manually")
+@pytest.mark.skip("Should only be run manually")
 def test_generation_llama_cpp() -> None:
     config = CONFIG.model_copy(deep=True)
     config.gen.model.name = "bartowski/Phi-3.1-mini-4k-instruct-GGUF"

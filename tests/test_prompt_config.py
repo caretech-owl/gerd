@@ -15,7 +15,7 @@ def test_path() -> None:
 
 
 def test_jinja() -> None:
-    config = PromptConfig(path="tests/data/simple_prompt.jinja")
+    config = PromptConfig(path="tests/data/simple_prompt.jinja2")
     assert "Filled Text" in config.template.render(task="Filled Text")
 
 

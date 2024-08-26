@@ -61,7 +61,7 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
                       and key not in qa_analyze_res.__class__.__dict__
                       and key != "sources"
                       and key != "status"
-                      and key != "model_response"
+                      and key != "response"
                       and key != "prompt"
         }
         qa_res_str = ", ".join(f"{key}={value}" for key, value in qa_res_dic.items())
@@ -82,7 +82,7 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
                       and key not in qa_analyze_mult_res.__class__.__dict__
                       and key != "sources"
                       and key != "status"
-                      and key != "model_response"
+                      and key != "response"
                       and key != "prompt"
         }
         qa_res_str = ", ".join(f"{key}={value}" for key, value in qa_res_dic.items())

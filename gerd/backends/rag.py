@@ -95,6 +95,7 @@ class Rag:
             for doc in docs:
                 answer.sources.append(
                     DocumentSource(
+                        query=question.question,
                         content=doc.page_content,
                         name=doc.metadata.get("source", "unknown"),
                         page=doc.metadata.get("page", 1),

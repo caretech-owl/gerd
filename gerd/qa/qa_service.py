@@ -6,19 +6,17 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional, Protocol, Tuple
 
-from ctransformers import LLM, AutoModelForCausalLM
 from langchain.chains.retrieval_qa.base import BaseRetrievalQA
 from langchain.docstore.document import Document
-from langchain.document_loaders import PyPDFLoader, TextLoader
-from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import FAISS
+from langchain_community.document_loaders import PyPDFLoader, TextLoader
 
-from team_red.llm import build_llm
-from team_red.models.model import ModelConfig
-from team_red.models.qa import QAConfig
-from team_red.transport import (
+import gerd.backends.loader as gerd_loader
+from gerd.backends.rag import Rag, VectorStore, create_faiss, load_faiss
+from gerd.models.model import ModelConfig
+from gerd.models.qa import QAConfig
+from gerd.transport import (
     DocumentSource,
     FileTypes,
     PromptConfig,
@@ -28,7 +26,6 @@ from team_red.transport import (
     QAModesEnum,
     QAQuestion,
 )
-from team_red.utils import build_retrieval_qa
 
 if TYPE_CHECKING:
     from langchain.document_loaders.base import BaseLoader
@@ -37,29 +34,6 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
 
-# class to generate vectorembeddings
-class VectorEmbeddings(Protocol):
-    def embed_documents(self, documents: List[str]) -> List[List[float]]:
-        pass
-
-# class to perform operations on vectorstore
-class VectorStore(Protocol):
-    def merge_from(self, vector_store: "VectorStore") -> None:
-        pass
-
-    def save_local(self, path: str) -> None:
-        pass
-
-    def add_texts(
-        self,
-        texts: Iterable[str],
-    ) -> List[str]:
-        pass
-
-    def search(self, query: str, search_type: str, k: int) -> List[Document]:
-        pass
-
-    embeddings: VectorEmbeddings
 
 class QAService:
     def __init__(self, config: QAConfig) -> None:
@@ -67,13 +41,9 @@ class QAService:
         Init the llm and set default values
         """
         self._config = config
-        self._llm = build_llm(config.model)
-        self._embeddings = HuggingFaceEmbeddings(
-            model_name=self._config.embedding.model.name,
-            model_kwargs={"device": self._config.device},
-        )
+        self._llm = gerd_loader.load_model_from_config(config.model)
         self._vectorstore: Optional[VectorStore] = None
-        self._fact_checker_db: Optional[BaseRetrievalQA] = None
+        self._database: Optional[Rag] = None
         if (
             config.embedding.db_path
             and Path(config.embedding.db_path, "index.faiss").exists()
@@ -81,10 +51,11 @@ class QAService:
             _LOGGER.info(
                 "Load existing vector store from '%s'.", config.embedding.db_path
             )
-            self._vectorstore = FAISS.load_local(
-                config.embedding.db_path, self._embeddings
+            self._vectorstore = load_faiss(
+                Path(config.embedding.db_path, "index.faiss"),
+                config.embedding.model.name,
+                config.device,
             )
-
 
     def db_query(self, question: QAQuestion) -> List[DocumentSource]:
         """
@@ -94,7 +65,7 @@ class QAService:
             return []
         return [
             DocumentSource(
-                question=question.question,
+                query=question.question,
                 content=doc.page_content,
                 name=doc.metadata.get("source", "unknown"),
                 page=doc.metadata.get("page", 1),
@@ -119,71 +90,17 @@ class QAService:
         Pass a single question to the llm and returns the answer
         """
 
-        if not self._vectorstore:
-            msg = "No vector store initialized! Upload documents first."
-            _LOGGER.error(msg)
-            return QAAnswer(status=404, error_msg=msg)
-
-        self._model = self._init_model(self._config.model)
-
-        parameters: Dict[str, str] = {}
-        context_list: List[Document]
-        qa_query_prompt = self._config.model.prompt
-
-        # read context from vectorstore
-        context_list = list(self._vectorstore.search(
-            question.question,
-            search_type=question.search_strategy,
-            k=question.max_sources
-        ))
-
-        # combine context and prompt
-        parameters["context"] = " ".join(doc.page_content for doc in context_list)
-        parameters["question"] = question.question
-
-        if ("context" not in qa_query_prompt.parameters
-            or "question"  not in qa_query_prompt.parameters):
-                msg = "Prompt does not include '{context}' or '{question}' variable."
-                _LOGGER.error(msg)
-                return QAAnswer(status=404, error_msg=msg)
-
-        formatted_prompt = qa_query_prompt.text.format(**parameters)
-
-        # query the model
-        response = self._query_model(self._config.model, formatted_prompt)
-
-        _LOGGER.info(
-            "\n===== Modelresult ====\n\n%s\n\n====================",
-            response
-        )
-
-        if response is not None:
-            response = self._format_response_query(response)
-        # format the model response in a jsonstructur
-        try:
-            answer_json = json.loads(response)["answer"]
-
-            if answer_json is None:
-                answer_json = ""
-        except BaseException:
-            answer_json = ""
-
-        answer = QAAnswer(answer=answer_json)
-
-        # if enabled, pass source data in answer
-        if self._config.features.return_source:
-            answer.sources = self._collect_source_docs(question.question, context_list)
-            answer.model_response = response
-
-        if self._config.features.fact_checking.enabled is True:
-            if not self._fact_checker_db:
-                self._fact_checker_db = self._setup_dbqa_fact_checking(
-                    self._config.features.fact_checking.model.prompt
-                )
-            response_fact = self._fact_checker_db({"query": answer.answer})
-
-        _LOGGER.debug("\n==== Answer ====\n\n%s\n===============", answer)
-        return answer
+        if not self._database:
+            if not self._vectorstore:
+                return QAAnswer(error_msg="No database available!", status=404)
+            self._database = Rag(
+                self._llm,
+                self._config.model,
+                self._config.model.prompt,
+                self._vectorstore,
+                self._config.features.return_source,
+            )
+        return self._database.query(question)
 
     def analyze_query(self) -> QAAnalyzeAnswer:
         """
@@ -202,21 +119,14 @@ class QAService:
             return QAAnalyzeAnswer(status=404, error_msg=msg)
 
         config = self._config.features.analyze
-        # init the model
-        self._model = self._init_model(config.model)
 
         # questions to search model and vectorstore
-        questions_model_dict : Dict[str, str] = {
-            "Wie heißt der Patient?" :
-            "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,", # noqa E501
-            "Wann hat der Patient Geburstag?" :
-            "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,", # noqa E501
-            "Wie heißt der Arzt?":
-            "Mit freundlichen kollegialen Grüßen, Prof, Dr",
-            "Wann wurde der Patient bei uns aufgenommen?" :
-            "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren",
-            "Wann wurde der Patient bei uns entlassen?" :
-            "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren"
+        questions_model_dict: Dict[str, str] = {
+            "Wie heißt der Patient?": "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,",  # noqa E501
+            "Wann hat der Patient Geburstag?": "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,",  # noqa E501
+            "Wie heißt der Arzt?": "Mit freundlichen kollegialen Grüßen, Prof, Dr",
+            "Wann wurde der Patient bei uns aufgenommen?": "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren",
+            "Wann wurde der Patient bei uns entlassen?": "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren",
         }
 
         # map model questions to jsonfields
@@ -228,32 +138,35 @@ class QAService:
             "Wann wurde der Patient bei uns entlassen?": "release_date",
         }
 
-        questions_dict : Dict[str, List[Document]] = {}
+        questions_dict: Dict[str, List[DocumentSource]] = {}
         parameters: Dict[str, str] = {}
-        question_counter : int = 0
+        question_counter: int = 0
 
         qa_analyze_prompt = config.model.prompt
         # check if prompt contains needed fields
         for i in range(0, len(questions_model_dict)):
-            if ("context" + str(i) not in qa_analyze_prompt.parameters
-                or "question" + str(i)
-                not in qa_analyze_prompt.parameters):
-                msg = ("Prompt does not include '{context"
-                + str(i) + "}' or '{question"
-                + str(i) + "}' variable.")
+            if (
+                "context" + str(i) not in qa_analyze_prompt.parameters
+                or "question" + str(i) not in qa_analyze_prompt.parameters
+            ):
+                msg = (
+                    "Prompt does not include '{context"
+                    + str(i)
+                    + "}' or '{question"
+                    + str(i)
+                    + "}' variable."
+                )
                 _LOGGER.error(msg)
                 return QAAnalyzeAnswer(status=404, error_msg=msg)
 
         # load context from vectorstore for each question
         for question_m, question_v in questions_model_dict.items():
-            questions_dict[question_m] = list(self._vectorstore.search(
-                question_v,
-                search_type="similarity",
-                k=3
-                ))
+            questions_dict[question_m] = list(
+                self.db_query(QAQuestion(question=question_v, max_sources=3))
+            )
 
             parameters["context" + str(question_counter)] = " ".join(
-                doc.page_content for doc in questions_dict[question_m]
+                doc.content for doc in questions_dict[question_m]
             )
             parameters["question" + str(question_counter)] = question_m
             parameters["field" + str(question_counter)] = fields[question_m]
@@ -263,30 +176,25 @@ class QAService:
         formatted_prompt = qa_analyze_prompt.text.format(**parameters)
 
         # query the model
-        response = self._query_model(config.model, formatted_prompt)
+        response = self._llm.generate(formatted_prompt)
 
         if response is not None:
             response = self._clean_response(response)
 
-        _LOGGER.info(
-            "\n===== Modelresult ====\n\n%s\n\n====================",
-            response
-        )
+        _LOGGER.info("\n===== Modelresult ====\n\n%s\n\n====================", response)
 
         # convert json to QAAnalyzerAnswerclass
         answer = self._format_response_analyze(response)
 
         # if enabled, pass source data to answer
         if self._config.features.return_source:
-            answer.model_response = response
+            answer.response = response
             answer.prompt = formatted_prompt
             for question in questions_dict:
-                answer.sources = answer.sources + self._collect_source_docs(
-                    question, questions_dict[question])
+                answer.sources = answer.sources + questions_dict[question]
             _LOGGER.info(
-           "\n===== Sources ====\n\n%s\n\n====================",
-           answer.sources
-        )
+                "\n===== Sources ====\n\n%s\n\n====================", answer.sources
+            )
 
         _LOGGER.warning("\n==== Answer ====\n\n%s\n===============", answer)
         return answer
@@ -311,44 +219,41 @@ class QAService:
 
         # check if prompt contains needed fields
         qa_analyze_mult_prompts = config.model.prompt
-        if ("context" not in qa_analyze_mult_prompts.parameters
-                or "question"  not in qa_analyze_mult_prompts.parameters):
-                msg = "Prompt does not include '{context}' or '{question}' variable."
-                _LOGGER.error(msg)
-                return QAAnalyzeAnswer(status=404, error_msg=msg)
-
-        # init the model
-        self._model = self._init_model(config.model)
+        if (
+            "context" not in qa_analyze_mult_prompts.parameters
+            or "question" not in qa_analyze_mult_prompts.parameters
+        ):
+            msg = "Prompt does not include '{context}' or '{question}' variable."
+            _LOGGER.error(msg)
+            return QAAnalyzeAnswer(status=404, error_msg=msg)
 
         # questions to search model and vectorstore
-        questions_model_dict : Dict[str, str] = {
-            "Wie heißt der Patient?" :
-            "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,", # noqa: E501
-            "Wann hat der Patient Geburstag?" :
-            "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,", # noqa: E501
-            "Wie heißt der Arzt?" :
-            "Mit freundlichen kollegialen Grüßen, Prof, Dr",
-            "Wann wurde der Patient bei uns aufgenommen?" :
-            "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren",
-            "Wann wurde der Patient bei uns entlassen?" :
-            "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren"}
-        fields: Dict[str, str]= {
-            "Wie heißt der Patient?" : "patient_name",
-            "Wann hat der Patient Geburstag?" : "patient_date_of_birth",
-            "Wie heißt der Arzt?" : "attending_doctors",
-            "Wann wurde der Patient bei uns aufgenommen?" : "recording_date",
-            "Wann wurde der Patient bei uns entlassen?" : "release_date"}
-        questions_dict : Dict[str, List[Document]] = {}
+        questions_model_dict: Dict[str, str] = {
+            "Wie heißt der Patient?": "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,",  # noqa: E501
+            "Wann hat der Patient Geburstag?": "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,",  # noqa: E501
+            "Wie heißt der Arzt?": "Mit freundlichen kollegialen Grüßen, Prof, Dr",
+            "Wann wurde der Patient bei uns aufgenommen?": "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren",
+            "Wann wurde der Patient bei uns entlassen?": "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren",
+        }
+        fields: Dict[str, str] = {
+            "Wie heißt der Patient?": "patient_name",
+            "Wann hat der Patient Geburstag?": "patient_date_of_birth",
+            "Wie heißt der Arzt?": "attending_doctors",
+            "Wann wurde der Patient bei uns aufgenommen?": "recording_date",
+            "Wann wurde der Patient bei uns entlassen?": "release_date",
+        }
+        questions_dict: Dict[str, List[Document]] = {}
         answer_dict: Dict[str, Any] = {}
         responses: str = ""
 
         # load context from vectorstore for each question
         for question_m, question_v in questions_model_dict.items():
             questions_dict, formatted_prompt = self._create_analyze_mult_prompt(
-                question_m, question_v, qa_analyze_mult_prompts.text)
+                question_m, question_v, qa_analyze_mult_prompts.text
+            )
 
             # query the model for each question
-            response = self._query_model(config.model, formatted_prompt)
+            response = self._llm.generate(formatted_prompt)
 
             # format the response
             if response is not None:
@@ -359,22 +264,20 @@ class QAService:
                     responses = responses + "; " + question_m + ": " + response
             # format the response
             answer_dict[fields[question_m]] = self._format_response_analyze_mult_prompt(
-                response, fields[question_m])
+                response, fields[question_m]
+            )
 
             _LOGGER.info(
-                "\n===== Modelresult ====\n\n%s\n\n====================",
-                response
+                "\n===== Modelresult ====\n\n%s\n\n====================", response
             )
 
         answer = QAAnalyzeAnswer(**answer_dict)
 
         # if enabled, pass source data to answer
         if self._config.features.return_source:
-            answer.model_response = responses
+            answer.response = responses
             for question in questions_dict:
-                answer.sources = answer.sources + self._collect_source_docs(
-                    question, questions_dict[question]
-                )
+                answer.sources = answer.sources + questions_dict[question]
 
         _LOGGER.warning("\n==== Answer ====\n\n%s\n===============", answer)
         return answer
@@ -407,13 +310,9 @@ class QAService:
         return PromptConfig()
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:
-        """
-        Add a file to the vectorstore
-        """
         documents: Optional[List[Document]] = None
         file_path = Path(file.name)
         try:
-            # store file in tmp file
             f = NamedTemporaryFile(dir=".", suffix=file_path.suffix, delete=False)
             f.write(file.data)
             f.flush()
@@ -441,52 +340,25 @@ class QAService:
             chunk_size=self._config.embedding.chunk_size,
             chunk_overlap=self._config.embedding.chunk_overlap,
         )
-        # split file to upload in vectorstore
         texts = text_splitter.split_documents(documents)
         if self._vectorstore is None:
-            # create a new vectorstore from document
             _LOGGER.info("Create new vector store from document.")
-            self._vectorstore = FAISS.from_documents(texts, self._embeddings)
+            self._vectorstore = create_faiss(
+                texts, self._config.embedding.model.name, self._config.device
+            )
         else:
-            # add file to vectorstore
             _LOGGER.info("Adding document to existing vector store.")
-            tmp = FAISS.from_documents(texts, self._embeddings)
+            tmp = create_faiss(
+                texts, self._config.embedding.model.name, self._config.device
+            )
             self._vectorstore.merge_from(tmp)
         if self._config.embedding.db_path:
             self._vectorstore.save_local(self._config.embedding.db_path)
         return QAAnswer()
 
-    def _init_model(self, model_config: ModelConfig) -> LLM:  # type: ignore[no-any-unimported]
-        """
-        Init model from config
-        """
-        return AutoModelForCausalLM.from_pretrained(
-                model_path_or_repo_id = model_config.name,
-                model_file = model_config.file,
-                model_type = model_config.type,
-                context_length = model_config.context_length
-                )
-
-    def _query_model(self, model_config: ModelConfig, prompt: str) -> str:
-        """
-        Query model and return response
-        """
-        if  not self._model:
-            return ""
-
-        return str(self._model(
-                prompt,
-                stop = model_config.stop,
-                max_new_tokens = model_config.max_new_tokens,
-                top_p = model_config.top_p,
-                top_k = model_config.top_k,
-                temperature = model_config.temperature,
-                repetition_penalty = model_config.repetition_penalty,
-            ))
-
     def _create_analyze_mult_prompt(
-            self, model_q: str, vector_q: str, prompt: str
-            ) -> Tuple[Dict[str, List[Document]], str]:
+        self, model_q: str, vector_q: str, prompt: str
+    ) -> Tuple[Dict[str, List[DocumentSource]], str]:
         """
         Create a prompt for the analyze multiple question mode
         and return prompt and context
@@ -494,34 +366,29 @@ class QAService:
         if not self._vectorstore:
             msg = "No vector store initialized! Upload documents first."
             _LOGGER.error(msg)
-            empty_dict: Dict[str, List[Document]] = {}
+            empty_dict: Dict[str, List[DocumentSource]] = {}
             return (empty_dict, "")
 
         parameters: Dict[str, str] = {}
-        questions_dict : Dict[str, List[Document]] = {}
+        questions_dict: Dict[str, List[DocumentSource]] = {}
 
-        questions_dict[model_q] = list(self._vectorstore.search(
-                vector_q,
-                search_type="similarity",
-                k=3
-                ))
-
-        parameters["context"] = " ".join(
-            doc.page_content for doc in questions_dict[model_q]
+        questions_dict[model_q] = self.db_query(
+            QAQuestion(question=vector_q, max_sources=3)
         )
+
+        parameters["context"] = " ".join(doc.content for doc in questions_dict[model_q])
         parameters["question"] = model_q
 
         return (questions_dict, prompt.format(**parameters))
 
-    def _format_response_query(
-        self, response: str) -> str:
+    def _format_response_query(self, response: str) -> str:
         """
         format response for the search mode
         """
         response = response.replace('"""', '"')
         response = re.sub(r'""\n*(?=(\,|\\n}|}))', '" ', response)
-        response = re.sub(r'\:\s*""(?=.)', ': "', response) # noqa W605
-        response = re.sub(r'\{\s*""(?=.)', "{ ", response) # noqa W605
+        response = re.sub(r'\:\s*""(?=.)', ': "', response)  # noqa W605
+        response = re.sub(r'\{\s*""(?=.)', "{ ", response)  # noqa W605
 
         split = response.split("{")
         if len(split) > 1:
@@ -531,18 +398,18 @@ class QAService:
         if len(split) > 1:
             response = split[0]
 
-        if '{' not in response:
-            response = '{' + response
-        if '}' not in response:
-            response = response + '}'
+        if "{" not in response:
+            response = "{" + response
+        if "}" not in response:
+            response = response + "}"
 
-        if ("["  in response or "]"  in response):
-            response = response.replace('[', '').replace(']', '')
+        if "[" in response or "]" in response:
+            response = response.replace("[", "").replace("]", "")
         return response
 
-
     def _format_response_analyze_mult_prompt(
-            self, response: str, field: str) -> str | List[str]:
+        self, response: str, field: str
+    ) -> str | List[str]:
         """
         format response for the analyze multiple question mode
         to put in jsonfield
@@ -560,7 +427,7 @@ class QAService:
                 return ""
         except BaseException:
             if field == "attending_doctors":
-                empty_list : List[str] = []
+                empty_list: List[str] = []
                 return empty_list
             else:
                 return ""
@@ -577,7 +444,8 @@ class QAService:
             # format the attending_doctors field
             if answer_dict is not None:
                 answer_dict["attending_doctors"] = self._format_attending_doctors(
-                    answer_dict["attending_doctors"])
+                    answer_dict["attending_doctors"]
+                )
 
                 return QAAnalyzeAnswer(**answer_dict)
             else:
@@ -586,100 +454,24 @@ class QAService:
             _LOGGER.error(err)
             return QAAnalyzeAnswer()
 
-    def _collect_source_docs(
-            self, question_str: str, docs: List[Document]
-            ) -> List[DocumentSource]:
-        """
-        Collect all source docs from context
-        """
-        answer_sources : List[DocumentSource] = []
-
-        answer_sources = [DocumentSource(
-                question=question_str,
-                content=doc.page_content,
-                name=doc.metadata.get("source", "unknown"),
-                page=doc.metadata.get("page", 1),
-                ) for doc in docs]
-
-        return answer_sources
-
-    def _clean_response(self, response : str) -> str:
+    def _clean_response(self, response: str) -> str:
         """
         Remove "\t" and "\n" and "" from response
         """
-        response = response.replace(
-            '"""', '"').replace(
-            "\t", "").replace(
-            "\n", "")
+        response = response.replace('"""', '"').replace("\t", "").replace("\n", "")
         return response
 
     def _format_attending_doctors(self, attending_doctors: str) -> List[str] | str:
         """
         Format the attending_doctors field to list
         """
-        if (attending_doctors is not None
-                and "[" not in attending_doctors
-                and isinstance(attending_doctors, str)):
+        if (
+            attending_doctors is not None
+            and "[" not in attending_doctors
+            and isinstance(attending_doctors, str)
+        ):
             return [attending_doctors]
         elif attending_doctors is not None and attending_doctors != "":
             return attending_doctors
         else:
             return []
-
-
-    def _setup_dbqa_fact_checking(self, prompt: PromptConfig) -> BaseRetrievalQA:
-        """
-        Setup the dba for factchecking
-        """
-        _LOGGER.info("Setup fact checking...")
-        if "context" not in prompt.parameters:
-            _LOGGER.warning(
-                "Prompt does not include '{context}' variable."
-                "It will be appened to the prompt."
-            )
-            prompt.text += "\n\n{context}"
-        fact_checking_prompt = PromptTemplate(
-            template=prompt.text,
-            input_variables=prompt.parameters,
-        )
-        dbqa = build_retrieval_qa(
-            self._llm,
-            fact_checking_prompt,
-            self._vectorstore,
-            self._config.embedding.vector_count,
-            self._config.features.return_source,
-        )
-
-        return dbqa
-
-
-# # Process source documents
-# source_docs = response["source_documents"]
-# for i, doc in enumerate(source_docs):
-#     _LOGGER.debug(f"\nSource Document {i+1}\n")
-#     _LOGGER.debug(f"Source Text: {doc.page_content}")
-#     _LOGGER.debug(f'Document Name: {doc.metadata["source"]}')
-#     _LOGGER.debug(f'Page Number: {doc.metadata.get("page", 1)}\n')
-#     _LOGGER.debug("=" * 60)
-
-# _LOGGER.debug(f"Time to retrieve response: {endQA - startQA}")
-
-# if CONFIG.features.fact_checking:
-#     startFactCheck = timeit.default_timer()
-#     dbqafact = setup_dbqa_fact_checking()
-#     response_fact = dbqafact({"query": response["result"]})
-#     endFactCheck = timeit.default_timer()
-#     _LOGGER.debug("Factcheck:")
-#     _LOGGER.debug(f'\nAnswer: {response_fact["result"]}')
-#     _LOGGER.debug("=" * 50)
-
-#     # Process source documents
-#     source_docs = response_fact["source_documents"]
-#     for i, doc in enumerate(source_docs):
-#         _LOGGER.debug(f"\nSource Document {i+1}\n")
-#         _LOGGER.debug(f"Source Text: {doc.page_content}")
-#         _LOGGER.debug(f'Document Name: {doc.metadata["source"]}')
-#         _LOGGER.debug(f'Page Number: {doc.metadata.get("page", 1)}\n')
-#         _LOGGER.debug("=" * 60)
-
-#     _LOGGER.debug(f"Time to retrieve fact check: {endFactCheck - startFactCheck}")

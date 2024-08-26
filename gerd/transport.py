@@ -20,7 +20,7 @@ class QAQuestion(BaseModel):
 
 # Dataclass to hold a docsource
 class DocumentSource(BaseModel):
-    question: str
+    query: str
     content: str
     name: str
     page: int
@@ -31,7 +31,7 @@ class QAAnswer(BaseModel):
     error_msg: str = ""
     answer: str = ""
     sources: List[DocumentSource] = []
-    model_response: str = ""
+    response: str = ""
 
 # Dataclass to hold a QAAnalyzeAnswer
 class QAAnalyzeAnswer(BaseModel):
@@ -74,7 +74,7 @@ class QAAnalyzeAnswer(BaseModel):
     reason: str = ""
     route: str = ""
     strength: str = ""
-    model_response: str = ""
+    response: str = ""
     prompt: str = ""
 
 # QAModes

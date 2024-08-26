@@ -1,4 +1,4 @@
-device: "mps" # options: cpu, mps, gpu
+device: "cpu" # options: cpu, mps, gpu
 logging:
   level: "debug" # options: debug, info, warn, error, none
 gen:
