@@ -7,7 +7,7 @@ from gerd.gen.generation_service import GenerationService
 from gerd.transport import PromptConfig
 
 
-@pytest.fixture()
+@pytest.fixture
 def gen_service(mocker: MockerFixture) -> GenerationService:
     _ = mocker.patch(
         "gerd.backends.loader.load_model_from_config",
@@ -57,10 +57,7 @@ def test_generate(gen_service: GenerationService) -> None:
 def test_jinja_prompt(gen_service: GenerationService) -> None:
     _ = gen_service.set_prompt(PromptConfig(path="tests/data/simple_prompt.jinja2"))
     response = gen_service.generate(
-        {
-            "task": "Halte dich so kurz wie möglich."
-        },
-        add_prompt=True
+        {"task": "Halte dich so kurz wie möglich."}, add_prompt=True
     )
     assert response.status == 200
     assert response.error_msg == ""

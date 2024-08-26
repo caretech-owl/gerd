@@ -4,17 +4,13 @@ import re
 from os import unlink
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional, Protocol, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
-from langchain.chains.retrieval_qa.base import BaseRetrievalQA
-from langchain.docstore.document import Document
-from langchain.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
 
 import gerd.backends.loader as gerd_loader
 from gerd.backends.rag import Rag, VectorStore, create_faiss, load_faiss
-from gerd.models.model import ModelConfig
 from gerd.models.qa import QAConfig
 from gerd.transport import (
     DocumentSource,
@@ -28,6 +24,7 @@ from gerd.transport import (
 )
 
 if TYPE_CHECKING:
+    from langchain.docstore.document import Document
     from langchain.document_loaders.base import BaseLoader
 
 
@@ -125,8 +122,12 @@ class QAService:
             "Wie heißt der Patient?": "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,",  # noqa E501
             "Wann hat der Patient Geburstag?": "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,",  # noqa E501
             "Wie heißt der Arzt?": "Mit freundlichen kollegialen Grüßen, Prof, Dr",
-            "Wann wurde der Patient bei uns aufgenommen?": "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren",
-            "Wann wurde der Patient bei uns entlassen?": "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren",
+            "Wann wurde der Patient bei uns aufgenommen?": (
+                "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren"
+            ),
+            "Wann wurde der Patient bei uns entlassen?": (
+                "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren"
+            ),
         }
 
         # map model questions to jsonfields
@@ -232,8 +233,12 @@ class QAService:
             "Wie heißt der Patient?": "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,",  # noqa: E501
             "Wann hat der Patient Geburstag?": "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren oder  Patient, * 0.00.0000,",  # noqa: E501
             "Wie heißt der Arzt?": "Mit freundlichen kollegialen Grüßen, Prof, Dr",
-            "Wann wurde der Patient bei uns aufgenommen?": "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren",
-            "Wann wurde der Patient bei uns entlassen?": "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren",
+            "Wann wurde der Patient bei uns aufgenommen?": (
+                "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren"
+            ),
+            "Wann wurde der Patient bei uns entlassen?": (
+                "wir berichten über unseren Patient oder Btr. oder Patient, wh, geboren"
+            ),
         }
         fields: Dict[str, str] = {
             "Wie heißt der Patient?": "patient_name",

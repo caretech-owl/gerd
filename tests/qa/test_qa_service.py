@@ -107,38 +107,37 @@ def test_db_query(qa_service_cajal: QAService) -> None:
     assert "Diakonissenkrankenhaus Berlin" in res[0].content
 
 
-def test_queries(
-    qa_service_file: QAService, query_questions: str) -> None:
+def test_queries(qa_service_file: QAService, query_questions: str) -> None:
     """
     Test the search mode
     """
     res = qa_service_file.query(QAQuestion(question=query_questions))
 
     txt_out = (
-            "=" * 10
-            + "\n"
-            + "["
-            + str(datetime.today())
-            + "]\n"
-            + "Question: "
-            + query_questions
-            + "\n"
-            + "Answer: "
-            + res.answer
-            + "\n"
-            + "Model response: "
-            + res.response
-            + "\n"
-            + "Sources: "
-            + (" ".join(doc.content for doc in res.sources))
-            + "\n"
-            + "=" * 10
-            + "\n"
-        )
+        "=" * 10
+        + "\n"
+        + "["
+        + str(datetime.today())
+        + "]\n"
+        + "Question: "
+        + query_questions
+        + "\n"
+        + "Answer: "
+        + res.answer
+        + "\n"
+        + "Model response: "
+        + res.response
+        + "\n"
+        + "Sources: "
+        + (" ".join(doc.content for doc in res.sources))
+        + "\n"
+        + "=" * 10
+        + "\n"
+    )
     assert res.status == 200
 
 
-def test_analyze_queries(qa_service_file: QAService, test_file: str) -> None:
+def test_analyze_queries(qa_service_file: QAService) -> None:
     """
     Test the analyze mode
     """
@@ -180,9 +179,7 @@ def test_analyze_queries(qa_service_file: QAService, test_file: str) -> None:
     assert res.status == 200
 
 
-def test_analyze_mult_prompts_queries(
-    qa_service_file: QAService, test_file: str
-) -> None:
+def test_analyze_mult_prompts_queries(qa_service_file: QAService) -> None:
     """
     Test the analyze mult prompts mode
     """
@@ -202,22 +199,22 @@ def test_analyze_mult_prompts_queries(
 
     # write result to file
     txt_out = (
-            "=" * 10
-            + "\n"
-            + "["
-            + str(datetime.today())
-            + "]\n"
-            + "Answer: "
-            + qa_res_str
-            + "\n"
-            + "Model response: "
-            + res.response
-            + "\n"
-            + "Sources: "
-            + ("; ".join(f"{doc.query}={doc.content}\n\n" for doc in res.sources))
-            + "\n"
-            + "=" * 10
-            + "\n"
-        )
+        "=" * 10
+        + "\n"
+        + "["
+        + str(datetime.today())
+        + "]\n"
+        + "Answer: "
+        + qa_res_str
+        + "\n"
+        + "Model response: "
+        + res.response
+        + "\n"
+        + "Sources: "
+        + ("; ".join(f"{doc.query}={doc.content}\n\n" for doc in res.sources))
+        + "\n"
+        + "=" * 10
+        + "\n"
+    )
 
     assert res.status == 200
