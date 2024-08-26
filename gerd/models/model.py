@@ -4,9 +4,6 @@ from string import Formatter
 from typing import Any, List, Literal, Optional, TypedDict
 
 from jinja2 import Environment, FileSystemLoader, Template, meta, select_autoescape
-from llama_cpp import (
-    ChatCompletionRequestMessage,
-)
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -15,8 +12,12 @@ from pydantic import (
     computed_field,
 )
 
-ChatMessage = ChatCompletionRequestMessage
 ChatRole = Literal["system", "user", "assistant"]
+
+
+class ChatMessage(TypedDict):
+    role: ChatRole
+    content: str
 
 
 class PromptConfig(BaseModel):
@@ -58,10 +59,10 @@ class PromptConfig(BaseModel):
     @property
     def parameters(self) -> List[str]:
         field_names = (
-            {fn for _, fn, _, _ in Formatter().parse(self.text) if fn is not None}
+            {fn for _, fn, _, _ in Formatter().parse(self.text or "") if fn is not None}
             if not self.is_template
             else meta.find_undeclared_variables(
-                Environment(autoescape=True).parse(self.text)
+                Environment(autoescape=True).parse(self.text or "")
             )
         )
         custom_order = [

@@ -66,7 +66,9 @@ class LlamaCppLLM(LLM):
         self, messages: list[ChatMessage]
     ) -> tuple[ChatRole, str]:
         res = self._model.create_chat_completion(
-            messages,
+            # mypy cannot resolve the role parameter even though
+            # is is defined on compatible literals
+            [{"role": m["role"], "content": m["content"]} for m in messages],  # type: ignore[misc]
             stop=self._config.stop,
             max_tokens=self._config.max_new_tokens,
             top_p=self._config.top_p,
