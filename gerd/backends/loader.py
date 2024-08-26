@@ -1,7 +1,8 @@
 import abc
 import logging
+from typing import Iterator
 
-from gerd.models.model import ChatMessage, ModelConfig
+from gerd.models.model import ChatMessage, ChatRole, ModelConfig, ModelEndpoint
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
@@ -17,7 +18,9 @@ class LLM:
         pass
 
     @abc.abstractmethod
-    def create_chat_completion(self, messages: list[ChatMessage]) -> tuple[str, str]:
+    def create_chat_completion(
+        self, messages: list[ChatMessage]
+    ) -> tuple[ChatRole, str]:
         pass
 
 
@@ -29,7 +32,7 @@ class MockLLM(LLM):
     def generate(self, _: str) -> str:
         return self.ret_value
 
-    def create_chat_completion(self, _: list[ChatMessage]) -> tuple[str, str]:
+    def create_chat_completion(self, _: list[ChatMessage]) -> tuple[ChatRole, str]:
         return ("assistant", self.ret_value)
 
 
@@ -47,7 +50,7 @@ class LlamaCppLLM(LLM):
         )
 
     def generate(self, prompt: str) -> str:
-        output = self._model(
+        res = self._model(
             prompt,
             stop=self._config.stop,
             max_tokens=self._config.max_new_tokens,
@@ -55,11 +58,13 @@ class LlamaCppLLM(LLM):
             top_k=self._config.top_k,
             temperature=self._config.temperature,
             repeat_penalty=self._config.repetition_penalty,
-        )["choices"][0]["text"]
+        )
+        output = next(res) if isinstance(res, Iterator) else res
+        return output["choices"][0]["text"]
 
-        return output
-
-    def create_chat_completion(self, messages: list[ChatMessage]) -> tuple[str, str]:
+    def create_chat_completion(
+        self, messages: list[ChatMessage]
+    ) -> tuple[ChatRole, str]:
         res = self._model.create_chat_completion(
             messages,
             stop=self._config.stop,
@@ -69,8 +74,15 @@ class LlamaCppLLM(LLM):
             temperature=self._config.temperature,
             repeat_penalty=self._config.repetition_penalty,
         )
-        msg = res["choices"][0]["message"]
-        return (msg["role"], msg["content"].strip())
+        if not isinstance(res, Iterator):
+            msg = res["choices"][0]["message"]
+            if msg["role"] == "function":
+                error_msg = "function role not expected"
+                raise NotImplementedError(error_msg)
+            return (msg["role"], msg["content"].strip() if msg["content"] else "")
+
+        error_msg = "Cannot process stream responses for now"
+        raise NotImplementedError(error_msg)
 
 
 class TransformerLLM(LLM):
@@ -100,7 +112,7 @@ class TransformerLLM(LLM):
         )
 
     def generate(self, prompt: str) -> str:
-        output = self._pipe(
+        res = self._pipe(
             prompt,
             max_new_tokens=self._config.max_new_tokens,
             repetition_penalty=self._config.repetition_penalty,
@@ -108,17 +120,33 @@ class TransformerLLM(LLM):
             top_p=self._config.top_p,
             temperature=self._config.temperature,
             do_sample=True,
-        )[0]["generated_text"]
-
+        )
+        output: str = res[0]["generated_text"]
         return output
 
-    def create_chat_completion(self, messages: list[ChatMessage]) -> tuple[str, str]:
-        msg = self.generate(messages)[-1]
+    def create_chat_completion(
+        self, messages: list[ChatMessage]
+    ) -> tuple[ChatRole, str]:
+        msg = self._pipe(
+            messages,
+            max_new_tokens=self._config.max_new_tokens,
+            repetition_penalty=self._config.repetition_penalty,
+            top_k=self._config.top_k,
+            top_p=self._config.top_p,
+            temperature=self._config.temperature,
+            do_sample=True,
+        )[0]["generated_text"][-1]
         return (msg["role"], msg["content"].strip())
+
 
 class RemoteLLM(LLM):
     def __init__(self, config: ModelConfig) -> None:
         self._config = config
+        if self._config.endpoint is None:
+            msg = "Endpoint is required for remote LLM"
+            raise ValueError(msg)
+
+        self._ep: ModelEndpoint = self._config.endpoint
         self._prompt_field = "prompt"
         self.msg_template = {
             "temperature": self._config.temperature,
@@ -136,25 +164,27 @@ class RemoteLLM(LLM):
 
         self.msg_template[self._prompt_field] = prompt
         res = requests.post(
-            self._config.endpoint.url + "/completion",
+            self._ep.url + "/completion",
             headers={"Content-Type": "application/json"},
             data=json.dumps(self.msg_template),
             timeout=300,
         )
         if res.status_code == 200:
-            return res.json()["content"]
+            return str(res.json()["content"])
         else:
             _LOGGER.warning("Server returned error code %d", res.status_code)
         return ""
 
-    def create_chat_completion(self, messages: list[ChatMessage]) -> tuple[str, str]:
+    def create_chat_completion(
+        self, messages: list[ChatMessage]
+    ) -> tuple[ChatRole, str]:
         import json
 
         import requests
 
         self.msg_template["messages"] = messages
         res = requests.post(
-            self._config.endpoint.url + "/v1/chat/completions",
+            self._ep.url + "/v1/chat/completions",
             headers={"Content-Type": "application/json"},
             data=json.dumps(self.msg_template),
             timeout=300,

@@ -28,7 +28,7 @@ jobs:
         with:
           extra_args: ruff --all-files -v
       - name: Run mypy on package
-        run: poetry run mypy team_red
+        run: poetry run mypy gerd
   testing:
     needs: linting
     strategy:

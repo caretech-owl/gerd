@@ -10,7 +10,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
 
 import gerd.backends.loader as gerd_loader
-from gerd.backends.rag import Rag, VectorStore, create_faiss, load_faiss
+from gerd.backends.rag import FAISS, Rag, create_faiss, load_faiss
 from gerd.models.qa import QAConfig
 from gerd.transport import (
     DocumentSource,
@@ -39,7 +39,7 @@ class QAService:
         """
         self._config = config
         self._llm = gerd_loader.load_model_from_config(config.model)
-        self._vectorstore: Optional[VectorStore] = None
+        self._vectorstore: Optional[FAISS] = None
         self._database: Optional[Rag] = None
         if (
             config.embedding.db_path
@@ -78,7 +78,7 @@ class QAService:
         """
         Generate embeddings
         """
-        if not self._vectorstore:
+        if self._vectorstore is None or self._vectorstore.embeddings is None:
             return []
         return self._vectorstore.embeddings.embed_documents([question.question])[0]
 
@@ -247,7 +247,7 @@ class QAService:
             "Wann wurde der Patient bei uns aufgenommen?": "recording_date",
             "Wann wurde der Patient bei uns entlassen?": "release_date",
         }
-        questions_dict: Dict[str, List[Document]] = {}
+        questions_dict: Dict[str, List[DocumentSource]] = {}
         answer_dict: Dict[str, Any] = {}
         responses: str = ""
 

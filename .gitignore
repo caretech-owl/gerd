@@ -144,3 +144,4 @@ data/*.pdf
 
 # no ide specific stuff
 .vscode
+sandbox.py

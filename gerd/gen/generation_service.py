@@ -67,6 +67,11 @@ class GenerationService:
 
     def gen_continue(self, parameters: Dict[str, str]) -> GenResponse:
         fmt = PartialFormatter()
+        if not self._config.features.continuation:
+            return GenResponse(
+                status=400,
+                error_msg="Continuation feature is not configured for this model.",
+            )
         continue_prompt = self._config.features.continuation.model.prompt.text
         resolved = fmt.format(continue_prompt, **parameters)
         _LOGGER.debug(

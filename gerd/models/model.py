@@ -1,9 +1,12 @@
 from functools import cached_property
 from pathlib import Path
 from string import Formatter
-from typing import Any, List, Optional, TypedDict
+from typing import Any, List, Literal, Optional, TypedDict
 
 from jinja2 import Environment, FileSystemLoader, Template, meta, select_autoescape
+from llama_cpp import (
+    ChatCompletionRequestMessage,
+)
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -12,13 +15,12 @@ from pydantic import (
     computed_field,
 )
 
+ChatMessage = ChatCompletionRequestMessage
+ChatRole = Literal["system", "user", "assistant"]
 
-class ChatMessage(TypedDict):
-    role: str
-    content: str
 
 class PromptConfig(BaseModel):
-    text: Optional[str] = None
+    text: str = ""
     template: Optional[Template] = Field(
         exclude=True,
         default=None,
@@ -52,7 +54,7 @@ class PromptConfig(BaseModel):
         elif self.text and self.is_template:
             self.template = Environment(autoescape=True).from_string(self.text)
 
-    @computed_field  # type: ignore[misc]
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def parameters(self) -> List[str]:
         field_names = (
@@ -83,9 +85,11 @@ class PromptConfig(BaseModel):
             ),
         )
 
+
 class ModelEndpoint(BaseModel):
     url: str
     type: str
+
 
 # Default values chosen by https://github.com/marella/ctransformers#config
 class ModelConfig(BaseModel):

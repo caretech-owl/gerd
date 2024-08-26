@@ -13,33 +13,8 @@ from gerd.transport import DocumentSource, QAAnswer, QAQuestion
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
 
-class VectorEmbeddings(Protocol):
-    def embed_documents(self, documents: list[str]) -> list[list[float]]:
-        pass
 
-
-class VectorStore(Protocol):
-    def merge_from(self, vector_store: "VectorStore") -> None:
-        pass
-
-    def save_local(self, path: str) -> None:
-        pass
-
-    def add_texts(
-        self,
-        texts: Iterable[str],
-    ) -> list[str]:
-        pass
-
-    def search(self, query: str, search_type: str, k: int) -> list[Document]:
-        pass
-
-    embeddings: VectorEmbeddings
-
-
-def create_faiss(
-    documents: list[Document], model_name: str, device: str
-) -> VectorStore:
+def create_faiss(documents: list[Document], model_name: str, device: str) -> FAISS:
     return FAISS.from_documents(
         documents,
         HuggingFaceEmbeddings(
@@ -49,9 +24,9 @@ def create_faiss(
     )
 
 
-def load_faiss(dp_path: Path, model_name: str, device: str) -> VectorStore:
+def load_faiss(dp_path: Path, model_name: str, device: str) -> FAISS:
     return FAISS.load_local(
-        dp_path,
+        dp_path.as_posix(),
         HuggingFaceEmbeddings(
             model_name=model_name,
             model_kwargs={"device": device},
@@ -65,7 +40,7 @@ class Rag:
         model: LLM,
         model_config: ModelConfig,
         prompt: PromptConfig,
-        store: VectorStore | None,
+        store: FAISS,
         return_source: bool,
     ) -> None:
         self.model = model
@@ -79,7 +54,7 @@ class Rag:
                 "Prompt does not include '{context}' variable."
                 "It will be appened to the prompt."
             )
-            prompt.text += "\n\n{context}"
+            prompt.text = prompt.text + "\n\n{context}"
 
     def query(self, question: QAQuestion) -> QAAnswer:
         docs = self.store.search(

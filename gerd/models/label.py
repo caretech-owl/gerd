@@ -82,7 +82,7 @@ class LabelStudioTask(BaseModel):
     updated_at: str
     updated_by: int
 
-    @computed_field  # type: ignore[misc]
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def file_name(self) -> str:
         return self.file_upload.split("-", 1)[-1]
