@@ -10,7 +10,7 @@ def test_text() -> None:
 
 def test_path() -> None:
     config = PromptConfig(path="tests/data/prompt.txt")
-    assert config.text == Path("tests/data/prompt.txt").read_text()
+    assert config.text == Path("tests/data/prompt.txt").read_text(encoding="utf-8")
     assert config.template is None
 
 

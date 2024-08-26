@@ -91,7 +91,7 @@ class LabelStudioTask(BaseModel):
 
 
 def load_label_studio_tasks(file_path: str) -> List[LabelStudioTask]:
-    with open(file_path, "r") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         obj = json.load(f)
 
     tasks = TypeAdapter(List[LabelStudioTask]).validate_python(obj)
