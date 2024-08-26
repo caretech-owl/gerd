@@ -17,9 +17,13 @@ class FactCheckingConfig(BaseModel):
     enabled: bool
     model: ModelConfig
 
+class AnalyzeConfig(BaseModel):
+    model: ModelConfig
 
 class QAFeaturesConfig(BaseModel):
     fact_checking: FactCheckingConfig
+    analyze: AnalyzeConfig
+    analyze_mult_prompts: AnalyzeConfig
     return_source: bool
 
 

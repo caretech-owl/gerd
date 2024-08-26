@@ -11,8 +11,11 @@ from ..transport import (
     DocumentSource,
     GenResponse,
     PromptConfig,
+    QAAnalyzeAnswer,
     QAAnswer,
     QAFileUpload,
+    QAModesEnum,
+    QAPromptConfig,
     QAQuestion,
     Transport,
 )
@@ -25,13 +28,30 @@ class RestClient(Transport):
         super().__init__()
         self._url = f"http://{CONFIG.server.host}:{CONFIG.server.port}{CONFIG.server.api_prefix}"
         self.timeout = 10
+        self.longtimeout = 10000
 
     def qa_query(self, question: QAQuestion) -> QAAnswer:
         return QAAnswer.model_validate(
             requests.post(
                 f"{self._url}/qa/query",
-                data=question.model_dump_json(),
-                timeout=self.timeout,
+                data=question.model_dump_json().encode("utf-8"),
+                timeout=self.longtimeout,
+            ).json()
+        )
+
+    def analyze_query(self) -> QAAnalyzeAnswer:
+        return QAAnalyzeAnswer.model_validate(
+            requests.post(
+                f"{self._url}/qa/query_analyze",
+                timeout=self.longtimeout,
+            ).json()
+        )
+
+    def analyze_mult_prompts_query(self) -> QAAnalyzeAnswer:
+                return QAAnalyzeAnswer.model_validate(
+            requests.post(
+                f"{self._url}/qa/query_analyze_mult_prompt",
+                timeout=self.longtimeout,
             ).json()
         )
 
@@ -51,17 +71,18 @@ class RestClient(Transport):
         _LOGGER.debug("db_embedding - request: %s", request)
         response = requests.post(
             f"{self._url}/qa/db_embedding",
-            data=question.model_dump_json(),
+            data=question.model_dump_json().encode("utf-8"),
             timeout=self.timeout,
         )
         _LOGGER.debug("db_embedding - response: %s", response.json())
         return TypeAdapter(List[float]).validate_python(response.json())
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:
+        t = file.model_dump_json().encode("utf-8")
         return QAAnswer.model_validate(
             requests.post(
                 f"{self._url}/qa/file",
-                data=file.model_dump_json(),
+                data=file.model_dump_json().encode("utf-8"),
                 timeout=self.timeout,
             ).json()
         )
@@ -80,18 +101,20 @@ class RestClient(Transport):
             requests.get(f"{self._url}/gen/prompt", timeout=self.timeout).json()
         )
 
-    def set_qa_prompt(self, config: PromptConfig) -> PromptConfig:
+    def set_qa_prompt(self, config: PromptConfig, qa_mode: QAModesEnum) -> PromptConfig:
         return PromptConfig.model_validate(
             requests.post(
                 f"{self._url}/qa/prompt",
-                data=config.model_dump_json(),
+                data=QAPromptConfig(config=config, mode=qa_mode).model_dump_json(),
                 timeout=self.timeout,
             ).json()
         )
 
-    def get_qa_prompt(self) -> PromptConfig:
+    def get_qa_prompt(self, qa_mode: QAModesEnum) -> PromptConfig:
         return PromptConfig.model_validate(
-            requests.get(f"{self._url}/qa/prompt", timeout=self.timeout).json()
+            requests.get(f"{self._url}/qa/prompt",
+                         timeout=self.timeout,
+                         params={"qa_mode": qa_mode.value}).json()
         )
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:

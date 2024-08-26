@@ -10,8 +10,10 @@ from ..transport import (
     DocumentSource,
     GenResponse,
     PromptConfig,
+    QAAnalyzeAnswer,
     QAAnswer,
     QAFileUpload,
+    QAModesEnum,
     QAQuestion,
     Transport,
 )
@@ -41,6 +43,12 @@ class Bridge(Transport):
     def qa_query(self, question: QAQuestion) -> QAAnswer:
         return self.qa.query(question)
 
+    def analyze_query(self) -> QAAnalyzeAnswer:
+        return self.qa.analyze_query()
+
+    def analyze_mult_prompts_query(self) -> QAAnalyzeAnswer:
+        return self.qa.analyze_mult_prompts_query()
+
     def db_query(self, question: QAQuestion) -> List[DocumentSource]:
         return self.qa.db_query(question)
 
@@ -56,11 +64,11 @@ class Bridge(Transport):
     def get_gen_prompt(self) -> PromptConfig:
         return self.gen.get_prompt()
 
-    def set_qa_prompt(self, config: PromptConfig) -> PromptConfig:
-        return self.qa.set_prompt(config)
+    def set_qa_prompt(self, config: PromptConfig, qa_mode: QAModesEnum) -> PromptConfig:
+        return self.qa.set_prompt(config, qa_mode)
 
-    def get_qa_prompt(self) -> PromptConfig:
-        return self.qa.get_prompt()
+    def get_qa_prompt(self, qa_mode: QAModesEnum) -> PromptConfig:
+        return self.qa.get_prompt(qa_mode)
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:
         return self.gen.generate(parameters)
