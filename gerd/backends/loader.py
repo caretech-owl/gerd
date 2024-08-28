@@ -108,7 +108,11 @@ class TransformerLLM(LLM):
             task="text-generation",
             model=config.name,
             # device_map="auto",  # https://github.com/huggingface/transformers/issues/31922
-            device="cuda" if config.gpu_layers > 0 else None,
+            device="cuda"
+            if config.gpu_layers > 0
+            else "mps"
+            if torch.backends.mps.is_available()
+            else "cpu",
             framework="pt",
             model_kwargs=model_kwargs,
         )
