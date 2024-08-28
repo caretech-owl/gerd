@@ -23,11 +23,6 @@ class YamlConfig(PydanticBaseSettingsSource):
     ) -> Tuple[Any, str, bool]:
         raise NotImplementedError()
 
-    # def prepare_field_value(
-    #     self, field_name: str, field: FieldInfo, value: Any, value_is_complex: bool
-    # ) -> Any:
-    #     raise NotImplementedError()
-
     def __call__(self) -> Dict[str, Any]:
         with Path(PROJECT_DIR, "config", "config.yml").open("r", encoding="utf-8") as f:
             d: Dict[str, Any] = safe_load(f)
@@ -40,10 +35,7 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         env_nested_delimiter="__",
     )
-    device: str
     logging: LoggingConfig
-    gen: GenerationConfig
-    qa: QAConfig
     server: ServerConfig
 
     @classmethod
@@ -63,5 +55,33 @@ class Settings(BaseSettings):
             YamlConfig(settings_cls),
         )
 
+
+def load_gen_config(config: str = "gen_default") -> GenerationConfig:
+    """Load the LLM model configuration.
+
+    :param config: The name of the configuration.
+    :return: The model configuration.
+    """
+    config_path = (
+        Path(config)
+        if config.endswith("yml")
+        else Path(PROJECT_DIR, "config", f"{config}.yml")
+    )
+    with config_path.open("r", encoding="utf-8") as f:
+        return GenerationConfig.model_validate(safe_load(f))
+
+def load_qa_config(config: str = "qa_default") ->  QAConfig:
+    """Load the LLM model configuration.
+
+    :param config: The name of the configuration.
+    :return: The model configuration.
+    """
+    config_path = (
+        Path(config)
+        if config.endswith("yml")
+        else Path(PROJECT_DIR, "config", f"{config}.yml")
+    )
+    with config_path.open("r", encoding="utf-8") as f:
+        return QAConfig.model_validate(safe_load(f))
 
 CONFIG = Settings()  # type: ignore[call-arg]

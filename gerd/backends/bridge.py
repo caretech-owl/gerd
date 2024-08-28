@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, List, Optional
 
-from gerd.config import CONFIG
+from gerd.config import load_gen_config, load_qa_config
 from gerd.gen import GenerationService
 from gerd.qa import QAService
 from gerd.transport import QAQuestion
@@ -31,13 +31,13 @@ class Bridge(Transport):
     @property
     def qa(self) -> QAService:
         if self._qa is None:
-            self._qa = QAService(CONFIG.qa)
+            self._qa = QAService(load_qa_config())
         return self._qa
 
     @property
     def gen(self) -> GenerationService:
         if self._gen is None:
-            self._gen = GenerationService(CONFIG.gen)
+            self._gen = GenerationService(load_gen_config())
         return self._gen
 
     def qa_query(self, question: QAQuestion) -> QAAnswer:
