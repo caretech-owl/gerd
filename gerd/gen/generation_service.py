@@ -51,6 +51,7 @@ class GenerationService:
     ) -> GenResponse:
         if self._config.features.prompt_chaining:
             from gerd.features.prompt_chaining import PromptChaining
+
             response = PromptChaining(
                 self._config.features.prompt_chaining,
                 self._model,
@@ -69,7 +70,8 @@ class GenerationService:
             )
             response = self._model.generate(resolved)
             _LOGGER.debug(
-                "\n====== Response =====\n\n%s\n\n=============================", response
+                "\n====== Response =====\n\n%s\n\n=============================",
+                response,
             )
         return GenResponse(text=response, prompt=resolved if add_prompt else None)
 
