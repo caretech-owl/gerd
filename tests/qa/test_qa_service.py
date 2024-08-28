@@ -6,7 +6,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from gerd.backends.loader import MockLLM
-from gerd.config import CONFIG
+from gerd.models.qa import QAConfig
 from gerd.qa import QAService
 from gerd.transport import QAFileUpload, QAQuestion
 
@@ -14,12 +14,12 @@ QA_PATH = Path(__file__).resolve().parent
 
 
 @pytest.fixture
-def qa_service(mocker: MockerFixture) -> QAService:
+def qa_service(mocker: MockerFixture, qa_config: QAConfig) -> QAService:
     _ = mocker.patch(
         "gerd.backends.loader.load_model_from_config",
-        return_value=MockLLM(CONFIG.qa.model),
+        return_value=MockLLM(qa_config.model),
     )
-    return QAService(CONFIG.qa)
+    return QAService(qa_config)
 
 
 @pytest.fixture
@@ -65,17 +65,17 @@ def qa_service_file(
     return qa_service
 
 
-def test_init(mocker: MockerFixture) -> None:
+def test_init(mocker: MockerFixture, qa_config: QAConfig) -> None:
     loader = mocker.patch(
         "gerd.backends.loader.load_model_from_config",
-        return_value=MockLLM(CONFIG.qa.model),
+        return_value=MockLLM(qa_config.model),
     )
-    qa = QAService(CONFIG.qa)
+    qa = QAService(qa_config)
     assert loader.called
 
 
 def test_query_without_document(qa_service: QAService) -> None:
-    assert CONFIG.qa.embedding.db_path == ""
+    assert qa_service._config.embedding.db_path == ""  # noqa: SLF001
     res = qa_service.query(QAQuestion(question="This should return a 404"))
     assert res.status == 404
 
@@ -91,7 +91,7 @@ def test_query(qa_service_cajal: QAService) -> None:
     assert res.answer
 
 
-def test_db_query(qa_service_cajal: QAService) -> None:
+def test_db_query(qa_service_cajal: QAService, qa_config: QAConfig) -> None:
     """
     Test the db search mode
     """
@@ -99,7 +99,7 @@ def test_db_query(qa_service_cajal: QAService) -> None:
     res = qa_service_cajal.db_query(q)
     assert len(res) == q.max_sources
     assert res[0].name == "Cajal.txt"
-    assert len(res[0].content) <= CONFIG.qa.embedding.chunk_size
+    assert len(res[0].content) <= qa_config.embedding.chunk_size
     assert res[0] != res[1]  # return values should not be the same
     q = QAQuestion(question="Wie heißt das Krankenhaus", max_sources=1)
     res = qa_service_cajal.db_query(q)

@@ -1,12 +1,12 @@
-from gerd.config import Settings
+from gerd.config import Settings, load_gen_config
 
 
 def test_config() -> None:
-    config = Settings(_env_file="tests/data/env.test")
+    config = load_gen_config("tests/data/gen_test.yml")
 
-    assert config.gen.model.prompt.path == "tests/data/prompt.txt"
+    assert config.model.prompt.path == "tests/data/prompt.txt"
     assert (
-        config.gen.model.prompt.text
+       config.model.prompt.text
         == """Erste Zeile
 Zweite Zeile
 Dritte Zeile
@@ -15,4 +15,4 @@ Sonderzeichen: |$&?(())
 {variableA}{variableB}
 """
     )
-    assert config.gen.model.prompt.parameters == ["variableA", "variableB"]
+    assert config.model.prompt.parameters == ["variableA", "variableB"]
