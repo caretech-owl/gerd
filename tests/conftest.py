@@ -16,7 +16,7 @@ GRASCCO_PATH = Path(DATA_PATH, "grascco", "raw")
 NO_SKIP_OPTION: Final[str] = "--no-skip"
 
 
-def pytest_addoption(parser):
+def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption(
         NO_SKIP_OPTION,
         action="store_true",
@@ -25,7 +25,7 @@ def pytest_addoption(parser):
     )
 
 
-def pytest_collection_modifyitems(config, items: List[Any]):
+def pytest_collection_modifyitems(config: pytest.Config, items: List[Any]) -> None:
     if config.getoption(NO_SKIP_OPTION):
         for test in items:
             test.own_markers = [
