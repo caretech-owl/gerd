@@ -49,20 +49,28 @@ class GenerationService:
     def generate(
         self, parameters: Dict[str, str], add_prompt: bool = False
     ) -> GenResponse:
-        template = self._config.model.prompt.template
-        resolved = (
-            template.render(**parameters)
-            if template
-            else self._config.model.prompt.text.format(**parameters)
-        )
-        _LOGGER.debug(
-            "\n====== Resolved prompt =====\n\n%s\n\n=============================",
-            resolved,
-        )
-        response = self._model.generate(resolved)
-        _LOGGER.debug(
-            "\n====== Response =====\n\n%s\n\n=============================", response
-        )
+        if self._config.features.prompt_chaining:
+            from gerd.features.prompt_chaining import PromptChaining
+            response = PromptChaining(
+                self._config.features.prompt_chaining,
+                self._model,
+                self._config.model.prompt,
+            ).generate(parameters)
+        else:
+            template = self._config.model.prompt.template
+            resolved = (
+                template.render(**parameters)
+                if template
+                else self._config.model.prompt.text.format(**parameters)
+            )
+            _LOGGER.debug(
+                "\n====== Resolved prompt =====\n\n%s\n\n=============================",
+                resolved,
+            )
+            response = self._model.generate(resolved)
+            _LOGGER.debug(
+                "\n====== Response =====\n\n%s\n\n=============================", response
+            )
         return GenResponse(text=response, prompt=resolved if add_prompt else None)
 
     def gen_continue(self, parameters: Dict[str, str]) -> GenResponse:
