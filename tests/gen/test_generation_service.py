@@ -8,7 +8,9 @@ from gerd.transport import PromptConfig
 
 
 @pytest.fixture
-def gen_service(mocker: MockerFixture, generation_config: GenerationConfig) -> GenerationService:
+def gen_service(
+    mocker: MockerFixture, generation_config: GenerationConfig
+) -> GenerationService:
     _ = mocker.patch(
         "gerd.backends.loader.load_model_from_config",
         return_value=MockLLM(generation_config.model),
@@ -25,7 +27,9 @@ def test_init(mocker: MockerFixture, generation_config: GenerationConfig) -> Non
     assert loader.called
 
 
-def test_get_prompt(gen_service: GenerationService, generation_config: GenerationConfig) -> None:
+def test_get_prompt(
+    gen_service: GenerationService, generation_config: GenerationConfig
+) -> None:
     prompt = gen_service.get_prompt()
     assert prompt
     assert prompt.text == generation_config.model.prompt.text
