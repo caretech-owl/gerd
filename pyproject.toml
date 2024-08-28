@@ -64,6 +64,7 @@ test = "poetry run pytest -x"
 qa = "poetry run gradio team_red/frontends/qa_frontend.py"
 gen = "poetry run gradio team_red/frontends/gen_frontend.py"
 server = "poetry run python -m gerd.backends.rest_server"
+test_manual = "poetry run python -m pytest tests/test_no_auto.py -k 'manual' --no-skip"
 
 [tool.ruff.lint]
 # 1. Enable flake8-bugbear (`B`) rules, in addition to the defaults.
