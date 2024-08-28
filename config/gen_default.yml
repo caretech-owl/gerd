@@ -1,0 +1,22 @@
+model: &gen_model
+  name: "TheBloke/em_german_leo_mistral-GGUF"
+  file: "em_german_leo_mistral.Q5_K_M.gguf"
+  temperature: 0
+  top_k: 100
+  top_p: 0.95
+  max_new_tokens: 512
+  stop: ["<|im_end|>"]
+  repetition_penalty: 1.1
+  context_length: 2048
+  prompt:
+    path: "prompts/gen.txt"
+features:
+  continuation:
+    model:
+      <<: *gen_model
+      temperature: 0.5
+      top_k: 100
+      top_p: 0.95
+      max_new_tokens: 512
+      prompt:
+        path: "prompts/gen_con.txt"
