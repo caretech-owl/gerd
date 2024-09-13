@@ -1,0 +1,14 @@
+model:
+  name: "mlabonne/Meta-Llama-3.1-8B-Instruct-abliterated-GGUF"
+  file: "meta-llama-3.1-8b-instruct-abliterated.Q6_K.gguf"
+  temperature: 0.7
+  top_p: 0.95
+  max_new_tokens: 512
+  repetition_penalty: 1.1
+  prompt:
+    format: 
+      path: "templates/llama_3_instruct.jinja2"
+    system:
+      text: "Du bist ein hilfreicher Assistent und endest jeden Satz mit 'Ay!'."
+    user:
+      text: "Sag bitte das Wort '{word}' drei mal hintereinander."
