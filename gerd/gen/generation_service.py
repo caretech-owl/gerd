@@ -55,7 +55,7 @@ class GenerationService:
             response = PromptChaining(
                 self._config.features.prompt_chaining,
                 self._model,
-                self._config.model.prompt,
+                self._config.model.prompt.get("format", PromptConfig("{message}")),
             ).generate(parameters)
         else:
             template = self._config.model.prompt.template

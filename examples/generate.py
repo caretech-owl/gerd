@@ -1,13 +1,12 @@
 import logging
 
 from gerd.config import load_gen_config
-from gerd.gen import GenerationService
+from gerd.gen.chat_service import ChatService
 from gerd.models.model import PromptConfig
 
 logging.basicConfig(level=logging.DEBUG)
 
 # For remoter server example
-gen = GenerationService(load_gen_config())
-gen.set_prompt(PromptConfig(text="{prompt}"))
-res = gen.generate({"prompt": "Wie heißt du?"})
+gen = ChatService(load_gen_config("chat_llama_3_1_abl"))
+res = gen.generate({"word": "Teleportation"})
 print(res)  # noqa: T201

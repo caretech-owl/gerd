@@ -32,6 +32,14 @@ class PromptConfig(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
+    def format(self, parameters: dict[str, str] | None = None) -> str:
+        parameters = parameters or {}
+        return (
+            self.template.render(**parameters)
+            if self.template
+            else self.text.format(**parameters)
+        )
+
     def model_post_init(self, __context: Any) -> None:  # noqa: ANN401
         if not self.text and self.path:
             path = Path(self.path)
@@ -52,7 +60,7 @@ class PromptConfig(BaseModel):
                         self.template = env.get_template(path.name)
             else:
                 msg = f"Prompt text is not set and '{self.path}' does not exist!"
-                raise ValidationError(msg)
+                raise ValueError(msg)
         elif self.text and self.is_template:
             self.template = Environment(autoescape=True).from_string(self.text)
 
@@ -97,7 +105,7 @@ class ModelEndpoint(BaseModel):
 # Default values chosen by https://github.com/marella/ctransformers#config
 class ModelConfig(BaseModel):
     name: str
-    prompt: PromptConfig = PromptConfig()
+    prompt: dict[Literal["format", "user", "system"], PromptConfig] = {}
     endpoint: Optional[ModelEndpoint] = None
     file: Optional[str] = None
     top_k: int = 40
