@@ -7,11 +7,13 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    SecretStr,
     ValidationError,
     computed_field,
 )
 
 ChatRole = Literal["system", "user", "assistant"]
+EndpointType = Literal["llama.cpp", "openai"]
 
 
 class ChatMessage(TypedDict):
@@ -88,7 +90,8 @@ class PromptConfig(BaseModel):
 
 class ModelEndpoint(BaseModel):
     url: str
-    type: str
+    type: EndpointType
+    key: Optional[SecretStr] = None
 
 
 # Default values chosen by https://github.com/marella/ctransformers#config

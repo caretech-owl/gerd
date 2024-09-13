@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Any, Dict, Tuple, Type
 
+from pydantic import BaseModel, SecretStr
 from pydantic.fields import FieldInfo
 from pydantic_settings import (
     BaseSettings,
@@ -29,6 +30,10 @@ class YamlConfig(PydanticBaseSettingsSource):
         return d
 
 
+class EnvVariables(BaseModel):
+    api_token: SecretStr | None = None
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -37,6 +42,7 @@ class Settings(BaseSettings):
     )
     logging: LoggingConfig
     server: ServerConfig
+    env: EnvVariables | None = None
 
     @classmethod
     def settings_customise_sources(
@@ -68,9 +74,13 @@ def load_gen_config(config: str = "gen_default") -> GenerationConfig:
         else Path(PROJECT_DIR, "config", f"{config}.yml")
     )
     with config_path.open("r", encoding="utf-8") as f:
-        return GenerationConfig.model_validate(safe_load(f))
+        conf = GenerationConfig.model_validate(safe_load(f))
+    if CONFIG.env and CONFIG.env.api_token:
+        conf.model.endpoint.key = CONFIG.env.api_token
+    return conf
 
-def load_qa_config(config: str = "qa_default") ->  QAConfig:
+
+def load_qa_config(config: str = "qa_default") -> QAConfig:
     """Load the LLM model configuration.
 
     :param config: The name of the configuration.
@@ -82,6 +92,10 @@ def load_qa_config(config: str = "qa_default") ->  QAConfig:
         else Path(PROJECT_DIR, "config", f"{config}.yml")
     )
     with config_path.open("r", encoding="utf-8") as f:
-        return QAConfig.model_validate(safe_load(f))
+        conf = QAConfig.model_validate(safe_load(f))
+    if CONFIG.env and CONFIG.env.api_token:
+        conf.model.endpoint.key = CONFIG.env.api_token
+    return conf
+
 
 CONFIG = Settings()  # type: ignore[call-arg]
