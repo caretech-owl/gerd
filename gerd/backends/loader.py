@@ -154,24 +154,51 @@ class RemoteLLM(LLM):
 
         self._ep: ModelEndpoint = self._config.endpoint
         self._prompt_field = "prompt"
-        self.msg_template = {
-            "temperature": self._config.temperature,
-            "top_k": self._config.top_k,
-            "top_p": self._config.top_p,
-            "repeat_penalty": self._config.repetition_penalty,
-            "n_predict": self._config.max_new_tokens,
-            "stop": self._config.stop or [],
-        }
+        self._header = {"Content-Type": "application/json"}
+        if self._config.endpoint.key:
+            self._header["Authorization"] = (
+                f"Bearer {self._config.endpoint.key.get_secret_value()}"
+            )
+
+        if self._config.endpoint.type == "openai":
+            self.msg_template = {
+                "model": self._config.name,
+                "temperature": self._config.temperature,
+                "frequency_penalty": self._config.repetition_penalty,
+                "max_completion_tokens": self._config.max_new_tokens,
+                "n": 1,
+                "stop": self._config.stop,
+                "top_p": self._config.top_p,
+            }
+        elif self._config.endpoint.type == "llama.cpp":
+            self.msg_template = {
+                "temperature": self._config.temperature,
+                "top_k": self._config.top_k,
+                "top_p": self._config.top_p,
+                "repeat_penalty": self._config.repetition_penalty,
+                "n_predict": self._config.max_new_tokens,
+                "stop": self._config.stop or [],
+            }
+        else:
+            msg = f"Unknown endpoint type: {self._config.endpoint.type}"
+            raise ValueError(msg)
 
     def generate(self, prompt: str) -> str:
         import json
 
         import requests
 
+        if self._config.endpoint.type != "llama.cpp":
+            msg = (
+                "Only llama.cpp supports simple completion yet. "
+                "Use chat completion instead."
+            )
+            raise NotImplementedError(msg)
+
         self.msg_template[self._prompt_field] = prompt
         res = requests.post(
             self._ep.url + "/completion",
-            headers={"Content-Type": "application/json"},
+            headers=self._header,
             data=json.dumps(self.msg_template),
             timeout=300,
         )
@@ -191,7 +218,7 @@ class RemoteLLM(LLM):
         self.msg_template["messages"] = messages
         res = requests.post(
             self._ep.url + "/v1/chat/completions",
-            headers={"Content-Type": "application/json"},
+            headers=self._header,
             data=json.dumps(self.msg_template),
             timeout=300,
         )

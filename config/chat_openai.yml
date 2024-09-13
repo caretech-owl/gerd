@@ -1,0 +1,11 @@
+model:
+  name: "gpt-4o-mini"
+  endpoint:
+    url: https://api.openai.com
+    type: "openai"
+  temperature: 0.7
+  top_p: 0.95
+  max_new_tokens: 512
+  repetition_penalty: 1.1
+  prompt:
+    txt: ""
