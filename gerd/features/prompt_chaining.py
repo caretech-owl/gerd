@@ -22,7 +22,7 @@ class PromptChaining:
 
     def generate(self, parameters: dict[str, str]) -> str:
         for i, prompt in enumerate(self.config.prompts, 1):
-            resolved = self.prompt.format(prompt.format(parameters))
+            resolved = self.prompt.format({"prompt": prompt.format(parameters)})
             _LOGGER.debug("\n===== Input =====\n\n%s\n\n====================", resolved)
             res = self.llm.generate(resolved).strip()
             _LOGGER.debug("\n===== Response =====\n\n%s\n\n====================", res)

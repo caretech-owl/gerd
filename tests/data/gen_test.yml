@@ -2,4 +2,5 @@ model:
   name: "TheBloke/em_german_leo_mistral-GGUF"
   file: "em_german_leo_mistral.Q5_K_M.gguf"
   prompt:
-    path: "tests/data/prompt.txt"
+    format:
+      path: "tests/data/prompt.txt"
