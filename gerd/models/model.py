@@ -1,6 +1,6 @@
 from pathlib import Path
 from string import Formatter
-from typing import Any, List, Literal, Optional, TypedDict
+from typing import Any, List, Literal, Mapping, Optional, TypedDict
 
 from jinja2 import Environment, FileSystemLoader, Template, meta, select_autoescape
 from pydantic import (
@@ -32,12 +32,17 @@ class PromptConfig(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    def format(self, parameters: dict[str, str] | None = None) -> str:
-        parameters = parameters or {}
+    def format(
+        self, parameters: Mapping[str, str | list[ChatMessage]] | None = None
+    ) -> str:
+        if parameters is None:
+            parameters = {}
         return (
             self.template.render(**parameters)
             if self.template
             else self.text.format(**parameters)
+            if self.text
+            else "".join(str(parameters.values()))
         )
 
     def model_post_init(self, __context: Any) -> None:  # noqa: ANN401

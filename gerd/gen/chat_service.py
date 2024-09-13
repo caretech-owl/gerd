@@ -24,7 +24,7 @@ class ChatService:
         parameters = parameters or {}
         self.messages.clear()
         system_prompt: PromptConfig = self._config.model.prompt.get(
-            "system", PromptConfig.model_validate({"text": "{message}"})
+            "system", PromptConfig.model_validate({})
         )
         self.messages.append(
             {
@@ -34,25 +34,29 @@ class ChatService:
         )
 
     def set_prompt(
-        self, config: PromptConfig, field: Literal["format", "user", "system"]
+        self,
+        config: PromptConfig,
+        field: Literal["format", "user", "system"] = "format",
     ) -> PromptConfig:
         """Set the prompt configuration."""
         self._config.model.prompt[field] = config
         return self._config.model.prompt[field]
 
-    def get_prompt(self, field: Literal["format", "user", "system"]) -> PromptConfig:
+    def get_prompt(
+        self, field: Literal["format", "user", "system"] = "format"
+    ) -> PromptConfig:
         """Get the prompt configuration."""
         return self._config.model.prompt[field]
 
     def add_message(
         self,
         parameters: Dict[str, str] | None = None,
-        role: Literal["user", "system", "assistant"] = "user",
+        role: Literal["user", "system"] = "user",
     ) -> None:
         """Add a message to the chat history."""
         parameters = parameters or {}
         user_prompt: PromptConfig = self._config.model.prompt.get(
-            role, PromptConfig.model_validate({"text": "{message}"})
+            role, PromptConfig.model_validate({})
         )
         self.messages.append(
             {
@@ -68,10 +72,13 @@ class ChatService:
         if self._config.features.prompt_chaining:
             from gerd.features.prompt_chaining import PromptChaining
 
+            resolved = "".join(parameters.values())
             response = PromptChaining(
                 self._config.features.prompt_chaining,
                 self._model,
-                self._config.model.prompt.get("format", PromptConfig("{message}")),
+                self._config.model.prompt.get(
+                    "format", PromptConfig.model_validate({})
+                ),
             ).generate(parameters)
         else:
             if "format" in self._config.model.prompt:

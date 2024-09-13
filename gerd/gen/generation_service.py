@@ -1,6 +1,6 @@
 import logging
 import string
-from typing import Any, Dict
+from typing import Any, Dict, Literal
 
 import gerd.backends.loader as gerd_loader
 from gerd.models.gen import GenerationConfig
@@ -39,12 +39,20 @@ class GenerationService:
         self._config = config
         self._model = gerd_loader.load_model_from_config(self._config.model)
 
-    def set_prompt(self, config: PromptConfig) -> PromptConfig:
-        self._config.model.prompt = config
-        return self._config.model.prompt
+    def set_prompt(
+        self,
+        config: PromptConfig,
+        field: Literal["format", "user", "system"] = "format",
+    ) -> PromptConfig:
+        """Set the prompt configuration."""
+        self._config.model.prompt[field] = config
+        return self._config.model.prompt[field]
 
-    def get_prompt(self) -> PromptConfig:
-        return self._config.model.prompt
+    def get_prompt(
+        self, field: Literal["format", "user", "system"] = "format"
+    ) -> PromptConfig:
+        """Get the prompt configuration."""
+        return self._config.model.prompt[field]
 
     def generate(
         self, parameters: Dict[str, str], add_prompt: bool = False
@@ -55,14 +63,16 @@ class GenerationService:
             response = PromptChaining(
                 self._config.features.prompt_chaining,
                 self._model,
-                self._config.model.prompt.get("format", PromptConfig("{message}")),
+                self._config.model.prompt.get(
+                    "format", PromptConfig.model_validate({})
+                ),
             ).generate(parameters)
         else:
-            template = self._config.model.prompt.template
+            template = self._config.model.prompt["format"].template
             resolved = (
                 template.render(**parameters)
                 if template
-                else self._config.model.prompt.text.format(**parameters)
+                else self._config.model.prompt["format"].text.format(**parameters)
             )
             _LOGGER.debug(
                 "\n====== Resolved prompt =====\n\n%s\n\n=============================",
@@ -82,7 +92,7 @@ class GenerationService:
                 status=400,
                 error_msg="Continuation feature is not configured for this model.",
             )
-        continue_prompt = self._config.features.continuation.model.prompt.text
+        continue_prompt = self._config.features.continuation.model.prompt["format"].text
         resolved = fmt.format(continue_prompt, **parameters)
         _LOGGER.debug(
             "\n====== Resolved prompt =====\n\n%s\n\n=============================",
