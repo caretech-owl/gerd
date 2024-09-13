@@ -188,7 +188,7 @@ class RemoteLLM(LLM):
 
         import requests
 
-        if self._config.endpoint.type != "llama.cpp":
+        if self._config.endpoint and self._config.endpoint.type != "llama.cpp":
             msg = (
                 "Only llama.cpp supports simple completion yet. "
                 "Use chat completion instead."

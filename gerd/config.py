@@ -75,7 +75,7 @@ def load_gen_config(config: str = "gen_default") -> GenerationConfig:
     )
     with config_path.open("r", encoding="utf-8") as f:
         conf = GenerationConfig.model_validate(safe_load(f))
-    if CONFIG.env and CONFIG.env.api_token:
+    if CONFIG.env and CONFIG.env.api_token and conf.model.endpoint:
         conf.model.endpoint.key = CONFIG.env.api_token
     return conf
 
@@ -93,7 +93,7 @@ def load_qa_config(config: str = "qa_default") -> QAConfig:
     )
     with config_path.open("r", encoding="utf-8") as f:
         conf = QAConfig.model_validate(safe_load(f))
-    if CONFIG.env and CONFIG.env.api_token:
+    if CONFIG.env and CONFIG.env.api_token and conf.model.endpoint:
         conf.model.endpoint.key = CONFIG.env.api_token
     return conf
 
