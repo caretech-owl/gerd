@@ -6,7 +6,6 @@ from gerd.models.model import PromptConfig
 
 logging.basicConfig(level=logging.DEBUG)
 
-# For remoter server example
 chat = ChatService(load_gen_config("chat_llama_3_1_abl"))
 res = chat.submit_user_message({"word": "Teleportation"})
 logging.info(res)
