@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     )
     logging: LoggingConfig
     server: ServerConfig
-    env: EnvVariables | None = None
+    env: EnvVariables = EnvVariables()
 
     @classmethod
     def settings_customise_sources(
