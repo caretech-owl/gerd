@@ -32,7 +32,7 @@ fastapi = "^0.115.0"
 requests = "^2.32.3"
 jinja2 = "^3.1.4"
 langchain-community = "^0.3.1"
-llama-cpp-python = "^0.3.1"
+llama-cpp-python = { version = "^0.3.1", optional = true }
 langchain-huggingface = "^0.1.0"
 autoawq = {version = "^0.2.6", optional = true}
 
@@ -51,6 +51,7 @@ pytest-mock = "^3.14.0"
 cpu = ["faiss-cpu"]
 gpu = ["faiss-gpu"]
 awq = ["autoawq"]
+gguf = ["llama-cpp-python"]
 
 [[tool.poetry.source]]
 name = "torch_cpu"

@@ -671,7 +671,7 @@ profile = ["gprof2dot (>=2022.7.29)"]
 name = "diskcache"
 version = "5.6.3"
 description = "Disk Cache -- Disk and file backed persistent cache."
-optional = false
+optional = true
 python-versions = ">=3"
 files = [
     {file = "diskcache-5.6.3-py3-none-any.whl", hash = "sha256:5e31b2d5fbad117cc363ebaf6b689474db18a1f6438bc82358b024abd4c2ca19"},
@@ -1482,7 +1482,7 @@ requests = ">=2,<3"
 name = "llama-cpp-python"
 version = "0.3.1"
 description = "Python bindings for the llama.cpp library"
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "llama_cpp_python-0.3.1.tar.gz", hash = "sha256:75ec8374960b6353c254e55a48e7c7783abf6bcb9178ba0f655490738e5a9004"},
@@ -4435,9 +4435,10 @@ cffi = ["cffi (>=1.11)"]
 [extras]
 awq = ["autoawq"]
 cpu = ["faiss-cpu"]
+gguf = ["llama-cpp-python"]
 gpu = ["faiss-gpu"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10, <4.0"
-content-hash = "9f67f31e8843e4552fcd1cce8990e11a621ec26f6c331989081119c26ee43e20"
+content-hash = "bd046ea9f4a60cedebfdb2065f254e41db46fe03ee52901a4fa28ab81ce6aa69"
