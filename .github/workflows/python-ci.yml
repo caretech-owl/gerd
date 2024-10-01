@@ -22,7 +22,7 @@ jobs:
           python-version: "3.12"
           cache: "poetry"
       - name: Install development dependencies with extras
-        run: poetry install --with dev --extras cpu
+        run: poetry install --with dev --extras "cpu gguf"
       - name: Run ruff linting via pre-commit on all files and verbose
         uses: pre-commit/action@v3.0.0
         with:
@@ -51,7 +51,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: "poetry"
       - name: Install development dependencies with extras
-        run: poetry install --with dev --extras cpu
+        run: poetry install --with dev --extras "cpu gguf"
       # - name: Install torch cpu version for Linux
       #   if: matrix.os == 'ubuntu-latest'
       #   run: pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
