@@ -114,7 +114,7 @@ def upload(file_path: str, progress: Optional[gr.Progress] = None) -> None:
     if progress is None:
         progress = gr.Progress()
     progress(0, desc="Hochladen...")
-    with pathlib.Path(file_path).open("rb", encoding="utf-8") as file:
+    with pathlib.Path(file_path).open("rb") as file:
         data = QAFileUpload(
             data=file.read(),
             name=pathlib.Path(file_path).name,

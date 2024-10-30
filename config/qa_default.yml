@@ -1,6 +1,6 @@
 model: &qa_model
-  name: "TheBloke/leo-hessianai-7B-chat-GGUF"
-  file: "leo-hessianai-7bp-chat.Q5_K_M.gguf"
+  name: "mlabonne/Meta-Llama-3.1-8B-Instruct-abliterated-GGUF"
+  file: "meta-llama-3.1-8b-instruct-abliterated.Q6_K.gguf"
   temperature: 0.01
   max_new_tokens: 128
   context_length: 512

@@ -18,7 +18,7 @@ orjson = "^3.10.7"
 python = ">=3.10, <4.0"
 transformers = "^4.42.1"
 # transformers = { git = "https://github.com/huggingface/transformers.git", branch = "main" }
-faiss-cpu = { version = "~1.8.0", optional = true }
+faiss-cpu = { version = "~1.9.0", optional = true }
 faiss-gpu = { version = "~1.7.2", optional = true }
 ipykernel = "^6.29.4"
 langchain = "^0.3.1"
@@ -35,6 +35,7 @@ langchain-community = "^0.3.1"
 llama-cpp-python = { version = "^0.3.1", optional = true }
 langchain-huggingface = "^0.1.0"
 autoawq = {version = "^0.2.6", optional = true}
+gradio = {version = "^5.4.0", optional = true}
 
 [tool.poetry.group.dev]
 optional = true
@@ -52,6 +53,7 @@ cpu = ["faiss-cpu"]
 gpu = ["faiss-gpu"]
 awq = ["autoawq"]
 gguf = ["llama-cpp-python"]
+gui = ["gradio"]
 
 [[tool.poetry.source]]
 name = "torch_cpu"
@@ -64,8 +66,8 @@ priority = "primary"
 
 [tool.poe.tasks]
 test = "poetry run pytest -x"
-qa = "poetry run gradio team_red/frontends/qa_frontend.py"
-gen = "poetry run gradio team_red/frontends/gen_frontend.py"
+qa = "poetry run gradio gerd/frontends/qa_frontend.py"
+gen = "poetry run gradio gerd/frontends/gen_frontend.py"
 server = "poetry run python -m gerd.backends.rest_server"
 test_manual = "poetry run python -m pytest tests/test_no_auto.py -k 'manual' --no-skip"
 
