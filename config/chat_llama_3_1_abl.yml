@@ -6,8 +6,6 @@ model:
   max_new_tokens: 512
   repetition_penalty: 1.1
   prompt:
-    format: 
-      path: "templates/llama_3_instruct.jinja2"
     system:
       text: "Du bist ein hilfreicher Assistent und endest jeden Satz mit 'Ay!'."
     user:

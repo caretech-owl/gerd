@@ -30,9 +30,9 @@ def test_init(mocker: MockerFixture, generation_config: GenerationConfig) -> Non
 def test_get_prompt(
     gen_service: GenerationService, generation_config: GenerationConfig
 ) -> None:
-    prompt = gen_service.get_prompt("format")
+    prompt = gen_service.get_prompt("user")
     assert prompt
-    assert prompt.text == generation_config.model.prompt["format"].text
+    assert prompt.text == generation_config.model.prompt["user"].text
 
 
 def test_set_prompt(gen_service: GenerationService) -> None:

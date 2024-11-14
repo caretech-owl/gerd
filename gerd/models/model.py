@@ -110,7 +110,7 @@ class ModelEndpoint(BaseModel):
 # Default values chosen by https://github.com/marella/ctransformers#config
 class ModelConfig(BaseModel):
     name: str
-    prompt: dict[Literal["format", "user", "system"], PromptConfig] = {}
+    prompt: dict[Literal["user", "system"], PromptConfig] = {}
     endpoint: Optional[ModelEndpoint] = None
     file: Optional[str] = None
     top_k: int = 40

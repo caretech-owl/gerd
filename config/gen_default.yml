@@ -9,7 +9,7 @@ model: &gen_model
   repetition_penalty: 1.1
   context_length: 2048
   prompt:
-    format:
+    user:
       path: "prompts/gen.txt"
 features:
   continuation:
@@ -20,5 +20,5 @@ features:
       top_p: 0.95
       max_new_tokens: 512
       prompt:
-        format:
+        user:
           path: "prompts/gen_con.txt"

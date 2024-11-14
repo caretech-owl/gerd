@@ -5,7 +5,7 @@ model: &qa_model
   max_new_tokens: 128
   context_length: 512
   prompt:
-    format:
+    user:
       path: "prompts/qa.txt"
 features:
   fact_checking:
@@ -13,20 +13,20 @@ features:
     model:
       <<: *qa_model
       prompt:
-        format:
+        user:
           path: "prompts/qa_fact_checking.txt"
   analyze:
     model:
       <<: *qa_model
       context_length: 4096
       prompt:
-        format:
+        user:
           path: "prompts/qa_analyze.txt"
   analyze_mult_prompts:
     model:
       <<: *qa_model
       prompt:
-        format:
+        user:
           path: "prompts/qa.txt"
   return_source: true
 embedding:
