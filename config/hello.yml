@@ -1,0 +1,11 @@
+model:
+  name: "Qwen/Qwen2.5-0.5B-Instruct"
+  temperature: 0.1
+  top_p: 0.90
+  max_new_tokens: 256
+  repetition_penalty: 1.1
+  prompt:
+    system:
+      text: "You are a helpful assistant. Start your answers with 'Sure thing, buddy!'."
+    user:
+      text: "Please say the word '{word}' three times."

@@ -36,6 +36,7 @@ llama-cpp-python = { version = "^0.3.1", optional = true }
 langchain-huggingface = "^0.1.0"
 autoawq = {version = "^0.2.6", optional = true}
 gradio = {version = "^5.4.0", optional = true}
+poetry = "^1.8.4"
 
 [tool.poetry.group.dev]
 optional = true
@@ -70,6 +71,7 @@ qa = "poetry run gradio gerd/frontends/qa_frontend.py"
 gen = "poetry run gradio gerd/frontends/gen_frontend.py"
 server = "poetry run python -m gerd.backends.rest_server"
 test_manual = "poetry run python -m pytest tests/test_no_auto.py -k 'manual' --no-skip"
+hello = "poetry run python examples/hello.py"
 
 [tool.ruff.lint]
 # 1. Enable flake8-bugbear (`B`) rules, in addition to the defaults.
