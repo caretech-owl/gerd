@@ -36,15 +36,13 @@ class ChatService:
     def set_prompt(
         self,
         config: PromptConfig,
-        field: Literal["format", "user", "system"] = "format",
+        field: Literal["user", "system"] = "user",
     ) -> PromptConfig:
         """Set the prompt configuration."""
         self._config.model.prompt[field] = config
         return self._config.model.prompt[field]
 
-    def get_prompt(
-        self, field: Literal["format", "user", "system"] = "format"
-    ) -> PromptConfig:
+    def get_prompt(self, field: Literal["user", "system"] = "user") -> PromptConfig:
         """Get the prompt configuration."""
         return self._config.model.prompt[field]
 
@@ -76,13 +74,11 @@ class ChatService:
             response = PromptChaining(
                 self._config.features.prompt_chaining,
                 self._model,
-                self._config.model.prompt.get(
-                    "format", PromptConfig.model_validate({})
-                ),
+                self._config.model.prompt.get("user", PromptConfig.model_validate({})),
             ).generate(parameters)
         else:
-            if "format" in self._config.model.prompt:
-                resolved = self._config.model.prompt["format"].format(
+            if "user" in self._config.model.prompt:
+                resolved = self._config.model.prompt["user"].format(
                     {"messages": self.messages}
                 )
             else:

@@ -42,15 +42,13 @@ class GenerationService:
     def set_prompt(
         self,
         config: PromptConfig,
-        field: Literal["format", "user", "system"] = "format",
+        field: Literal["user", "system"] = "user",
     ) -> PromptConfig:
         """Set the prompt configuration."""
         self._config.model.prompt[field] = config
         return self._config.model.prompt[field]
 
-    def get_prompt(
-        self, field: Literal["format", "user", "system"] = "format"
-    ) -> PromptConfig:
+    def get_prompt(self, field: Literal["user", "system"] = "user") -> PromptConfig:
         """Get the prompt configuration."""
         return self._config.model.prompt[field]
 
@@ -63,16 +61,14 @@ class GenerationService:
             response = PromptChaining(
                 self._config.features.prompt_chaining,
                 self._model,
-                self._config.model.prompt.get(
-                    "format", PromptConfig.model_validate({})
-                ),
+                self._config.model.prompt.get("user", PromptConfig.model_validate({})),
             ).generate(parameters)
         else:
-            template = self._config.model.prompt["format"].template
+            template = self._config.model.prompt["user"].template
             resolved = (
                 template.render(**parameters)
                 if template
-                else self._config.model.prompt["format"].text.format(**parameters)
+                else self._config.model.prompt["user"].text.format(**parameters)
             )
             _LOGGER.debug(
                 "\n====== Resolved prompt =====\n\n%s\n\n=============================",
@@ -92,7 +88,7 @@ class GenerationService:
                 status=400,
                 error_msg="Continuation feature is not configured for this model.",
             )
-        continue_prompt = self._config.features.continuation.model.prompt["format"].text
+        continue_prompt = self._config.features.continuation.model.prompt["user"].text
         resolved = fmt.format(continue_prompt, **parameters)
         _LOGGER.debug(
             "\n====== Resolved prompt =====\n\n%s\n\n=============================",

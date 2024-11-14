@@ -8,4 +8,5 @@ model:
   max_new_tokens: 512
   repetition_penalty: 1.1
   prompt:
-    txt: ""
+    user:
+      txt: ""

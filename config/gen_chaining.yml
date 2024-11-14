@@ -9,7 +9,7 @@ model:
   repetition_penalty: 1.1
   context_length: 2048
   prompt:
-    format:
+    user:
       text: "Du bist ein hilfreicher Assistent und beantwortest alle Fragen zuverlässig und wahrheitsgetreu. USER: {prompt} ASSISTANT:"
 features:
   prompt_chaining:
