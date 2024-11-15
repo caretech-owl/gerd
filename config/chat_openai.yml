@@ -7,6 +7,3 @@ model:
   top_p: 0.95
   max_new_tokens: 512
   repetition_penalty: 1.1
-  prompt:
-    user:
-      txt: ""

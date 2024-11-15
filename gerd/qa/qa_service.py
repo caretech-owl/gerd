@@ -93,7 +93,7 @@ class QAService:
             self._database = Rag(
                 self._llm,
                 self._config.model,
-                self._config.model.prompt["user"],
+                self._config.model.prompt_config,
                 self._vectorstore,
                 self._config.features.return_source,
             )
@@ -143,12 +143,12 @@ class QAService:
         parameters: Dict[str, str] = {}
         question_counter: int = 0
 
-        qa_analyze_prompt = config.model.prompt
+        qa_analyze_prompt = config.model.prompt_config
         # check if prompt contains needed fields
         for i in range(0, len(questions_model_dict)):
             if (
-                "context" + str(i) not in qa_analyze_prompt["user"].parameters
-                or "question" + str(i) not in qa_analyze_prompt["user"].parameters
+                "context" + str(i) not in qa_analyze_prompt.parameters
+                or "question" + str(i) not in qa_analyze_prompt.parameters
             ):
                 msg = (
                     "Prompt does not include '{context"
@@ -174,7 +174,7 @@ class QAService:
 
             question_counter = question_counter + 1
 
-        formatted_prompt = qa_analyze_prompt["user"].text.format(**parameters)
+        formatted_prompt = qa_analyze_prompt.text.format(**parameters)
 
         # query the model
         response = self._llm.generate(formatted_prompt)
@@ -219,10 +219,10 @@ class QAService:
         config = self._config.features.analyze_mult_prompts
 
         # check if prompt contains needed fields
-        qa_analyze_mult_prompts = config.model.prompt
+        qa_analyze_mult_prompts = config.model.prompt_config
         if (
-            "context" not in qa_analyze_mult_prompts["user"].parameters
-            or "question" not in qa_analyze_mult_prompts["user"].parameters
+            "context" not in qa_analyze_mult_prompts.parameters
+            or "question" not in qa_analyze_mult_prompts.parameters
         ):
             msg = "Prompt does not include '{context}' or '{question}' variable."
             _LOGGER.error(msg)
@@ -254,7 +254,7 @@ class QAService:
         # load context from vectorstore for each question
         for question_m, question_v in questions_model_dict.items():
             questions_dict, formatted_prompt = self._create_analyze_mult_prompt(
-                question_m, question_v, qa_analyze_mult_prompts["user"].text
+                question_m, question_v, qa_analyze_mult_prompts.text
             )
 
             # query the model for each question
@@ -287,31 +287,33 @@ class QAService:
         _LOGGER.warning("\n==== Answer ====\n\n%s\n===============", answer)
         return answer
 
-    def set_prompt(self, config: PromptConfig, qa_mode: QAModesEnum) -> PromptConfig:
+    def set_prompt_config(
+        self, config: PromptConfig, qa_mode: QAModesEnum
+    ) -> PromptConfig:
         """
         Set the prompt for the mode
         """
         if qa_mode == QAModesEnum.SEARCH:
-            self._config.model.prompt["user"] = config
-            return self._config.model.prompt["user"]
+            self._config.model.prompt_config = config
+            return self._config.model.prompt_config
         elif qa_mode == QAModesEnum.ANALYZE:
-            self._config.features.analyze.model.prompt["user"] = config
-            return self._config.features.analyze.model.prompt["user"]
+            self._config.features.analyze.model.prompt_config = config
+            return self._config.features.analyze.model.prompt_config
         elif qa_mode == QAModesEnum.ANALYZE_MULT_PROMPTS:
-            self._config.features.analyze_mult_prompts.model.prompt["user"] = config
-            return self._config.features.analyze_mult_prompts.model.prompt["user"]
+            self._config.features.analyze_mult_prompts.model.prompt_config = config
+            return self._config.features.analyze_mult_prompts.model.prompt_config
         return PromptConfig()
 
-    def get_prompt(self, qa_mode: QAModesEnum) -> PromptConfig:
+    def get_prompt_config(self, qa_mode: QAModesEnum) -> PromptConfig:
         """
         Returns the prompt for the mode
         """
         if qa_mode == QAModesEnum.SEARCH:
-            return self._config.model.prompt["user"]
+            return self._config.model.prompt_config
         elif qa_mode == QAModesEnum.ANALYZE:
-            return self._config.features.analyze.model.prompt["user"]
+            return self._config.features.analyze.model.prompt_config
         elif qa_mode == QAModesEnum.ANALYZE_MULT_PROMPTS:
-            return self._config.features.analyze_mult_prompts.model.prompt["user"]
+            return self._config.features.analyze_mult_prompts.model.prompt_config
         return PromptConfig()
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:

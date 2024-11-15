@@ -4,8 +4,7 @@ model:
   top_p: 0.90
   max_new_tokens: 256
   repetition_penalty: 1.1
-  prompt:
-    system:
-      text: "You are a helpful assistant. Start your answers with 'Sure thing, buddy!'."
-    user:
-      text: "Please say the word '{word}' three times."
+  prompt_setup:
+    - [system, text: "You are a helpful assistant. Start your answers with 'Sure thing, buddy!'."]
+  prompt_config:
+    text: "Please say the word '{word}' three times."

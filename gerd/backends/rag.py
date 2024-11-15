@@ -64,7 +64,9 @@ class Rag:
         )
         context = "\n".join(doc.page_content for doc in docs)
         resolved = self.prompt.text.format(context=context, question=question.question)
-        response = self.model.generate(resolved)
+        role, response = self.model.create_chat_completion(
+            [{"role": "user", "content": resolved}]
+        )
         answer = QAAnswer(answer=response)
         if self.return_source:
             for doc in docs:

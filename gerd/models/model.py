@@ -1,6 +1,6 @@
 from pathlib import Path
 from string import Formatter
-from typing import Any, List, Literal, Mapping, Optional, TypedDict
+from typing import Any, List, Literal, Mapping, Optional, Tuple, TypedDict
 
 from jinja2 import Environment, FileSystemLoader, Template, meta, select_autoescape
 from pydantic import (
@@ -110,7 +110,8 @@ class ModelEndpoint(BaseModel):
 # Default values chosen by https://github.com/marella/ctransformers#config
 class ModelConfig(BaseModel):
     name: str
-    prompt: dict[Literal["user", "system"], PromptConfig] = {}
+    prompt_setup: List[Tuple[Literal["system", "user"], PromptConfig]] = []
+    prompt_config: PromptConfig = PromptConfig()
     endpoint: Optional[ModelEndpoint] = None
     file: Optional[str] = None
     top_k: int = 40

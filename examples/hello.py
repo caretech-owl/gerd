@@ -10,6 +10,6 @@ chat = ChatService(load_gen_config("hello"))
 res = chat.submit_user_message({"word": "teleportation"})
 logging.info(res)
 
-chat.set_prompt(PromptConfig.model_validate({"text": "{message}"}), "user")
+chat.set_prompt_config(PromptConfig.model_validate({"text": "{message}"}))
 res = chat.submit_user_message({"message": "Hello! What is one plus one?"})
 logging.info(res)

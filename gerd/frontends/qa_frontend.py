@@ -171,9 +171,11 @@ def handle_developer_mode_checkbox_change(check: bool) -> List[Any]:
         gr.update(visible=check),
         gr.update(visible=check),
         gr.update(
-            choices=["LLM", "Analyze", "Analyze mult.", "VectorDB"]
-            if check
-            else ["LLM", "Analyze mult."]
+            choices=(
+                ["LLM", "Analyze", "Analyze mult.", "VectorDB"]
+                if check
+                else ["LLM", "Analyze mult."]
+            )
         ),
     ]
 
@@ -207,11 +209,15 @@ with demo:
         with gr.Column(scale=1):
             developer_checkbox = gr.Checkbox(
                 info="Aktivieren/Deaktivieren von zusätzlichen Modi",
-                label="Developermode",
-                value=True,
+                label="Developer Mode",
+                value=developer_mode,
             )
             type_radio = gr.Radio(
-                choices=["LLM", "Analyze", "Analyze mult.", "VectorDB"],
+                choices=(
+                    ["LLM", "Analyze", "Analyze mult.", "VectorDB"]
+                    if developer_mode
+                    else ["LLM", "Analyze mult."]
+                ),
                 value="LLM",
                 label="Suchmodus",
                 interactive=True,
@@ -223,20 +229,23 @@ with demo:
                 value=3,
                 interactive=False,
                 label="Quellenanzahl",
+                visible=developer_mode,
             )
             strategy_dropdown = gr.Dropdown(
                 choices=["similarity", "mmr"],
                 value="similarity",
                 interactive=False,
                 label="Suchmodus",
+                visible=developer_mode,
             )
 
     prompt = gr.TextArea(
         value=TRANSPORTER.get_qa_prompt(get_qa_mode(type_radio.value)).text,
         interactive=True,
         label="Prompt",
+        visible=developer_mode,
     )
-    prompt_submit = gr.Button("Aktualisiere Prompt")
+    prompt_submit = gr.Button("Aktualisiere Prompt", visible=developer_mode)
     inp = gr.Textbox(
         label="Stellen Sie eine Frage:", placeholder="Wie heißt der Patient?"
     )

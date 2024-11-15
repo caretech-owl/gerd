@@ -40,6 +40,23 @@ poetry install --extras cpu
 # and may take a while
 poe hello
 ```
+
+## Question and Answer example
+
+Folloq quickstart and make sure to install `gui` and `gguf` dependencies. Next start the qa server.
+When the server is done loading, open `http://127.0.0.1:7860` in your browser.
+
+```shell
+poe qa
+# Some Llama.cpp outut
+# ...
+# * Running on local URL:  http://127.0.0.1:7860
+```
+
+Click the 'Click to Upload' button and search for a [GRASCCO](https://pubmed.ncbi.nlm.nih.gov/36073490/) document named `Caja.txt` which is located in the `tests/data/grascoo` folder and upload it into the vector store. Next, you can query information from the document. For instance `Wie heißt der Patient?` (What is the patient called?).
+
+![](images/qa.png)
+
 ___
 ## Used Tools
 - **LangChain**: Framework for developing applications powered by language models
@@ -54,6 +71,7 @@ ___
 - `/config`: Configuration files for LLM applications
 - `/examples`: Examples that demonstrate the different usage scenarios
 - `/gerd`: Code related to `GERD`
+- `/images`: Images for the documentation
 - `/models`: Binary file of GGML quantized LLM model (i.e., Llama-2-7B-Chat)
 - `/prompts`: Plain text prompt files
 - `/templates`: Prompt files as jinja2 templates 

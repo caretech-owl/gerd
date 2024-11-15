@@ -59,16 +59,16 @@ class Bridge(Transport):
         return self.qa.add_file(file)
 
     def set_gen_prompt(self, config: PromptConfig) -> PromptConfig:
-        return self.gen.set_prompt(config)
+        return self.gen.set_prompt_config(config)
 
     def get_gen_prompt(self) -> PromptConfig:
-        return self.gen.get_prompt()
+        return self.gen.get_prompt_config()
 
     def set_qa_prompt(self, config: PromptConfig, qa_mode: QAModesEnum) -> PromptConfig:
-        return self.qa.set_prompt(config, qa_mode)
+        return self.qa.set_prompt_config(config, qa_mode)
 
     def get_qa_prompt(self, qa_mode: QAModesEnum) -> PromptConfig:
-        return self.qa.get_prompt(qa_mode)
+        return self.qa.get_prompt_config(qa_mode)
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:
         return self.gen.generate(parameters)

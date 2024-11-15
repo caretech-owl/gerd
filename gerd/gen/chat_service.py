@@ -23,28 +23,25 @@ class ChatService:
         """Reset the chat history."""
         parameters = parameters or {}
         self.messages.clear()
-        system_prompt: PromptConfig = self._config.model.prompt.get(
-            "system", PromptConfig.model_validate({})
-        )
-        self.messages.append(
-            {
-                "role": "system",
-                "content": system_prompt.format(parameters),
-            }
-        )
+        for role, message in self._config.model.prompt_setup:
+            self.messages.append(
+                {
+                    "role": role,
+                    "content": message.format(parameters),
+                }
+            )
 
-    def set_prompt(
+    def set_prompt_config(
         self,
         config: PromptConfig,
-        field: Literal["user", "system"] = "user",
     ) -> PromptConfig:
         """Set the prompt configuration."""
-        self._config.model.prompt[field] = config
-        return self._config.model.prompt[field]
+        self._config.model.prompt_config = config
+        return self._config.model.prompt_config
 
-    def get_prompt(self, field: Literal["user", "system"] = "user") -> PromptConfig:
+    def get_prompt_config(self) -> PromptConfig:
         """Get the prompt configuration."""
-        return self._config.model.prompt[field]
+        return self._config.model.prompt_config
 
     def add_message(
         self,
@@ -53,9 +50,7 @@ class ChatService:
     ) -> None:
         """Add a message to the chat history."""
         parameters = parameters or {}
-        user_prompt: PromptConfig = self._config.model.prompt.get(
-            role, PromptConfig.model_validate({})
-        )
+        user_prompt: PromptConfig = self._config.model.prompt_config
         self.messages.append(
             {
                 "role": role,
@@ -74,15 +69,12 @@ class ChatService:
             response = PromptChaining(
                 self._config.features.prompt_chaining,
                 self._model,
-                self._config.model.prompt.get("user", PromptConfig.model_validate({})),
+                self._config.model.prompt_config,
             ).generate(parameters)
         else:
-            if "user" in self._config.model.prompt:
-                resolved = self._config.model.prompt["user"].format(
-                    {"messages": self.messages}
-                )
-            else:
-                resolved = "".join([message["content"] for message in self.messages])
+            resolved = self._config.model.prompt_config.format(
+                {"messages": self.messages}
+            )
             _LOGGER.debug(
                 "\n====== Resolved prompt =====\n\n%s\n\n=============================",
                 resolved,

@@ -39,18 +39,17 @@ class GenerationService:
         self._config = config
         self._model = gerd_loader.load_model_from_config(self._config.model)
 
-    def set_prompt(
+    def set_prompt_config(
         self,
         config: PromptConfig,
-        field: Literal["user", "system"] = "user",
     ) -> PromptConfig:
         """Set the prompt configuration."""
-        self._config.model.prompt[field] = config
-        return self._config.model.prompt[field]
+        self._config.model.prompt_config = config
+        return self._config.model.prompt_config
 
-    def get_prompt(self, field: Literal["user", "system"] = "user") -> PromptConfig:
+    def get_prompt_config(self) -> PromptConfig:
         """Get the prompt configuration."""
-        return self._config.model.prompt[field]
+        return self._config.model.prompt_config
 
     def generate(
         self, parameters: Dict[str, str], add_prompt: bool = False
@@ -61,14 +60,14 @@ class GenerationService:
             response = PromptChaining(
                 self._config.features.prompt_chaining,
                 self._model,
-                self._config.model.prompt.get("user", PromptConfig.model_validate({})),
+                self._config.model.prompt_config,
             ).generate(parameters)
         else:
-            template = self._config.model.prompt["user"].template
+            template = self._config.model.prompt_config.template
             resolved = (
                 template.render(**parameters)
                 if template
-                else self._config.model.prompt["user"].text.format(**parameters)
+                else self._config.model.prompt_config.text.format(**parameters)
             )
             _LOGGER.debug(
                 "\n====== Resolved prompt =====\n\n%s\n\n=============================",
@@ -88,7 +87,7 @@ class GenerationService:
                 status=400,
                 error_msg="Continuation feature is not configured for this model.",
             )
-        continue_prompt = self._config.features.continuation.model.prompt["user"].text
+        continue_prompt = self._config.features.continuation.model.prompt_config.text
         resolved = fmt.format(continue_prompt, **parameters)
         _LOGGER.debug(
             "\n====== Resolved prompt =====\n\n%s\n\n=============================",

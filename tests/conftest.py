@@ -55,7 +55,7 @@ def files_txt(test_file: str) -> bytes:
 
 @pytest.fixture
 def qa_config() -> QAConfig:
-    p = Path(PROJECT_DIR, "config", "qa_default.yml")
+    p = Path(PROJECT_DIR, "tests", "data", "qa_test.yml")
     assert p.exists()
     config = QAConfig.model_validate(safe_load(p.read_text()))
     config.embedding.db_path = ""

@@ -8,8 +8,7 @@ model: &gen_model
   stop: ["<|im_end|>"]
   repetition_penalty: 1.1
   context_length: 2048
-  prompt:
-    user:
+  prompt_config:
       path: "prompts/gen.txt"
 features:
   continuation:
@@ -19,6 +18,5 @@ features:
       top_k: 100
       top_p: 0.95
       max_new_tokens: 512
-      prompt:
-        user:
-          path: "prompts/gen_con.txt"
+      prompt_config:
+        path: "prompts/gen_con.txt"

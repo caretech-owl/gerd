@@ -30,28 +30,30 @@ def test_init(mocker: MockerFixture, generation_config: GenerationConfig) -> Non
 def test_get_prompt(
     gen_service: GenerationService, generation_config: GenerationConfig
 ) -> None:
-    prompt = gen_service.get_prompt("user")
+    prompt = gen_service.get_prompt_config()
     assert prompt
-    assert prompt.text == generation_config.model.prompt["user"].text
+    assert prompt.text == generation_config.model.prompt_config.text
 
 
 def test_set_prompt(gen_service: GenerationService) -> None:
     tmp = "A {value} prompt {test}."
-    prompt = gen_service.set_prompt(PromptConfig(text=tmp))
+    prompt = gen_service.set_prompt_config(PromptConfig(text=tmp))
     assert "value" in prompt.parameters
     assert "test" in prompt.parameters
-    assert gen_service.get_prompt().text == tmp
+    assert gen_service.get_prompt_config().text == tmp
 
 
 def test_prompt_duplicate(gen_service: GenerationService) -> None:
     tmp = """A {value} prompt {test} and another duplicate {value} and {foo}
     in between as well as {test} and {value} again."""
-    prompt = gen_service.set_prompt(PromptConfig(text=tmp))
+    prompt = gen_service.set_prompt_config(PromptConfig(text=tmp))
     assert len(prompt.parameters) == len(set(prompt.parameters))
 
 
 def test_generate(gen_service: GenerationService) -> None:
-    gen_service.set_prompt(PromptConfig(text="Schreibe einen Brief an Herrn {name}."))
+    gen_service.set_prompt_config(
+        PromptConfig(text="Schreibe einen Brief an Herrn {name}.")
+    )
     response = gen_service.generate({"name": "Cajal"})
     assert response.status == 200
     assert response.error_msg == ""
@@ -59,7 +61,9 @@ def test_generate(gen_service: GenerationService) -> None:
 
 
 def test_jinja_prompt(gen_service: GenerationService) -> None:
-    _ = gen_service.set_prompt(PromptConfig(path="tests/data/simple_prompt.jinja2"))
+    _ = gen_service.set_prompt_config(
+        PromptConfig(path="tests/data/simple_prompt.jinja2")
+    )
     response = gen_service.generate(
         {"task": "Halte dich so kurz wie möglich."}, add_prompt=True
     )
