@@ -41,9 +41,12 @@ poetry install --extras cpu
 poe hello
 ```
 
+Remember to acticate the virtual environment (step 2) every time you start using GERD.
+For more information on development look at [DEV.md](DEV.md).
+
 ## Question and Answer example
 
-Folloq quickstart and make sure to install `gui` and `gguf` dependencies. Next start the qa server.
+Follow quickstart and make sure to install `gui` and `gguf` dependencies. Next start the qa server via `poe qa`.
 When the server is done loading, open `http://127.0.0.1:7860` in your browser.
 
 ```shell
