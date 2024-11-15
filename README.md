@@ -1,6 +1,6 @@
 # Generating and evaluating relevant documentation (GERD)
 
-GERD is developed as a library to investigate how large language models (LLMs) can be used to generate and analyze (sets of) documents.
+GERD is developed as an experimental library to investigate how large language models (LLMs) can be used to generate and analyze (sets of) documents.
 
 This project was initially forked from [Llama-2-Open-Source-LLM-CPU-Inference
 ](https://github.com/kennethleungty/Llama-2-Open-Source-LLM-CPU-Inference) by [Kenneth Leung](https://github.com/kennethleungty).
@@ -78,8 +78,9 @@ ___
 - `/tests`: Unit tests for `GERD`
 - `/vectorstore`: FAISS vector store for documents
 - `pyproject.toml`: TOML file to specify which versions of the dependencies used (Poetry)
-- `requirements.txt`: List of Python dependencies (and version)
 ___
 
 ## References
 - https://github.com/kennethleungty/Llama-2-Open-Source-LLM-CPU-Inference
+- https://pubmed.ncbi.nlm.nih.gov/36073490
+- https://huggingface.co
