@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Literal
+from typing import Dict, Literal, Optional
 
 import gerd.backends.loader as gerd_loader
 from gerd.models.gen import GenerationConfig
@@ -47,10 +47,11 @@ class ChatService:
         self,
         parameters: Dict[str, str] | None = None,
         role: Literal["user", "system"] = "user",
+        prompt_config: Optional[PromptConfig] = None,
     ) -> None:
         """Add a message to the chat history."""
         parameters = parameters or {}
-        user_prompt: PromptConfig = self._config.model.prompt_config
+        user_prompt: PromptConfig = prompt_config or self._config.model.prompt_config
         self.messages.append(
             {
                 "role": role,
@@ -63,14 +64,14 @@ class ChatService:
         self.add_message(parameters, role="user")
 
         if self._config.features.prompt_chaining:
-            from gerd.features.prompt_chaining import PromptChaining
-
-            resolved = "".join(parameters.values())
-            response = PromptChaining(
-                self._config.features.prompt_chaining,
-                self._model,
-                self._config.model.prompt_config,
-            ).generate(parameters)
+            for i, prompt_config in enumerate(
+                self._config.features.prompt_chaining.prompts, 1
+            ):
+                self.reset()
+                res = self.submit_user_message(parameters, prompt_config=prompt_config)
+                parameters[f"response_{i}"] = res.text
+            response = res.text
+            resolved = "\n".join(parameters.values())
         else:
             resolved = self._config.model.prompt_config.format(
                 {"messages": self.messages}
@@ -87,9 +88,11 @@ class ChatService:
         return GenResponse(text=response, prompt=resolved)
 
     def submit_user_message(
-        self, parameters: Dict[str, str] | None = None
+        self,
+        parameters: Dict[str, str] | None = None,
+        prompt_config: Optional[PromptConfig] = None,
     ) -> GenResponse:
-        self.add_message(parameters, role="user")
+        self.add_message(parameters, role="user", prompt_config=prompt_config)
         _LOGGER.debug(
             "\n====== Resolved prompt =====\n\n%s\n\n=============================",
             "\n".join(m["role"] + ": " + str(m["content"]) for m in self.messages),

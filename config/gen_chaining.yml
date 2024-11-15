@@ -1,19 +1,14 @@
 model:
-  name: "TheBloke/em_german_leo_mistral-GGUF"
-  file: "em_german_leo_mistral.Q5_K_M.gguf"
+  name: "Qwen/Qwen2.5-0.5B-Instruct"
   temperature: 0.05
-  top_k: 50
-  top_p: 0.95
   max_new_tokens: 512
-  stop: ["<|im_end|>"]
-  repetition_penalty: 1.1
   context_length: 2048
-  prompt_config:
-    text: "Du bist ein hilfreicher Assistent und beantwortest alle Fragen zuverlässig und wahrheitsgetreu. USER: {prompt} ASSISTANT:"
+  prompt_setup:
+    - ["system", text: "You are a helpful assistant. Please answer the following question in a truthful and brief manner."]
 features:
   prompt_chaining:
     prompts:
       - text: "{question}"
-      - text: "Hier ist eine Aussage:\n{response_1}\n\nErstelle eine Auflistung von Annahmen, um zu dieser Aussage zu gelangen."
-      - text: "Hier ist eine Liste von Annahmen:\n{response_2}\n\nFür jede Annahme stelle fest, ob die Annahme wahr oder falsch ist und erkläre warum."
-      - text: "In Anbetracht der folgenden Fakten:\n{response_3}\n\nWie würdest du die folgende Frage beantworten: {question}."
+      - text: "Here is a statement:\n{response_1}\n\nMake a bullet point list of the assumptions you made when producing the above statement.\n\n"
+      - text: "Here is a bullet point list of assertions:\n{response_2}\n\nFor each assertion, determine whether it is true or false. If it is false, explain why.\n\n"
+      - text: "{response_3}\n\nIn light of the above facts, how would you answer the question '{question}'"
