@@ -1,12 +1,14 @@
 name: gerd-environment
 dependencies:
   - python=3.12
-  - transformers
-  - faiss-cpu
-  - sentence-transformers
-  - pydantic
-  - pydantic-settings
-  - langchain-community
-  - jinja2
-  - llama-cpp-python
-  - orjson
+  - pip
+  - pip:
+    - transformers
+    - faiss-cpu
+    - sentence-transformers
+    - pydantic
+    - pydantic-settings
+    - langchain-community
+    - jinja2
+    - llama-cpp-python
+    - orjson
