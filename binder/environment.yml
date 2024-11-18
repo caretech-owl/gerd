@@ -5,6 +5,7 @@ channels:
 dependencies:
   - python=3.12
   - pip
+  - pytorch
   - pip:
     - faiss-cpu
     - jinja2
@@ -13,7 +14,6 @@ dependencies:
     - orjson
     - pydantic
     - pydantic-settings
-    - pytorch
     - requests
     - sentence-transformers
     - transformers
