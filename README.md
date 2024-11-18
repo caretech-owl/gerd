@@ -43,6 +43,8 @@ poe hello
 
 Remember to acticate the virtual environment (step 2) every time you start using GERD.
 For more information on development look at [DEV.md](DEV.md).
+If you want to try this out in your browser, head over to binder 👉 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/caretech-owl/gerd/HEAD?labpath=%2Fnotebooks%2Fhello_gerd.ipynb).
+
 
 ## Question and Answer example
 
