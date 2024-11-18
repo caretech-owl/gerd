@@ -17,3 +17,4 @@ dependencies:
     - requests
     - sentence-transformers
     - transformers
+    - ipywidgets
