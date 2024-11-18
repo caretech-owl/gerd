@@ -44,7 +44,7 @@ poe hello
 Remember to acticate the virtual environment (step 2) every time you start using GERD.
 For more information on development look at [DEV.md](DEV.md).
 If you want to try this out in your browser, head over to binder 👉 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/caretech-owl/gerd/HEAD?labpath=%2Fnotebooks%2Fhello_gerd.ipynb). 
-Note that running LLMs on the CPU and especially on virtual machine like binder takes some time.
+Note that running LLMs on the CPU (and especially on limited virtual machines like binder) takes some time.
 If you are in a hurry you might be better off by cloning the repo and running the [examples](./examples/) or [notebooks](./notebooks/) locally.
 
 ## Question and Answer example
