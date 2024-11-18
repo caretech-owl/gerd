@@ -1,14 +1,21 @@
 name: gerd-environment
+channels:
+  - conda-forge
+  - pytorch
 dependencies:
   - python=3.12
   - pip
-  - pip:
-    - transformers
-    - faiss-cpu
-    - sentence-transformers
-    - pydantic
-    - pydantic-settings
-    - langchain-community
-    - jinja2
-    - llama-cpp-python
-    - orjson
+  - requests
+  - pytorch
+  - torchvision
+  - torchaudio
+  - transformers
+  - llama-cpp-python
+  - sentence-transformers
+  - pydantic
+  - langchain-community
+  - jinja2
+  - pip
+  - orjson
+  - pydantic-settings
+  - faiss-cpu
