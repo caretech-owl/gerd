@@ -5,16 +5,15 @@ channels:
 dependencies:
   - python=3.12
   - pip
-  - faiss-cpu
-  - jinja2
-  - langchain-community
-  - llama-cpp-python
-  - orjson
-  - pydantic
-  - pydantic-settings
-  - pytorch
-  - requests
-  - sentence-transformers
-  - torchvision
-  - torchaudio
-  - transformers
+  - pip:
+    - faiss-cpu
+    - jinja2
+    - langchain-community
+    - llama-cpp-python
+    - orjson
+    - pydantic
+    - pydantic-settings
+    - pytorch
+    - requests
+    - sentence-transformers
+    - transformers
