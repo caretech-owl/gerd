@@ -67,6 +67,7 @@ priority = "primary"
 
 [tool.poe.tasks]
 test = "poetry run pytest -x"
+lint = "poetry run mypy gerd"
 qa = "poetry run gradio gerd/frontends/qa_frontend.py"
 gen = "poetry run gradio gerd/frontends/gen_frontend.py"
 server = "poetry run python -m gerd.backends.rest_server"
