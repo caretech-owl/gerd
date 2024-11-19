@@ -316,6 +316,21 @@ class QAService:
             return self._config.features.analyze_mult_prompts.model.prompt_config
         return PromptConfig()
 
+    def remove_file(self, file_name: str) -> QAAnswer:
+        """
+        Remove a document from the vectorstore
+        """
+        if not self._vectorstore:
+            return QAAnswer(error_msg="No vector store initialized!", status=404)
+        self._vectorstore.delete(
+            [
+                id
+                for id in self._vectorstore.index_to_docstore_id.values()
+                if id.startswith(file_name)
+            ]
+        )
+        return QAAnswer(status=200)
+
     def add_file(self, file: QAFileUpload) -> QAAnswer:
         documents: Optional[List[Document]] = None
         file_path = Path(file.name)
@@ -348,6 +363,8 @@ class QAService:
             chunk_overlap=self._config.embedding.chunk_overlap,
         )
         texts = text_splitter.split_documents(documents)
+        for i, text in enumerate(texts):
+            text.id = f"{file_path.name}_{i}"
         if self._vectorstore is None:
             _LOGGER.info("Create new vector store from document.")
             self._vectorstore = create_faiss(

@@ -105,32 +105,40 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
     return output
 
 
-def upload(file_path: str, progress: Optional[gr.Progress] = None) -> None:
+store_set = set()
+
+
+def files_changed(file_paths: Optional[list[str]]) -> None:
     """
     Upload a document to vectorstore
     """
-    if not file_path:
-        return
-    if progress is None:
-        progress = gr.Progress()
-    progress(0, desc="Hochladen...")
-    with pathlib.Path(file_path).open("rb") as file:
-        data = QAFileUpload(
-            data=file.read(),
-            name=pathlib.Path(file_path).name,
-        )
-    res = TRANSPORTER.add_file(data)
-    if res.status != 200:
-        _LOGGER.warning(
-            "Data upload failed with error code: %d\nReason: %s",
-            res.status,
-            res.error_msg,
-        )
-        msg = (
-            f"Datei konnte nicht hochgeladen werden: {res.error_msg}"
-            "(Error Code {res.status})"
-        )
-        raise gr.Error(msg)
+    file_paths = file_paths or []
+    progress = gr.Progress()
+    new_set = set(file_paths)
+    new_files = new_set - store_set
+    delete_files = store_set - new_set
+    for new_file in new_files:
+        store_set.add(new_file)
+        with pathlib.Path(new_file).open("rb") as file:
+            data = QAFileUpload(
+                data=file.read(),
+                name=pathlib.Path(new_file).name,
+            )
+        res = TRANSPORTER.add_file(data)
+        if res.status != 200:
+            _LOGGER.warning(
+                "Data upload failed with error code: %d\nReason: %s",
+                res.status,
+                res.error_msg,
+            )
+            msg = (
+                f"Datei konnte nicht hochgeladen werden: {res.error_msg}"
+                "(Error Code {res.status})"
+            )
+            raise gr.Error(msg)
+    for delete_file in delete_files:
+        store_set.remove(delete_file)
+        res = TRANSPORTER.remove_file(pathlib.Path(delete_file).name)
     progress(100, desc="Fertig!")
 
 
@@ -205,7 +213,7 @@ with demo:
 
     with gr.Row():
         with gr.Column(scale=1):
-            file_upload = gr.File(file_count="single", file_types=[".txt"])
+            file_upload = gr.Files(file_types=[".txt"])
         with gr.Column(scale=1):
             developer_checkbox = gr.Checkbox(
                 info="Aktivieren/Deaktivieren von zusätzlichen Modi",
@@ -255,7 +263,9 @@ with demo:
         outputs=[inp, prompt, k_slider, strategy_dropdown],
     )
     out = gr.Textbox(label="Antwort")
-    file_upload.change(fn=upload, inputs=file_upload, outputs=out)
+    file_upload.upload(fn=files_changed, inputs=file_upload, outputs=out)
+    file_upload.delete(fn=files_changed, inputs=file_upload, outputs=out)
+    file_upload.clear(fn=files_changed, inputs=file_upload, outputs=out)
     btn = gr.Button("Frage stellen")
     btn.click(
         fn=query, inputs=[inp, type_radio, k_slider, strategy_dropdown], outputs=out
