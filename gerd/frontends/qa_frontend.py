@@ -198,7 +198,21 @@ def set_prompt(
         progress = gr.Progress()
     progress(0, "Aktualisiere Prompt...")
 
-    _ = TRANSPORTER.set_qa_prompt(PromptConfig(text=prompt), get_qa_mode(search_type))
+    answer = TRANSPORTER.set_qa_prompt(
+        PromptConfig(text=prompt), get_qa_mode(search_type)
+    )
+    if answer.error_msg:
+        if answer.status != 200:
+            msg = (
+                f"Prompt konnte nicht aktualisiert werden: {answer.error_msg}"
+                f" (Error Code {answer.status})"
+            )
+            raise gr.Error(msg)
+        else:
+            msg = f"{answer.error_msg}"
+            gr.Warning(msg)
+    else:
+        gr.Info("Prompt wurde aktualisiert!")
     progress(100, "Fertig!")
 
 

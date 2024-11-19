@@ -135,7 +135,7 @@ class Transport(Protocol):
     def get_gen_prompt(self) -> PromptConfig:
         pass
 
-    def set_qa_prompt(self, config: PromptConfig, qa_mode: QAModesEnum) -> PromptConfig:
+    def set_qa_prompt(self, config: PromptConfig, qa_mode: QAModesEnum) -> QAAnswer:
         pass
 
     def get_qa_prompt(self, qa_mode: QAModesEnum) -> PromptConfig:

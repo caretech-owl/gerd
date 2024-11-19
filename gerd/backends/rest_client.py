@@ -48,7 +48,7 @@ class RestClient(Transport):
         )
 
     def analyze_mult_prompts_query(self) -> QAAnalyzeAnswer:
-                return QAAnalyzeAnswer.model_validate(
+        return QAAnalyzeAnswer.model_validate(
             requests.post(
                 f"{self._url}/qa/query_analyze_mult_prompt",
                 timeout=self.longtimeout,
@@ -101,7 +101,7 @@ class RestClient(Transport):
             requests.get(f"{self._url}/gen/prompt", timeout=self.timeout).json()
         )
 
-    def set_qa_prompt(self, config: PromptConfig, qa_mode: QAModesEnum) -> PromptConfig:
+    def set_qa_prompt(self, config: PromptConfig, qa_mode: QAModesEnum) -> QAAnswer:
         return PromptConfig.model_validate(
             requests.post(
                 f"{self._url}/qa/prompt",
@@ -112,9 +112,11 @@ class RestClient(Transport):
 
     def get_qa_prompt(self, qa_mode: QAModesEnum) -> PromptConfig:
         return PromptConfig.model_validate(
-            requests.get(f"{self._url}/qa/prompt",
-                         timeout=self.timeout,
-                         params={"qa_mode": qa_mode.value}).json()
+            requests.get(
+                f"{self._url}/qa/prompt",
+                timeout=self.timeout,
+                params={"qa_mode": qa_mode.value},
+            ).json()
         )
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:

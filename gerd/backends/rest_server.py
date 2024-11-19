@@ -31,11 +31,13 @@ class RestServer(Transport):
         self.router = APIRouter()
         self.router.add_api_route(f"{prefix}/qa/query", self.qa_query, methods=["POST"])
         self.router.add_api_route(
-            f"{prefix}/qa/query_analyze",
-            self.analyze_query, methods=["POST"])
+            f"{prefix}/qa/query_analyze", self.analyze_query, methods=["POST"]
+        )
         self.router.add_api_route(
             f"{prefix}/qa/query_analyze_mult_prompt",
-            self.analyze_mult_prompts_query, methods=["POST"])
+            self.analyze_mult_prompts_query,
+            methods=["POST"],
+        )
         self.router.add_api_route(
             f"{prefix}/qa/db_query", self.db_query, methods=["POST"]
         )
@@ -89,13 +91,13 @@ class RestServer(Transport):
     def get_gen_prompt(self) -> PromptConfig:
         return self._bridge.get_gen_prompt()
 
-    def set_qa_prompt_rest(self, config: QAPromptConfig) -> PromptConfig:
+    def set_qa_prompt_rest(self, config: QAPromptConfig) -> QAAnswer:
         return self._bridge.set_qa_prompt(config.config, config.mode)
 
     def get_qa_prompt_rest(self, qa_mode: int) -> PromptConfig:
         return self._bridge.get_qa_prompt(QAModesEnum(qa_mode))
 
-    def set_qa_prompt(self, config: PromptConfig, qa_mode: QAModesEnum) -> PromptConfig:
+    def set_qa_prompt(self, config: PromptConfig, qa_mode: QAModesEnum) -> QAAnswer:
         return self._bridge.set_qa_prompt(config, qa_mode)
 
     def get_qa_prompt(self, qa_mode: QAModesEnum) -> PromptConfig:
