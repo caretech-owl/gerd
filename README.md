@@ -30,11 +30,13 @@ poetry install --extras cpu
 # include 'dev' group
 # poetry install --with dev --extras cpu
 # 5.4: You can add further extras
+# --extras recommended  # install a set of useful extras (includes cpu)
 # --extras gguf # for llama.cpp and GGUF model support;
 # --extras awq  # for GPU model quantization
 # --extras gui  # for Gradio GUIs
 # 5.5: Recommended for CPU inference
-# poetry install --extras cpu --extras gguf --extras gui
+# poetry install --extras recommended
+
 # 6) Run GERD 'hello' chat example
 # This will download a LLM from https://huggingface.co 
 # and may take a while

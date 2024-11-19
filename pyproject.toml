@@ -50,6 +50,7 @@ types-requests = "^2.32.0.20240622"
 pytest-mock = "^3.14.0"
 
 [tool.poetry.extras]
+recommended = ["faiss-cpu", "llama-cpp-python", "gradio"]
 cpu = ["faiss-cpu"]
 gpu = ["faiss-gpu"]
 awq = ["autoawq"]
