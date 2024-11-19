@@ -6,9 +6,10 @@ import pytest
 from pytest_mock import MockerFixture
 
 from gerd.backends.loader import MockLLM
+from gerd.models.model import PromptConfig
 from gerd.models.qa import QAConfig
 from gerd.qa import QAService
-from gerd.transport import QAFileUpload, QAQuestion
+from gerd.transport import QAAnswer, QAFileUpload, QAModesEnum, QAQuestion
 
 QA_PATH = Path(__file__).resolve().parent
 
@@ -218,3 +219,35 @@ def test_analyze_mult_prompts_queries(qa_service_file: QAService) -> None:
     )
 
     assert res.status == 200
+
+
+def test_set_qa_prompt(qa_service: QAService) -> None:
+    """
+    Test the set_qa_prompt method
+    """
+    res: QAAnswer = qa_service.set_prompt_config(
+        PromptConfig(text="This is a test prompt."), qa_mode=QAModesEnum.SEARCH
+    )
+    assert res.status == 200
+    assert "{context}" in res.error_msg
+    assert "{question}" in res.error_msg
+    res = qa_service.set_prompt_config(
+        PromptConfig(text="This is a test prompt with {context}."),
+        qa_mode=QAModesEnum.SEARCH,
+    )
+    assert res.status == 200
+    assert "{context}" not in res.error_msg
+    assert "{question}" in res.error_msg
+    res = qa_service.set_prompt_config(
+        PromptConfig(text="This is a test prompt with a {question}."),
+        qa_mode=QAModesEnum.SEARCH,
+    )
+    assert res.status == 200
+    assert "{context}" in res.error_msg
+    assert "{question}" not in res.error_msg
+    res = qa_service.set_prompt_config(
+        PromptConfig(text="This is a test prompt with {question} and {context}."),
+        qa_mode=QAModesEnum.SEARCH,
+    )
+    assert res.status == 200
+    assert res.error_msg == ""

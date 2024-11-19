@@ -46,6 +46,9 @@ class RestServer(Transport):
         )
         self.router.add_api_route(f"{prefix}/qa/file", self.add_file, methods=["POST"])
         self.router.add_api_route(
+            f"{prefix}/qa/file", self.remove_file, methods=["DELETE"]
+        )
+        self.router.add_api_route(
             f"{prefix}/gen/prompt", self.set_gen_prompt, methods=["POST"]
         )
         self.router.add_api_route(
@@ -74,9 +77,9 @@ class RestServer(Transport):
         return self._bridge.qa.analyze_mult_prompts_query()
 
     def db_query(self, question: QAQuestion) -> List[DocumentSource]:
-        _LOGGER.debug("dq_query - request: %s", question)
+        # _LOGGER.debug("dq_query - request: %s", question)
         response = self._bridge.db_query(question)
-        _LOGGER.debug("dq_query - response: %s", response)
+        # _LOGGER.debug("dq_query - response: %s", response)
         return response
 
     def db_embedding(self, question: QAQuestion) -> List[float]:
@@ -84,6 +87,9 @@ class RestServer(Transport):
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:
         return self._bridge.add_file(file)
+
+    def remove_file(self, file_name: str) -> QAAnswer:
+        return self._bridge.remove_file(file_name)
 
     def set_gen_prompt(self, config: PromptConfig) -> PromptConfig:
         return self._bridge.set_gen_prompt(config)
