@@ -287,22 +287,28 @@ class QAService:
         _LOGGER.warning("\n==== Answer ====\n\n%s\n===============", answer)
         return answer
 
-    def set_prompt_config(
-        self, config: PromptConfig, qa_mode: QAModesEnum
-    ) -> PromptConfig:
+    def set_prompt_config(self, config: PromptConfig, qa_mode: QAModesEnum) -> QAAnswer:
         """
         Set the prompt for the mode
         """
+        answer = QAAnswer()
         if qa_mode == QAModesEnum.SEARCH:
             self._config.model.prompt_config = config
-            return self._config.model.prompt_config
+            if "context" not in config.parameters:
+                answer.error_msg = (
+                    "Prompt does not include '{context}' variable. "
+                    "No context will be added. "
+                )
+            if "question" not in config.parameters:
+                answer.error_msg += (
+                    "Prompt does not include '{question}' variable. "
+                    "Questions will not be passed to the model."
+                )
         elif qa_mode == QAModesEnum.ANALYZE:
             self._config.features.analyze.model.prompt_config = config
-            return self._config.features.analyze.model.prompt_config
         elif qa_mode == QAModesEnum.ANALYZE_MULT_PROMPTS:
             self._config.features.analyze_mult_prompts.model.prompt_config = config
-            return self._config.features.analyze_mult_prompts.model.prompt_config
-        return PromptConfig()
+        return answer
 
     def get_prompt_config(self, qa_mode: QAModesEnum) -> PromptConfig:
         """

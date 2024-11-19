@@ -67,7 +67,7 @@ class Bridge(Transport):
     def get_gen_prompt(self) -> PromptConfig:
         return self.gen.get_prompt_config()
 
-    def set_qa_prompt(self, config: PromptConfig, qa_mode: QAModesEnum) -> PromptConfig:
+    def set_qa_prompt(self, config: PromptConfig, qa_mode: QAModesEnum) -> QAAnswer:
         return self.qa.set_prompt_config(config, qa_mode)
 
     def get_qa_prompt(self, qa_mode: QAModesEnum) -> PromptConfig:

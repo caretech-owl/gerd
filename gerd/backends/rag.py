@@ -51,10 +51,9 @@ class Rag:
 
         if "context" not in prompt.parameters:
             _LOGGER.warning(
-                "Prompt does not include '{context}' variable."
-                "It will be appened to the prompt."
+                "Prompt does not include '{context}' variable! "
+                "No context will be added to the query."
             )
-            prompt.text = prompt.text + "\n\n{context}"
 
     def query(self, question: QAQuestion) -> QAAnswer:
         docs = self.store.search(
