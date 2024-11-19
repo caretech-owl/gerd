@@ -5702,8 +5702,9 @@ cpu = ["faiss-cpu"]
 gguf = ["llama-cpp-python"]
 gpu = ["faiss-gpu"]
 gui = ["gradio"]
+recommended = ["faiss-cpu", "gradio", "llama-cpp-python"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10, <4.0"
-content-hash = "cc7273e23505a1f4b4b3cbd1224187487902ebb9979c036cb975ded8ea37478e"
+content-hash = "74cf9b153a72db4f0172e5d9889a4babe29ab1e0a6d61ac3c91b200e54c5f097"
