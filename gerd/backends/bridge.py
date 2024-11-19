@@ -58,6 +58,9 @@ class Bridge(Transport):
     def add_file(self, file: QAFileUpload) -> QAAnswer:
         return self.qa.add_file(file)
 
+    def remove_file(self, file_name: str) -> QAAnswer:
+        return self.qa.remove_file(file_name)
+
     def set_gen_prompt(self, config: PromptConfig) -> PromptConfig:
         return self.gen.set_prompt_config(config)
 

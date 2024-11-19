@@ -12,11 +12,13 @@ class GenResponse(BaseModel):
     error_msg: str = ""
     prompt: str | None = None
 
+
 # Dataclass to hold a QAQuestion
 class QAQuestion(BaseModel):
     question: str
     search_strategy: str = "similarity"
     max_sources: int = 3
+
 
 # Dataclass to hold a docsource
 class DocumentSource(BaseModel):
@@ -25,6 +27,7 @@ class DocumentSource(BaseModel):
     name: str
     page: int
 
+
 # Dataclass to hold a QAAnswer
 class QAAnswer(BaseModel):
     status: int = 200
@@ -32,6 +35,7 @@ class QAAnswer(BaseModel):
     answer: str = ""
     sources: List[DocumentSource] = []
     response: str = ""
+
 
 # Dataclass to hold a QAAnalyzeAnswer
 class QAAnalyzeAnswer(BaseModel):
@@ -77,6 +81,7 @@ class QAAnalyzeAnswer(BaseModel):
     response: str = ""
     prompt: str = ""
 
+
 # QAModes
 class QAModesEnum(Enum):
     NONE = 0
@@ -84,19 +89,23 @@ class QAModesEnum(Enum):
     ANALYZE = 2
     ANALYZE_MULT_PROMPTS = 3
 
+
 # All supported filetypes
 class FileTypes(Enum):
     TEXT = "txt"
     PDF = "pdf"
+
 
 # Dataclass to hold a fileupload
 class QAFileUpload(BaseModel):
     data: bytes
     name: str
 
+
 class QAPromptConfig(BaseModel):
     config: PromptConfig
     mode: QAModesEnum
+
 
 class Transport(Protocol):
     def qa_query(self, query: QAQuestion) -> QAAnswer:
@@ -115,6 +124,9 @@ class Transport(Protocol):
         pass
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:
+        pass
+
+    def remove_file(self, file_name: str) -> QAAnswer:
         pass
 
     def set_gen_prompt(self, config: PromptConfig) -> PromptConfig:
