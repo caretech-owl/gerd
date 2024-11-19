@@ -87,6 +87,15 @@ class RestClient(Transport):
             ).json()
         )
 
+    def remove_file(self, file_name: str) -> QAAnswer:
+        return QAAnswer.model_validate(
+            requests.delete(
+                f"{self._url}/qa/file",
+                data=file_name.encode("utf-8"),
+                timeout=self.timeout,
+            ).json()
+        )
+
     def set_gen_prompt(self, config: PromptConfig) -> PromptConfig:
         return PromptConfig.model_validate(
             requests.post(
@@ -102,7 +111,7 @@ class RestClient(Transport):
         )
 
     def set_qa_prompt(self, config: PromptConfig, qa_mode: QAModesEnum) -> QAAnswer:
-        return PromptConfig.model_validate(
+        return QAAnswer.model_validate(
             requests.post(
                 f"{self._url}/qa/prompt",
                 data=QAPromptConfig(config=config, mode=qa_mode).model_dump_json(),

@@ -105,7 +105,7 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
     return output
 
 
-store_set = set()
+store_set: set[str] = set()
 
 
 def files_changed(file_paths: Optional[list[str]]) -> None:
