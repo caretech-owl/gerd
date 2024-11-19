@@ -110,7 +110,7 @@ class ModelEndpoint(BaseModel):
 # Default values chosen by https://github.com/marella/ctransformers#config
 class ModelConfig(BaseModel):
     name: str
-    prompt_setup: List[Tuple[Literal["system", "user"], PromptConfig]] = []
+    prompt_setup: List[Tuple[Literal["system", "user", "assistant"], PromptConfig]] = []
     prompt_config: PromptConfig = PromptConfig()
     endpoint: Optional[ModelEndpoint] = None
     file: Optional[str] = None

@@ -46,7 +46,7 @@ class ChatService:
     def add_message(
         self,
         parameters: Dict[str, str] | None = None,
-        role: Literal["user", "system"] = "user",
+        role: Literal["user", "system", "assistant"] = "user",
         prompt_config: Optional[PromptConfig] = None,
     ) -> None:
         """Add a message to the chat history."""
