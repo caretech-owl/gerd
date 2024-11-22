@@ -341,10 +341,11 @@ class QAService:
         documents: Optional[List[Document]] = None
         file_path = Path(file.name)
         try:
-            f = NamedTemporaryFile(dir=".", suffix=file_path.suffix, delete=False)
-            f.write(file.data)
-            f.flush()
-            f.close()
+            with NamedTemporaryFile(
+                dir=".", suffix=file_path.suffix, delete=False
+            ) as f:
+                f.write(file.data)
+                f.flush()
             file_type = FileTypes(file_path.suffix[1:])
             loader: BaseLoader
             if file_type == FileTypes.TEXT:

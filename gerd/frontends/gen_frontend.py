@@ -32,7 +32,7 @@ def _pairwise(
     fields: Tuple[gr.Textbox, ...],
 ) -> Iterable[Tuple[gr.Textbox, gr.Textbox, gr.Textbox]]:
     a = iter(fields)
-    return zip(a, a, a)
+    return zip(a, a, a, strict=True)
 
 
 def generate(*fields: gr.Textbox) -> Tuple[str, str, gr.TextArea, gr.Button]:
@@ -55,7 +55,7 @@ def compare_paragraphs(src_doc: str, mod_doc: str) -> Dict[str, str]:
     mod_parts = {}
     src_doc_split = src_doc.split("\n\n")
     mod_doc_split = mod_doc.split("\n\n")
-    for section_order, src_para in zip(sections, src_doc_split):
+    for section_order, src_para in zip(sections, src_doc_split, strict=True):
         mod_para = mod_doc_split[sections.index(section_order)]
         if src_para != mod_para:
             mod_parts[section_order] = mod_para
