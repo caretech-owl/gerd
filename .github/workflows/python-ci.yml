@@ -14,21 +14,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Install uv
+        run: pipx install uv
       - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
-          cache: "poetry"
+          cache: "uv"
       - name: Install development dependencies with extras
-        run: poetry install --with dev --extras "cpu gguf"
+        run: uv sync
       - name: Run ruff linting via pre-commit on all files and verbose
         uses: pre-commit/action@v3.0.0
         with:
           extra_args: ruff --all-files -v
-      - name: Run mypy on package
-        run: poetry run mypy gerd
+      - name: Run linting
+        run: uv run poe lint
   testing:
     needs: linting
     strategy:
@@ -43,20 +43,20 @@ jobs:
         with:
           path: ~/.cache/huggingface
           key: ${{ runner.os }}-hf
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Install uv
+        run: pipx install uv
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "poetry"
+          cache: "uv"
       - name: Install development dependencies with extras
-        run: poetry install --with dev --extras "cpu gguf"
+        run: uv sync
       # - name: Install torch cpu version for Linux
       #   if: matrix.os == 'ubuntu-latest'
       #   run: pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-      - name: Run pytests without coverage for now
-        run: poetry run pytest
+      - name: Run tests
+        run: uv run poe test
     # - name: Test with pytest
     #   run: |
     #     coverage run --source=transitions -m pytest --doctest-modules tests/
