@@ -8,42 +8,15 @@ ___
 
 ## Quickstart
 
-```shell
-# 1) Create a virtual environment with a tool of your choice
-# e.g. conda, venv or micromamba
-micromamba create -n gerd python=3.12
-# 2) Activate env; prompt starts with (gerd) now
-micromamba activate gerd
-# 3) Install poetry
-pip install poetry
-# 4) Clone project
-git clone git@github.com:caretech-owl/gerd.git
-cd gerd
-# 5) Install dependencies and GERD
-# 5.1: You need to chose either CPU or GPU as extras
-# to install the correct version of FAISS
-# if you unsure, use 'cpu'
-poetry install --extras cpu
-# 5.2: Alternatively
-# poetry install --extras gpu
-# 5.3: To install development dependencies as well
-# include 'dev' group
-# poetry install --with dev --extras cpu
-# 5.4: You can add further extras
-# --extras recommended  # install a set of useful extras (includes cpu)
-# --extras gguf # for llama.cpp and GGUF model support;
-# --extras awq  # for GPU model quantization
-# --extras gui  # for Gradio GUIs
-# 5.5: Recommended for CPU inference
-# poetry install --extras recommended
+If you just want to it try out, you can clone the project and install dependencies with `pip`:
 
-# 6) Run GERD 'hello' chat example
-# This will download a LLM from https://huggingface.co 
-# and may take a while
-poe hello
+```shell
+git clone https://github.com/caretech-owl/gerd.git
+cd gerd
+pip install -e .
+python examples/hello.py
 ```
 
-Remember to acticate the virtual environment (step 2) every time you start using GERD.
 For more information on development look at [DEV.md](DEV.md).
 If you want to try this out in your browser, head over to binder 👉 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/caretech-owl/gerd/HEAD?labpath=%2Fnotebooks%2Fhello_gerd.ipynb). 
 Note that running LLMs on the CPU (and especially on limited virtual machines like binder) takes some time.
@@ -51,11 +24,11 @@ If you are in a hurry you might be better off by cloning the repo and running th
 
 ## Question and Answer example
 
-Follow quickstart and make sure to install `gui` and `gguf` dependencies. Next start the qa server via `poe qa`.
+Follow quickstart but execute `gradio` with the `qa_frontend` instead of the example file.
 When the server is done loading, open `http://127.0.0.1:7860` in your browser.
 
 ```shell
-poe qa
+gradio gerd/frontends/qa_frontend.py
 # Some Llama.cpp outut
 # ...
 # * Running on local URL:  http://127.0.0.1:7860
