@@ -31,7 +31,7 @@ uv add langchain
 To add a new *development* dependency, run `uv add` with the `--dev` flag:
 
 ```sh
-uv add mypy -dev
+uv add mypy --dev
 ```
 
 ## Further tools
@@ -49,6 +49,17 @@ uv run poe lint  # do some linting (with mypy)
 
 Test case are run via pytest. Tests can be found in the [tests folder](./tests).
 Tests will not be run via pre-commit since they might be too complex to be done before commits.
+To run the standard set of tests use the `poe` task `test`:
+
+```shell
+uv run poe test
+```
+
+More excessive testing can be trigger with `test_manual` which will NOT mock calls to the used models:
+
+```shell
+uv run poe test_manual
+```
 
 ### Ruff
 
