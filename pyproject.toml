@@ -41,7 +41,12 @@ lint = "mypy gerd"
 qa = "gradio gerd/frontends/qa_frontend.py"
 gen = "gradio gerd/frontends/gen_frontend.py"
 server = "python -m gerd.backends.rest_server"
-test_manual = "python -m pytest tests/test_no_auto.py -k 'manual' --no-skip"
+
+# for better isolation run manual tests separately
+test_manual_transformers = "python -m pytest tests/test_no_auto.py -k 'generation_transformers' --no-skip"
+test_manual_llama = "python -m pytest tests/test_no_auto.py -k 'generation_llama_cpp' --no-skip"
+test_manual = ["test_manual_transformers", "test_manual_llama"]
+
 
 [tool.ruff.lint]
 # 1. Enable flake8-bugbear (`B`) rules, in addition to the defaults.
