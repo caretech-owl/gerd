@@ -9,7 +9,7 @@ You can use `pip`, `pipx` or `conda` to do so:
 pip install uv
 ```
 
-Next intall the package and all dependencies with `uv sync`.
+Next install the package and all dependencies with `uv sync`.
 
 ```shell
 # cd <gerd_project_root>
@@ -32,6 +32,17 @@ To add a new *development* dependency, run `uv add` with the `--dev` flag:
 
 ```sh
 uv add mypy --dev
+```
+
+### Pre-commit hooks (recommended)
+
+Pre-commit hooks are used to check linting and run tests before commit changes to prevent faulty commits.
+Thus, it is recommended to use these hooks!
+Hooks should not include long running actions (such as tests) since committing should be fast.
+To install pre-commit hooks, execute this *once*:
+
+```shell
+uv run pre-commit install
 ```
 
 ## Further tools
@@ -84,19 +95,9 @@ To run MyPy manually use uv with the folder to be checked:
 uv run mypy gerd
 ```
 
-### Pre-commit hooks
-
-These hooks are used to check linting and run tests before commit changes to prevent faulty commits.
-This should not include long running actions (such as tests) since committing should be fast.
-To install pre-commit hooks, execute this *once*:
-
-```shell
-uv run pre-commit install
-```
-
 ## Implemented GUIs
 
-### Run Frontend 
+### Run Frontend
 
 Either run Generate Frontend:
 
@@ -112,7 +113,6 @@ uv run poe qa
 
 The backend is chosen via `config.yaml`.
 
-
 ## CI/CD and Distribution
 
 ### GitHub Actions
@@ -125,6 +125,6 @@ It will also trigger actions when commits are pushed to `main` directly but this
 
 #### Bugs
 
-#### Feature 
+#### Feature
 
 #### Use Case
