@@ -115,6 +115,7 @@ class TransformerLLM(LLM):
             else "cpu",
             framework="pt",
             model_kwargs=model_kwargs,
+            use_fast=False,
         )
 
     def generate(self, prompt: str) -> str:

@@ -1,79 +1,52 @@
-[tool.poetry]
+[project]
 name = "gerd"
-version = "0.3.1"
-description = ""
-authors = ["cto"]
-license = ""
+version = "0.4.0"
+description = "Add your description here"
 readme = "README.md"
-
-[tool.poetry.scripts]
-start = "main:app"
-
-[tool.poetry.dependencies]
-torch = [
-    { version = ">=2.0.0, !=2.0.1", platform = "!=darwin", source = "torch_cpu" },
-    { version = ">=2.0.0, !=2.0.1", platform = "darwin", source = "PyPI" },
+requires-python = ">=3.10, <3.13"
+dependencies = [
+    "fastapi>=0.115.5",
+    "faiss-cpu>=1.9.0.post1",
+    "gradio>=5.6.0",
+    "jinja2>=3.1.4",
+    "langchain>=0.3.7",
+    "langchain-community>=0.3.7",
+    "langchain-huggingface>=0.1.2",
+    "llama-cpp-python>=0.3.2",
+    "orjson>=3.10.11",
+    "pydantic>=2.10.1",
+    "pydantic-settings>=2.6.1",
+    "pypdf>=5.1.0",
+    "requests>=2.32.3",
+    "sentence-transformers>=3.3.1",
+    "torch>=2.5.1",
+    "transformers>=4.46.3",
+    "uvicorn>=0.32.1",
 ]
-orjson = "^3.10.7"
-python = ">=3.10, <4.0"
-transformers = "^4.42.1"
-# transformers = { git = "https://github.com/huggingface/transformers.git", branch = "main" }
-faiss-cpu = { version = "~1.9.0", optional = true }
-faiss-gpu = { version = "~1.7.2", optional = true }
-ipykernel = "^6.29.4"
-langchain = "^0.3.1"
-pypdf = "^5.0.1"
-sentence-transformers = "^3.0.1"
-uvicorn = "^0.31.0"
-pydantic = "^2.9.2"
-pydantic-settings = "^2.3.4"
-poethepoet = "^0.29.0"
-fastapi = "^0.115.0"
-requests = "^2.32.3"
-jinja2 = "^3.1.4"
-langchain-community = "^0.3.1"
-llama-cpp-python = { version = "^0.3.1", optional = true }
-langchain-huggingface = "^0.1.0"
-autoawq = {version = "^0.2.6", optional = true}
-gradio = {version = "^5.4.0", optional = true}
-poetry = "^1.8.4"
 
-[tool.poetry.group.dev]
-optional = true
-
-[tool.poetry.group.dev.dependencies]
-mypy = "^1.10.0"
-pytest = "^8.2.2"
-pre-commit = "^3.7.1"
-types-pyyaml = "^6.0.12.20240311"
-types-requests = "^2.32.0.20240622"
-pytest-mock = "^3.14.0"
-
-[tool.poetry.extras]
-recommended = ["faiss-cpu", "llama-cpp-python", "gradio"]
-cpu = ["faiss-cpu"]
-gpu = ["faiss-gpu"]
-awq = ["autoawq"]
-gguf = ["llama-cpp-python"]
-gui = ["gradio"]
-
-[[tool.poetry.source]]
-name = "torch_cpu"
-url = "https://download.pytorch.org/whl/cpu"
-priority = "explicit"
-
-[[tool.poetry.source]]
-name = "PyPI"
-priority = "primary"
+[dependency-groups]
+dev = [
+    "mypy>=1.13.0",
+    "pre-commit>=4.0.1",
+    "poethepoet>=0.30.0",
+    "pytest>=8.3.3",
+    "pytest-mock>=3.14.0",
+    "types-pyyaml>=6.0.12.20240917",
+    "types-requests>=2.32.0.20241016",
+]
 
 [tool.poe.tasks]
-test = "poetry run pytest -x"
-lint = "poetry run mypy gerd"
-qa = "poetry run gradio gerd/frontends/qa_frontend.py"
-gen = "poetry run gradio gerd/frontends/gen_frontend.py"
-server = "poetry run python -m gerd.backends.rest_server"
-test_manual = "poetry run python -m pytest tests/test_no_auto.py -k 'manual' --no-skip"
-hello = "poetry run python examples/hello.py"
+test = "pytest -x"
+lint = "mypy gerd"
+qa = "gradio gerd/frontends/qa_frontend.py"
+gen = "gradio gerd/frontends/gen_frontend.py"
+server = "python -m gerd.backends.rest_server"
+
+# for better isolation run manual tests separately
+test_manual_transformers = "python -m pytest tests/test_no_auto.py -k 'generation_transformers' --no-skip"
+test_manual_llama = "python -m pytest tests/test_no_auto.py -k 'generation_llama_cpp' --no-skip"
+test_manual = ["test_manual_transformers", "test_manual_llama"]
+
 
 [tool.ruff.lint]
 # 1. Enable flake8-bugbear (`B`) rules, in addition to the defaults.
@@ -99,27 +72,17 @@ select = [
     # "D",     # enforce documented functions [will be enabled soon]
 ]
 
-# 2. Avoid enforcing line-length violations (`E501`)
-ignore = [
-    "ANN101", # do not enforce self type annotation
-    "ANN102", # do not enforce cls type annoation
-]
-
-# 3. Fix everything except flake8-bugbear (`B`) violations.
+# 2. Fix everything except flake8-bugbear (`B`) violations.
 fixable = ["ALL"]
 unfixable = ["B"]
 
-# 4. Things to ignore
+# 3. Things to ignore
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"] # assert is fine in pytest
-# "__init__.py" = ["E402"]
-# 
-# "**/{tests,docs,tools}/*" = ["E402"]
 
-# [tool.ruff.format]
-# # 5. Use single quotes for non-triple-quoted strings.
-# quote-style = "single"
-
+# Without build system declaration the package cannot be imported
+# https://github.com/astral-sh/uv/issues/9291
+# https://github.com/astral-sh/uv/issues/1626
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

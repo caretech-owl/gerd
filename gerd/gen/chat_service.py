@@ -77,12 +77,18 @@ class ChatService:
                 {"messages": self.messages}
             )
             _LOGGER.debug(
-                "\n====== Resolved prompt =====\n\n%s\n\n=============================",
+                "\n"
+                "===== Resolved prompt ======\n\n"
+                "%s\n\n"
+                "============================",
                 resolved,
             )
             response = self._model.generate(resolved)
             _LOGGER.debug(
-                "\n====== Response =====\n\n%s\n\n=============================",
+                "\n"
+                "========= Response =========\n\n"
+                "%s\n\n"
+                "============================",
                 response,
             )
         return GenResponse(text=response, prompt=resolved)
@@ -94,12 +100,18 @@ class ChatService:
     ) -> GenResponse:
         self.add_message(parameters, role="user", prompt_config=prompt_config)
         _LOGGER.debug(
-            "\n====== Resolved prompt =====\n\n%s\n\n=============================",
+            "\n"
+            "===== Resolved prompt ======\n\n"
+            "%s\n\n"
+            "============================",
             "\n".join(m["role"] + ": " + str(m["content"]) for m in self.messages),
         )
         role, response = self._model.create_chat_completion(self.messages)
         _LOGGER.debug(
-            "\n====== Response =====\n\n%s: %s\n\n=============================",
+            "\n"
+            "========= Response =========\n\n"
+            "%s: %s\n\n"
+            "============================",
             role,
             response,
         )

@@ -1,58 +1,86 @@
 # Development Guide
 
-## Tools
+## Basics
 
-### Poetry
+To get started on development you need to install [uv](https://docs.astral.sh/uv/getting-started/).
+You can use `pip`, `pipx` or `conda` to do so:
 
-#### Getting started
-
-Setup your environment and install poetry (e.g. via `pip`):
-
-```sh
-pip install poetry
+```shell
+pip install uv
 ```
 
-Next intall the package and all dependencies, including `dev` dependencies. Furthermore, you need to chose whether you need packages for `cpu` or `gpu` operation. Depending on your choise, run one of the commands below:
+Next install the package and all dependencies with `uv sync`.
 
-```sh
-poetry install --with dev --extras cpu
-poetry install --with dev --extras gpu
+```shell
+# cd <gerd_project_root>
+uv sync
 ```
 
-To add a new *runtime* dependency, just run `poetry add`:
+After that, it should be possible to run scripts without further issues:
 
-```sh
-poetry add langchain
+```shell
+uv run examples/hello.py
 ```
 
-To add a new *development* dependency, run `poetry add` with a group specifier:
+To add a new *runtime* dependency, just run `uv add`:
 
 ```sh
-poetry add mypy --group dev
+uv add langchain
 ```
 
-Poetry will install dependencies in its own virtual environment.
-You need to prepend `poetry run` to any Python command you'd like to execute:
+To add a new *development* dependency, run `uv add` with the `--dev` flag:
 
 ```sh
-poetry run python main.py
-poetry run ruff team_red
+uv add mypy --dev
+```
+
+### Pre-commit hooks (recommended)
+
+Pre-commit hooks are used to check linting and run tests before commit changes to prevent faulty commits.
+Thus, it is recommended to use these hooks!
+Hooks should not include long running actions (such as tests) since committing should be fast.
+To install pre-commit hooks, execute this *once*:
+
+```shell
+uv run pre-commit install
+```
+
+## Further tools
+
+### Poe Task Runner
+
+See [pyproject.toml](pyproject.toml) for task runner configurations.
+You can run most of the tools mentioned above with a (shorter) call to `poe`.
+
+```shell
+uv run poe lint  # do some linting (with mypy)
 ```
 
 ### PyTest
 
 Test case are run via pytest. Tests can be found in the [tests folder](./tests).
 Tests will not be run via pre-commit since they might be too complex to be done before commits.
+To run the standard set of tests use the `poe` task `test`:
+
+```shell
+uv run poe test
+```
+
+More excessive testing can be trigger with `test_manual` which will NOT mock calls to the used models:
+
+```shell
+uv run poe test_manual
+```
 
 ### Ruff
 
 Ruff is used for linting and code formatting.
 Ruff follows `black` styling [ref](https://docs.astral.sh/ruff/faq/#is-the-ruff-linter-compatible-with-black).
 Ruff will be run automatically before commits when pre-commit hooks are installed.
-To run `ruff` manually, use poetry syntax:
+To run `ruff` manually, use uv:
 
 ```sh
-poetry run ruff check team_red
+uv run ruff check gerd
 ```
 
 There is a [VSCode extension](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff) that handles formatting and linting.
@@ -61,42 +89,31 @@ There is a [VSCode extension](https://marketplace.visualstudio.com/items?itemNam
 
 MyPy does static type checking.
 It will not be run automatically.
-To run MyPy manually use poetry syntax with the folder to be checked:
+To run MyPy manually use uv with the folder to be checked:
 
 ```shell
-poetry run mypy team_red
+uv run mypy gerd
 ```
 
-### Pre-commit hooks
+## Implemented GUIs
 
-These hooks are used to check linting and run tests before commit changes to prevent faulty commits.
-This should not include long running actions (such as tests) since committing should be fast.
-To install pre-commit hooks, execute this *once*:
-
-```shell
-poetry run pre-commit install
-```
-
-### Poe Task Runner
-
-See [pyproject.toml](pyproject.toml) for task runner configurations.
-
-#### Run Frontend 
+### Run Frontend
 
 Either run Generate Frontend:
 
 ```shell
-poetry poe gen
+uv run poe gen
 ```
 
 or QA Frontend:
 
 ```shell
-poetry poe qa
+uv run poe qa
 ```
 
 The backend is chosen via `config.yaml`.
-Currently only the direct backend is implemented.
+
+## CI/CD and Distribution
 
 ### GitHub Actions
 
@@ -108,7 +125,6 @@ It will also trigger actions when commits are pushed to `main` directly but this
 
 #### Bugs
 
-#### Feature 
+#### Feature
 
 #### Use Case
-

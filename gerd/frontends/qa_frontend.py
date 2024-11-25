@@ -10,7 +10,8 @@ from gerd.transport import PromptConfig, QAFileUpload, QAModesEnum, QAQuestion
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARNING)
+logging.getLogger("gerd").setLevel(logging.DEBUG)
 
 qa_modes_dict: Dict[str, QAModesEnum] = {
     "LLM": QAModesEnum.SEARCH,
