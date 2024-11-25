@@ -19,7 +19,7 @@ uv sync
 After that, it should be possible to run scripts without further issues:
 
 ```shell
-python examples/hello.py
+uv run examples/hello.py
 ```
 
 To add a new *runtime* dependency, just run `uv add`:
