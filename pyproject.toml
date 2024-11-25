@@ -86,8 +86,9 @@ unfixable = ["B"]
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"] # assert is fine in pytest
 
-# Otherwise pip does not know what to install
-# https://stackoverflow.com/questions/72294299/multiple-top-level-packages-discovered-in-a-flat-layout
-# https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
-[tool.setuptools]
-packages = ["gerd"]
+# Without build system declaration the package cannot be imported
+# https://github.com/astral-sh/uv/issues/9291
+# https://github.com/astral-sh/uv/issues/1626
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
