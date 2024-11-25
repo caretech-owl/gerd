@@ -72,17 +72,11 @@ select = [
     # "D",     # enforce documented functions [will be enabled soon]
 ]
 
-# 2. Avoid enforcing line-length violations (`E501`)
-ignore = [
-    "ANN101", # do not enforce self type annotation
-    "ANN102", # do not enforce cls type annoation
-]
-
-# 3. Fix everything except flake8-bugbear (`B`) violations.
+# 2. Fix everything except flake8-bugbear (`B`) violations.
 fixable = ["ALL"]
 unfixable = ["B"]
 
-# 4. Things to ignore
+# 3. Things to ignore
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"] # assert is fine in pytest
 
