@@ -449,7 +449,7 @@ requires-dist = [
     { name = "requests", specifier = ">=2.32.3" },
     { name = "sentence-transformers", specifier = ">=3.3.1" },
     { name = "torch", specifier = ">=2.5.1" },
-    { name = "transformers", specifier = ">=4.46.3" },
+    { name = "transformers", specifier = ">=4.46.2" },
     { name = "uvicorn", specifier = ">=0.32.1" },
 ]
 
