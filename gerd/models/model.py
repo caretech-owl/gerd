@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from string import Formatter
 from typing import Any, List, Literal, Mapping, Optional, Tuple, TypedDict
@@ -8,8 +9,8 @@ from pydantic import (
     ConfigDict,
     Field,
     SecretStr,
-    ValidationError,
     computed_field,
+    model_validator,
 )
 
 ChatRole = Literal["system", "user", "assistant"]
@@ -40,9 +41,11 @@ class PromptConfig(BaseModel):
         return (
             self.template.render(**parameters)
             if self.template
-            else self.text.format(**parameters)
-            if self.text
-            else "".join(str(parameters.values()))
+            else (
+                self.text.format(**parameters)
+                if self.text
+                else "".join(str(parameters.values()))
+            )
         )
 
     def model_post_init(self, __context: Any) -> None:  # noqa: ANN401
@@ -128,3 +131,32 @@ class ModelConfig(BaseModel):
     context_length: int = 0  # Currently only LLaMA, MPT and Falcon
     gpu_layers: int = 0
     torch_dtype: Optional[str] = None
+
+    @model_validator(mode="after")
+    @classmethod
+    def validate_field(cls, data: Any) -> Any:  # noqa: ANN401
+        for field in cls.model_fields:
+            env_name = f"GERD_MODEL_{field.upper()}"
+            # Special handling of endpoint field override
+            if (
+                field == "endpoint"
+                and f"{env_name}_URL" in os.environ
+                and f"{env_name}_TYPE" in os.environ
+            ):
+                setattr(
+                    data,
+                    field,
+                    ModelEndpoint(
+                        url=os.environ[f"{env_name}_URL"],
+                        type=os.environ[f"{env_name}_TYPE"],
+                        key=(
+                            SecretStr(os.environ.get(f"{env_name}_KEY"))
+                            if f"{env_name}_KEY" in os.environ
+                            else None
+                        ),
+                    ),
+                )
+            elif env_val := os.environ.get(env_name):
+                setattr(data, field, type(getattr(data, field))(env_val))
+
+        return data
