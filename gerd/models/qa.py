@@ -1,6 +1,11 @@
-from typing import Optional
+from typing import Optional, Tuple, Type
 
 from pydantic import BaseModel
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+)
 
 from gerd.models.model import ModelConfig
 
@@ -29,8 +34,25 @@ class QAFeaturesConfig(BaseModel):
     return_source: bool
 
 
-class QAConfig(BaseModel):
+class QAConfig(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="gerd_qa_", env_nested_delimiter="__")
     model: ModelConfig
     embedding: EmbeddingConfig
     features: QAFeaturesConfig
     device: str = "cpu"
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        _: Type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> Tuple[PydanticBaseSettingsSource, ...]:
+        return (
+            file_secret_settings,
+            env_settings,
+            dotenv_settings,
+            init_settings,
+        )

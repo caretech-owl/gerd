@@ -1,4 +1,11 @@
+from typing import Tuple, Type
+
 from pydantic import BaseModel
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+)
 
 from gerd.features.prompt_chaining import PromptChainingConfig
 from gerd.models.model import ModelConfig
@@ -13,6 +20,23 @@ class GenerationFeaturesConfig(BaseModel):
     prompt_chaining: PromptChainingConfig | None = None
 
 
-class GenerationConfig(BaseModel):
+class GenerationConfig(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="gerd_gen_", env_nested_delimiter="__")
     model: ModelConfig
     features: GenerationFeaturesConfig = GenerationFeaturesConfig()
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        _: Type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> Tuple[PydanticBaseSettingsSource, ...]:
+        return (
+            file_secret_settings,
+            env_settings,
+            dotenv_settings,
+            init_settings,
+        )
