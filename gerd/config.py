@@ -55,8 +55,8 @@ class Settings(BaseSettings):
     ) -> Tuple[PydanticBaseSettingsSource, ...]:
         return (
             file_secret_settings,
-            dotenv_settings,
             env_settings,
+            dotenv_settings,
             init_settings,
             YamlConfig(settings_cls),
         )
