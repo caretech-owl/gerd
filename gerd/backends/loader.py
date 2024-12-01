@@ -108,11 +108,13 @@ class TransformerLLM(LLM):
             task="text-generation",
             model=config.name,
             # device_map="auto",  # https://github.com/huggingface/transformers/issues/31922
-            device="cuda"
-            if config.gpu_layers > 0
-            else "mps"
-            if torch.backends.mps.is_available()
-            else "cpu",
+            device=(
+                "cuda"
+                if config.gpu_layers > 0
+                else "mps"
+                if torch.backends.mps.is_available()
+                else "cpu"
+            ),
             framework="pt",
             model_kwargs=model_kwargs,
             use_fast=False,
@@ -233,7 +235,12 @@ class RemoteLLM(LLM):
 
 def load_model_from_config(config: ModelConfig) -> LLM:
     if config.endpoint:
+        _LOGGER.info("Using remote endpoint %s", config.endpoint.url)
         return RemoteLLM(config)
     if config.file:
+        _LOGGER.info(
+            "Using Llama.cpp with model %s and file %s", config.name, config.file
+        )
         return LlamaCppLLM(config)
+    _LOGGER.info("Using transformers with model %s", config.name)
     return TransformerLLM(config)
