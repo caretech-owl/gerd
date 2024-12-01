@@ -143,14 +143,20 @@ class ModelConfig(BaseModel):
                 and f"{env_name}_URL" in os.environ
                 and f"{env_name}_TYPE" in os.environ
             ):
+                # Check if the endpoint type is valid
+                # Since MyPy does not correctly infer the type of `os.environ`
+                # we need to use `type: ignore`
+                if os.environ[f"{env_name}_TYPE"] not in ["llama.cpp", "openai"]:
+                    msg = f"Unknown endpoint type: {os.environ[f'{env_name}_TYPE']}"
+                    raise ValueError(msg)
                 setattr(
                     data,
                     field,
                     ModelEndpoint(
                         url=os.environ[f"{env_name}_URL"],
-                        type=os.environ[f"{env_name}_TYPE"],
+                        type=os.environ[f"{env_name}_TYPE"],  # type: ignore[arg-type]
                         key=(
-                            SecretStr(os.environ.get(f"{env_name}_KEY"))
+                            SecretStr(os.environ.get(f"{env_name}_KEY") or "")
                             if f"{env_name}_KEY" in os.environ
                             else None
                         ),
