@@ -10,9 +10,6 @@ from gerd.transport import PromptConfig, QAFileUpload, QAModesEnum, QAQuestion
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
 
-logging.basicConfig(level=logging.WARNING)
-logging.getLogger("gerd").setLevel(logging.DEBUG)
-
 qa_modes_dict: Dict[str, QAModesEnum] = {
     "LLM": QAModesEnum.SEARCH,
     "Analyze": QAModesEnum.ANALYZE,
@@ -297,4 +294,8 @@ with demo:
     )
 
 if __name__ == "__main__":
+    from gerd.config import CONFIG
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("gerd").setLevel(CONFIG.logging.level.value.upper())
     demo.launch()
