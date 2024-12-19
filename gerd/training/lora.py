@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Protocol, Type
+from typing import Any, Dict, List, Literal, Optional, Protocol, Type
 
 import torch
 import transformers
@@ -25,7 +25,7 @@ MODEL_CLASSES: dict[str, str] = {
 
 
 class LLMModelProto(Protocol):
-    def named_modules(self) -> Dict[str, List]:
+    def named_modules(self) -> list[tuple[str, torch.nn.Module]]:
         pass
 
 
@@ -79,7 +79,7 @@ class LoraTrainingConfig(BaseSettings):
     warmup_steps: int = 100
     epochs: int = 3
     r: int = 8
-    bias: str = "none"
+    bias: Literal["none", "all", "lora_only"] = "none"
     task_type: str = "CAUSAL_LM"
 
     # learning_rate

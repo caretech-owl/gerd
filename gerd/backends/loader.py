@@ -115,7 +115,7 @@ class TransformerLLM(LLM):
             model_kwargs["torch_dtype"] = torch_dtypes[config.torch_dtype]
 
         tokenizer = AutoTokenizer.from_pretrained(config.name, use_fast=False)
-        model: PreTrainedModel = AutoModelForCausalLM.from_pretrained(
+        model: PreTrainedModel = AutoModelForCausalLM.from_pretrained(  # type: ignore[no-any-unimported]
             config.name, **model_kwargs
         )
 

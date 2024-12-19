@@ -35,7 +35,7 @@ def despacyfy(text: str) -> str:
 def encode(
     text: str, add_bos_token: bool, tokenizer: PreTrainedTokenizer, cutoff_len: int
 ) -> List[int]:
-    result = tokenizer.encode(text, truncation=True, max_length=cutoff_len)
+    result: list[int] = tokenizer.encode(text, truncation=True, max_length=cutoff_len)
     # Check if the first two tokens are BOS
     if len(result) >= 2 and result[:2] == [
         tokenizer.bos_token_id,
@@ -53,7 +53,7 @@ def tokenize(
     tokenizer: PreTrainedTokenizer,
     cutoff_len: int,
     append_eos_token: bool = False,
-) -> Dict[str, List]:
+) -> Dict[str, torch.Tensor | list[int]]:
     input_ids = encode(prompt, True, tokenizer, cutoff_len)
 
     if tokenizer.pad_token_id is None or tokenizer.padding_side is None:
@@ -73,11 +73,11 @@ def tokenize(
     input_ids = [tokenizer.pad_token_id] * (cutoff_len - len(input_ids)) + input_ids
     labels = [1] * len(input_ids)
 
-    input_ids = torch.tensor(input_ids)
+    input_tensors = torch.tensor(input_ids)
     return {
-        "input_ids": input_ids,
+        "input_ids": input_tensors,
         "labels": labels,
-        "attention_mask": input_ids.ne(tokenizer.pad_token_id),
+        "attention_mask": input_tensors.ne(tokenizer.pad_token_id),
     }
 
 
@@ -87,7 +87,7 @@ def generate_and_tokenize_prompt(
     tokenizer: PreTrainedTokenizer,
     cutoff_len: int,
     append_eos_token: bool = False,
-) -> Dict[str, List]:
+) -> Dict[str, torch.Tensor | list[int]]:
     for options, prompt in format_template.items():
         if set(options.split(",")) == {
             x[0]

@@ -133,6 +133,9 @@ class Trainer:
             _LOGGER.info("Quantization detected!")
 
         self.lora_model = get_peft_model(self.base_model, training_config)
+        if not hasattr(self.lora_model.config, "use_cache"):
+            msg = "LoRA model config not have 'use_cache' attribute"
+            raise AssertionError(msg)
         self.lora_model.config.use_cache = False
 
         self.tracked = Tracked(self.lora_model, self.config)
@@ -213,6 +216,9 @@ class Trainer:
             )
 
         def threaded_run() -> None:
+            if self.trainer is None:
+                msg = "Trainer not initialized"
+                raise RuntimeError(msg)
             self.trainer.train()
             # Note: save in the thread in case the gradio thread breaks
             # (eg browser closed)
@@ -250,7 +256,7 @@ class Trainer:
         # and will remove required information from the training data set.
         # Whether it is useful to compile after reassignment.
         if torch_compile and torch.__version__ >= "2" and sys.platform != "win32":
-            self.lora_model = torch.compile(self.lora_model)
+            self.lora_model = torch.compile(self.lora_model)  # type: ignore[assignment]
 
         # == Save parameters for reuse ==
         with open(
@@ -265,7 +271,10 @@ class Trainer:
             json.dump(train_template, file, indent=2)
 
     def save(self) -> None:
-        self.trainer.save_model(self.config.output_dir)
+        if self.trainer is not None:
+            self.trainer.save_model(self.config.output_dir)
+        else:
+            _LOGGER.warning("Trainer not initialized")
 
     def interrupt(self) -> None:
         self.tracked.interrupted = True

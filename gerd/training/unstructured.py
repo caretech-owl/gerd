@@ -44,7 +44,7 @@ def train_lora(config: str) -> Trainer:
         with open(file, "r") as f:
             training_texts.append(f.read())
 
-    training_tokens = []
+    training_tokens: list[list[int]] = []
     for text in training_texts:
         if len(text) == 0:
             continue
