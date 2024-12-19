@@ -145,3 +145,6 @@ data/*.pdf
 # no ide specific stuff
 .vscode
 sandbox.py
+
+# lora adapters
+models/lora
