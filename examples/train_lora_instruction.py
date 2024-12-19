@@ -3,7 +3,12 @@ import time
 from pathlib import Path
 
 from gerd.config import PROJECT_DIR
-from gerd.training.unstructured import train_lora
+from gerd.models.model import ChatMessage
+from gerd.training.instruct import (
+    InstructTrainingData,
+    InstructTrainingSample,
+    train_lora,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -14,7 +19,33 @@ if Path().cwd() != PROJECT_DIR:
     msg = "This example must be run from the project root."
     raise AssertionError(msg)
 
-trainer = train_lora("lora_unstructured_example.yml")
+data_glob = "tmp/*.json"
+
+data = InstructTrainingData()
+for i in range(1000):
+    data.samples.append(
+        InstructTrainingSample(
+            messages=[
+                ChatMessage(
+                    role="user",
+                    content=f"Bitte erweitere die Zahl {i}.",
+                ),
+                ChatMessage(
+                    role="assistant",
+                    content=(
+                        "Nichts leichter als das! "
+                        f"Hier hast du die {i} drei mal hintereinander: {i}{i}{i}."
+                    ),
+                ),
+            ]
+        )
+    )
+
+Path("tmp").mkdir(exist_ok=True)
+with open("tmp/test.json", "w") as f:
+    f.write(data.model_dump_json(indent=2))
+
+trainer = train_lora("lora_instruct_example")
 try:
     while trainer.thread.is_alive():
         time.sleep(0.5)

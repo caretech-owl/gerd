@@ -1,0 +1,10 @@
+model:
+  name: "meta-llama/Llama-3.2-1B-Instruct"
+  temperature: 0.01
+  top_k: 100
+  top_p: 0.95
+  max_new_tokens: 256
+  repetition_penalty: 1.1
+  context_length: 2048
+  prompt_config: 
+    text: "{content}"

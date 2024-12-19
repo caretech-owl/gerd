@@ -1,0 +1,15 @@
+model:
+  name: "meta-llama/Llama-3.2-1B-Instruct"
+  temperature: 0.01
+  top_k: 100
+  top_p: 0.95
+  max_new_tokens: 512
+  repetition_penalty: 1.1
+  context_length: 2048
+input_glob: "tmp/*.json"
+output_dir: "models/lora_instruct"
+override_existing: true
+pad_token_id: 0
+padding_side: right
+modules:
+  default: True
