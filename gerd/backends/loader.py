@@ -1,5 +1,7 @@
 import abc
 import logging
+import os
+from pathlib import Path
 from typing import Iterator
 
 from gerd.models.model import ChatMessage, ChatRole, ModelConfig, ModelEndpoint
@@ -90,7 +92,15 @@ class LlamaCppLLM(LLM):
 class TransformerLLM(LLM):
     def __init__(self, config: ModelConfig) -> None:
         import torch
-        from transformers import pipeline
+        from transformers import (
+            AutoModelForCausalLM,
+            AutoTokenizer,
+            PreTrainedModel,
+            pipeline,
+        )
+
+        # use_fast=False is ignored by transformers
+        os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
         self._config = config
         torch_dtypes: dict[str, torch.dtype] = {
@@ -104,9 +114,29 @@ class TransformerLLM(LLM):
         if config.torch_dtype in torch_dtypes:
             model_kwargs["torch_dtype"] = torch_dtypes[config.torch_dtype]
 
+        tokenizer = AutoTokenizer.from_pretrained(config.name, use_fast=False)
+        model: PreTrainedModel = AutoModelForCausalLM.from_pretrained(
+            config.name, **model_kwargs
+        )
+
+        for lora in config.loras:
+            model.load_adapter(lora)
+            train_params = Path(lora) / "training_parameters.json"
+            if train_params.exists() and tokenizer.pad_token_id is None:
+                from gerd.training.lora import LoraTrainingConfig
+
+                with open(train_params, "r") as f:
+                    lora_config = LoraTrainingConfig.model_validate_json(f.read())
+                    tokenizer.pad_token_id = lora_config.pad_token_id
+                    tokenizer.padding_side = lora_config.padding_side
+
+        if config.loras:
+            model.enable_adapters()
+
         self._pipe = pipeline(
             task="text-generation",
-            model=config.name,
+            model=model,
+            tokenizer=tokenizer,
             # device_map="auto",  # https://github.com/huggingface/transformers/issues/31922
             device=(
                 "cuda"
@@ -116,7 +146,6 @@ class TransformerLLM(LLM):
                 else "cpu"
             ),
             framework="pt",
-            model_kwargs=model_kwargs,
             use_fast=False,
         )
 

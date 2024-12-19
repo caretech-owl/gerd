@@ -73,9 +73,7 @@ class ChatService:
             response = res.text
             resolved = "\n".join(parameters.values())
         else:
-            resolved = self._config.model.prompt_config.format(
-                {"messages": self.messages}
-            )
+            resolved = "\n".join(m["content"] for m in self.messages)
             _LOGGER.debug(
                 "\n"
                 "===== Resolved prompt ======\n\n"
