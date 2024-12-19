@@ -147,4 +147,5 @@ data/*.pdf
 sandbox.py
 
 # lora adapters
-models/lora
+models/lora*
+tmp/
