@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Protocol
+from typing import Any, Dict, List, Optional, Protocol, Type
 
 import torch
 import transformers
@@ -8,6 +8,11 @@ import transformers
 #     TRANSFORMERS_MODELS_TO_LORA_TARGET_MODULES_MAPPING as model_to_lora_modules,
 # )
 from pydantic import BaseModel, Field
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+)
 from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING_NAMES
 from yaml import safe_load
 
@@ -50,7 +55,11 @@ class TrainingFlags(BaseModel):
     use_ipex: bool = False
 
 
-class LoraTrainingConfig(BaseModel):
+class LoraTrainingConfig(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_prefix="gerd_lora_", env_nested_delimiter="__"
+    )
+
     # custom things
     model: ModelConfig
     input_glob: str
@@ -121,6 +130,22 @@ class LoraTrainingConfig(BaseModel):
             )
             raise ValueError(msg)
         self.reset_tokenizer()
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        _: Type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        return (
+            file_secret_settings,
+            env_settings,
+            dotenv_settings,
+            init_settings,
+        )
 
 
 def find_target_modules(model: LLMModelProto) -> List[str]:
