@@ -22,7 +22,7 @@ def train_lora(config: str) -> Trainer:
     if Path(lora_config.output_dir).joinpath("adapter_model.safetensors").exists():
         if lora_config.override_existing:
             # check that we do not delete anything vital
-            if lora_config.output_dir != Path("/"):
+            if lora_config.output_dir == Path("/"):
                 msg = "Cannot delete root directory."
                 raise RuntimeError(msg)
 
@@ -35,7 +35,7 @@ def train_lora(config: str) -> Trainer:
                 f"LoRA target directory {lora_config.output_dir}"
                 " must not contain another lora adapter."
             )
-        raise AssertionError(msg)
+            raise AssertionError(msg)
 
     _LOGGER.info("Tokenizing training data ...")
 
@@ -76,7 +76,7 @@ def train_lora(config: str) -> Trainer:
 
     trainer = Trainer(config=lora_config)
     trainer.setup_training(
-        train_data=train_data, train_template={"template": "raw_text"}
+        train_data=train_data, train_template={"template_type": "raw_text"}
     )
 
     trainer.train()
