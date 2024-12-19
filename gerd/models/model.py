@@ -10,7 +10,6 @@ from pydantic import (
     Field,
     SecretStr,
     computed_field,
-    model_validator,
 )
 
 ChatRole = Literal["system", "user", "assistant"]
