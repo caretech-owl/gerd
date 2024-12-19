@@ -1,6 +1,6 @@
 model:
   name: "meta-llama/Llama-3.2-1B"
-  temperature: 0
+  temperature: 0.01
   top_k: 100
   top_p: 0.95
   max_new_tokens: 512

@@ -1,7 +1,7 @@
 model: &gen_model
   name: "TheBloke/em_german_leo_mistral-GGUF"
   file: "em_german_leo_mistral.Q5_K_M.gguf"
-  temperature: 0
+  temperature: 0.01
   top_k: 100
   top_p: 0.95
   max_new_tokens: 512
