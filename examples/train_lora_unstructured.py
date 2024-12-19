@@ -14,7 +14,7 @@ if Path().cwd() != PROJECT_DIR:
     msg = "This example must be run from the project root."
     raise AssertionError(msg)
 
-trainer = train_lora("lora_unstructured_example.yml")
+trainer = train_lora("lora_unstructured_example")
 try:
     while trainer.thread.is_alive():
         time.sleep(0.5)
