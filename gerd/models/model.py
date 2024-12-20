@@ -1,7 +1,13 @@
 import os
+import sys
 from pathlib import Path
 from string import Formatter
-from typing import Any, List, Literal, Mapping, Optional, Tuple, TypedDict
+from typing import Any, List, Literal, Mapping, Optional, Tuple
+
+if sys.version_info < (3, 12):
+    from typing_extensions import TypedDict
+else:
+    from typing import TypedDict
 
 from jinja2 import Environment, FileSystemLoader, Template, meta, select_autoescape
 from pydantic import (
