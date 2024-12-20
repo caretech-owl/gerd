@@ -62,8 +62,8 @@ class LoraTrainingConfig(BaseSettings):
 
     # custom things
     model: ModelConfig
-    input_glob: str
     output_dir: Path
+    input_glob: str = ""
     override_existing: bool = False
     pad_token_id: int = 0
     padding_side: str = ""
