@@ -66,7 +66,7 @@ class LoraTrainingConfig(BaseSettings):
     input_glob: str = ""
     override_existing: bool = False
     pad_token_id: int = 0
-    padding_side: str = ""
+    padding_side: Literal["right", "left"] = "right"
 
     # training parameters
     cutoff_len: int = 256

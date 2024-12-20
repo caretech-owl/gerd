@@ -128,7 +128,11 @@ class TransformerLLM(LLM):
                 with open(train_params, "r") as f:
                     lora_config = LoraTrainingConfig.model_validate_json(f.read())
                     tokenizer.pad_token_id = lora_config.pad_token_id
-                    tokenizer.padding_side = lora_config.padding_side
+                    # https://github.com/huggingface/transformers/issues/34842#issuecomment-2490994584
+                    tokenizer.padding_side = (
+                        "left" if lora_config.padding_side == "right" else "right"
+                    )
+                    # tokenizer.padding_side = lora_config.padding_side
 
         if config.loras:
             model.enable_adapters()
