@@ -13,7 +13,7 @@ from gerd.training.trainer import Trainer
 _LOGGER = logging.getLogger(__name__)
 
 
-def train_lora(config: str) -> Trainer:
+def train_lora(config: str, texts: list[str] | None = None) -> Trainer:
     # Disable parallelism to avoid issues with transformers
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -39,13 +39,14 @@ def train_lora(config: str) -> Trainer:
 
     _LOGGER.info("Tokenizing training data ...")
 
-    training_texts = []
-    for file in Path().glob(lora_config.input_glob):
-        with open(file, "r") as f:
-            training_texts.append(f.read())
+    if not texts:
+        texts = []
+        for file in Path().glob(lora_config.input_glob):
+            with open(file, "r") as f:
+                texts.append(f.read())
 
     training_tokens: list[list[int]] = []
-    for text in training_texts:
+    for text in texts:
         if len(text) == 0:
             continue
         training_tokens.extend(

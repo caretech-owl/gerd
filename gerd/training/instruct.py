@@ -23,7 +23,7 @@ class InstructTrainingData(BaseModel):
     samples: list[InstructTrainingSample] = []
 
 
-def train_lora(config: str) -> Trainer:
+def train_lora(config: str, data: InstructTrainingData | None = None) -> Trainer:
     # Disable parallelism to avoid issues with transformers
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -49,25 +49,26 @@ def train_lora(config: str) -> Trainer:
 
     _LOGGER.info("Tokenizing training data ...")
 
-    training_data = InstructTrainingData()
-    for file in Path().glob(lora_config.input_glob):
-        if not file.is_file():
-            msg = "Can only read files for now."
-            raise NotImplementedError(msg)
-        if file.suffix == ".json":
-            with open(file, "r") as f:
-                training_data.samples.extend(
-                    InstructTrainingData.model_validate_json(f.read()).samples
-                )
-        elif file.suffix == ".yml":
-            with open(file, "r") as f:
-                obj = yaml.safe_load(f)
-                training_data.samples.extend(
-                    InstructTrainingData.model_validate(obj).samples
-                )
-        else:
-            msg = f"Unsupported file format: {file.suffix}"
-            raise NotImplementedError(msg)
+    if data is None:
+        data = InstructTrainingData()
+        for file in Path().glob(lora_config.input_glob):
+            if not file.is_file():
+                msg = "Can only read files for now."
+                raise NotImplementedError(msg)
+            if file.suffix == ".json":
+                with open(file, "r") as f:
+                    data.samples.extend(
+                        InstructTrainingData.model_validate_json(f.read()).samples
+                    )
+            elif file.suffix == ".yml":
+                with open(file, "r") as f:
+                    obj = yaml.safe_load(f)
+                    data.samples.extend(
+                        InstructTrainingData.model_validate(obj).samples
+                    )
+            else:
+                msg = f"Unsupported file format: {file.suffix}"
+                raise NotImplementedError(msg)
 
     train_data = Dataset.from_list(
         [
@@ -76,7 +77,7 @@ def train_lora(config: str) -> Trainer:
                     sample.messages, tokenize=False
                 )
             )
-            for sample in training_data.samples
+            for sample in data.samples
         ]
     )
     _LOGGER.info("Decoding sample data ...")
