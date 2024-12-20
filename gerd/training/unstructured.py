@@ -7,17 +7,19 @@ from pathlib import Path
 from datasets import Dataset
 
 from gerd.training.data import split_chunks, tokenize
-from gerd.training.lora import load_training_config
+from gerd.training.lora import LoraTrainingConfig, load_training_config
 from gerd.training.trainer import Trainer
 
 _LOGGER = logging.getLogger(__name__)
 
 
-def train_lora(config: str, texts: list[str] | None = None) -> Trainer:
+def train_lora(
+    config: str | LoraTrainingConfig, texts: list[str] | None = None
+) -> Trainer:
     # Disable parallelism to avoid issues with transformers
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-    lora_config = load_training_config(config)
+    lora_config = load_training_config(config) if isinstance(config, str) else config
 
     if Path(lora_config.output_dir).joinpath("adapter_model.safetensors").exists():
         if lora_config.override_existing:

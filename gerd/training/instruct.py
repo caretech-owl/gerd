@@ -9,7 +9,7 @@ from datasets import Dataset
 from pydantic import BaseModel
 
 from gerd.models.model import ChatMessage
-from gerd.training.lora import load_training_config
+from gerd.training.lora import LoraTrainingConfig, load_training_config
 from gerd.training.trainer import Trainer
 
 _LOGGER = logging.getLogger(__name__)
@@ -23,11 +23,13 @@ class InstructTrainingData(BaseModel):
     samples: list[InstructTrainingSample] = []
 
 
-def train_lora(config: str, data: InstructTrainingData | None = None) -> Trainer:
+def train_lora(
+    config: str | LoraTrainingConfig, data: InstructTrainingData | None = None
+) -> Trainer:
     # Disable parallelism to avoid issues with transformers
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-    lora_config = load_training_config(config)
+    lora_config = load_training_config(config) if isinstance(config, str) else config
 
     if Path(lora_config.output_dir).joinpath("adapter_model.safetensors").exists():
         if lora_config.override_existing:
