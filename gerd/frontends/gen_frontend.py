@@ -93,7 +93,7 @@ demo = gr.Blocks()
 with demo:
     config = TRANSPORTER.get_gen_prompt()
 
-    gr.Markdown("# Entlassbrief generieren")
+    gr.Markdown("# GERD - Entlassbrief generieren")
     temp_output = gr.State(" ")
 
     fields = []

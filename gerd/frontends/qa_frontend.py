@@ -221,7 +221,7 @@ with demo:
     # define the GUI Layout
     developer_mode: bool = False
 
-    gr.Markdown("# Entlassbriefe QA")
+    gr.Markdown("# GERD - Entlassbriefe QA")
 
     with gr.Row():
         with gr.Column(scale=1):

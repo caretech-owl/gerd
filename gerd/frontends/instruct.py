@@ -54,7 +54,7 @@ def generate(
 
 
 with demo:
-    gr.Markdown("# GERD - LoRA Trainer")
+    gr.Markdown("# GERD - Instruct")
     with gr.Accordion("Parameter"):
         with gr.Row():
             model_name = gr.Textbox(config.model.name, label="Model Name")

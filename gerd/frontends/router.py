@@ -107,6 +107,11 @@ class AppController:
         self.state = AppState.QA_STARTING
         return self.state.name
 
+    def start_training(self) -> str:
+        self.start("training")
+        self.state = AppState.TRAINING_STARTING
+        return self.state.name
+
 
 def check_state() -> str:
     app = AppController.instance()
@@ -125,7 +130,7 @@ def check_state() -> str:
 
 
 with demo:
-    gr.Markdown("# GERD Router")
+    gr.Markdown("# GERD - Router")
     app = AppController.instance()
 
     with gr.Row(equal_height=True):
@@ -156,6 +161,15 @@ with demo:
             outputs=service_link,
         )
         gr.Button("Document QA").click(lambda: app.start_qa(), outputs=state_txt).then(
+            lambda: gr.update(interactive=app.state != AppState.STOPPED),
+            outputs=service_link,
+        ).then(check_state, outputs=state_txt).then(
+            lambda: gr.update(interactive=app.state != AppState.STOPPED),
+            outputs=service_link,
+        )
+        gr.Button("LoRA Training").click(
+            lambda: app.start_training(), outputs=state_txt
+        ).then(
             lambda: gr.update(interactive=app.state != AppState.STOPPED),
             outputs=service_link,
         ).then(check_state, outputs=state_txt).then(
