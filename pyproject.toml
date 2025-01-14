@@ -1,9 +1,11 @@
 [project]
 name = "gerd"
-version = "0.5.0"
+version = "0.5.1"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10, <3.13"
+
+
 dependencies = [
     "fastapi>=0.115.5",
     "faiss-cpu>=1.9.0.post1",
@@ -11,7 +13,6 @@ dependencies = [
     "langchain>=0.3.7",
     "langchain-community>=0.3.7",
     "langchain-huggingface>=0.1.2",
-    "llama-cpp-python>=0.3.2",
     "orjson>=3.10.11",
     "pydantic>=2.10.1",
     "pydantic-settings>=2.6.1",
@@ -26,8 +27,13 @@ dependencies = [
     "gradio>=5.12",
 ]
 
+[project.optional-dependencies]
+llama-cpp = ["llama-cpp-python>=0.3.2"]
+full = ["gerd[llama-cpp]"]
+
 [dependency-groups]
 dev = [
+    "gerd[full]",
     "mypy>=1.13.0",
     "pre-commit>=4.0.1",
     "poethepoet>=0.30.0",

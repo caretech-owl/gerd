@@ -571,7 +571,7 @@ http = [
 
 [[package]]
 name = "gerd"
-version = "0.5.0"
+version = "0.5.1"
 source = { editable = "." }
 dependencies = [
     { name = "datasets" },
@@ -582,7 +582,6 @@ dependencies = [
     { name = "langchain" },
     { name = "langchain-community" },
     { name = "langchain-huggingface" },
-    { name = "llama-cpp-python" },
     { name = "orjson" },
     { name = "peft" },
     { name = "pydantic" },
@@ -595,8 +594,17 @@ dependencies = [
     { name = "uvicorn" },
 ]
 
+[package.optional-dependencies]
+full = [
+    { name = "llama-cpp-python" },
+]
+llama-cpp = [
+    { name = "llama-cpp-python" },
+]
+
 [package.dev-dependencies]
 dev = [
+    { name = "gerd", extra = ["full"] },
     { name = "gitpython" },
     { name = "ipykernel" },
     { name = "ipywidgets" },
@@ -614,12 +622,13 @@ requires-dist = [
     { name = "datasets", specifier = ">=3.2.0" },
     { name = "faiss-cpu", specifier = ">=1.9.0.post1" },
     { name = "fastapi", specifier = ">=0.115.5" },
+    { name = "gerd", extras = ["llama-cpp"], marker = "extra == 'full'" },
     { name = "gradio", specifier = ">=5.12" },
     { name = "jinja2", specifier = ">=3.1.4" },
     { name = "langchain", specifier = ">=0.3.7" },
     { name = "langchain-community", specifier = ">=0.3.7" },
     { name = "langchain-huggingface", specifier = ">=0.1.2" },
-    { name = "llama-cpp-python", specifier = ">=0.3.2" },
+    { name = "llama-cpp-python", marker = "extra == 'llama-cpp'", specifier = ">=0.3.2" },
     { name = "orjson", specifier = ">=3.10.11" },
     { name = "peft", specifier = ">=0.14.0" },
     { name = "pydantic", specifier = ">=2.10.1" },
@@ -634,6 +643,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "gerd", extras = ["full"] },
     { name = "gitpython", specifier = ">=3.1.44" },
     { name = "ipykernel", specifier = ">=6.29.5" },
     { name = "ipywidgets", specifier = ">=8.1.5" },
@@ -1115,7 +1125,7 @@ wheels = [
 
 [[package]]
 name = "llama-cpp-python"
-version = "0.3.2"
+version = "0.3.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "diskcache" },
@@ -1123,7 +1133,7 @@ dependencies = [
     { name = "numpy" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5f/0e/ff129005a33b955088fc7e4ecb57e5500b604fb97eca55ce8688dbe59680/llama_cpp_python-0.3.2.tar.gz", hash = "sha256:8fbf246a55a999f45015ed0d48f91b4ae04ae959827fac1cd6ac6ec65aed2e2f", size = 64964148 }
+sdist = { url = "https://files.pythonhosted.org/packages/72/cd/efae0a18621ba66baf19d19507bb17f1aa2dd5e7f0d5dd4aa008c9bc7091/llama_cpp_python-0.3.6.tar.gz", hash = "sha256:86e35a8888274466958e24201b856cd71c8def0ea72e14312be13da96c15c7a4", size = 66893177 }
 
 [[package]]
 name = "markdown-it-py"
