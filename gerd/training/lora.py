@@ -61,10 +61,11 @@ class LoraTrainingConfig(BaseSettings):
     )
 
     # custom things
-    model: ModelConfig
-    output_dir: Path
+    model: ModelConfig = ModelConfig(name="meta-llama/Llama-3.2-1B-Instruct")
+    output_dir: Path = Path("loras/lora")
     input_glob: str = ""
     override_existing: bool = False
+    zip_output: bool = False
     pad_token_id: int = 0
     padding_side: Literal["right", "left"] = "right"
 
