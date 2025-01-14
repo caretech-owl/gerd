@@ -27,6 +27,9 @@ class Global:
 demo = gr.Blocks(title="GERD")
 default_config = LoraTrainingConfig()
 gr.set_static_paths(paths=[default_config.output_dir.parent])
+_LOGGER.info(
+    "LoRA output directory: %s", default_config.output_dir.parent.absolute().as_posix()
+)
 
 
 # Should this be limited to relative files or allowed directories
