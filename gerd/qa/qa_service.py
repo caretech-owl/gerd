@@ -37,7 +37,7 @@ class QAService:
         """
         Init the llm and set default values
         """
-        self._config = config
+        self.config = config
         self._llm = gerd_loader.load_model_from_config(config.model)
         self._vectorstore: Optional[FAISS] = None
         self._database: Optional[Rag] = None
@@ -92,10 +92,10 @@ class QAService:
                 return QAAnswer(error_msg="No database available!", status=404)
             self._database = Rag(
                 self._llm,
-                self._config.model,
-                self._config.model.prompt_config,
+                self.config.model,
+                self.config.model.prompt_config,
                 self._vectorstore,
-                self._config.features.return_source,
+                self.config.features.return_source,
             )
         return self._database.query(question)
 
@@ -115,7 +115,7 @@ class QAService:
             _LOGGER.error(msg)
             return QAAnalyzeAnswer(status=404, error_msg=msg)
 
-        config = self._config.features.analyze
+        config = self.config.features.analyze
 
         # questions to search model and vectorstore
         questions_model_dict: Dict[str, str] = {
@@ -188,7 +188,7 @@ class QAService:
         answer = self._format_response_analyze(response)
 
         # if enabled, pass source data to answer
-        if self._config.features.return_source:
+        if self.config.features.return_source:
             answer.response = response
             answer.prompt = formatted_prompt
             for question in questions_dict:
@@ -216,7 +216,7 @@ class QAService:
             _LOGGER.error(msg)
             return QAAnalyzeAnswer(status=404, error_msg=msg)
 
-        config = self._config.features.analyze_mult_prompts
+        config = self.config.features.analyze_mult_prompts
 
         # check if prompt contains needed fields
         qa_analyze_mult_prompts = config.model.prompt_config
@@ -265,7 +265,7 @@ class QAService:
                 response = self._clean_response(response)
 
                 # if enabled, collect response
-                if self._config.features.return_source:
+                if self.config.features.return_source:
                     responses = responses + "; " + question_m + ": " + response
             # format the response
             answer_dict[fields[question_m]] = self._format_response_analyze_mult_prompt(
@@ -279,7 +279,7 @@ class QAService:
         answer = QAAnalyzeAnswer(**answer_dict)
 
         # if enabled, pass source data to answer
-        if self._config.features.return_source:
+        if self.config.features.return_source:
             answer.response = responses
             for question in questions_dict:
                 answer.sources = answer.sources + questions_dict[question]
@@ -293,7 +293,7 @@ class QAService:
         """
         answer = QAAnswer()
         if qa_mode == QAModesEnum.SEARCH:
-            self._config.model.prompt_config = config
+            self.config.model.prompt_config = config
             if "context" not in config.parameters:
                 answer.error_msg = (
                     "Prompt does not include '{context}' variable. "
@@ -305,9 +305,9 @@ class QAService:
                     "Questions will not be passed to the model."
                 )
         elif qa_mode == QAModesEnum.ANALYZE:
-            self._config.features.analyze.model.prompt_config = config
+            self.config.features.analyze.model.prompt_config = config
         elif qa_mode == QAModesEnum.ANALYZE_MULT_PROMPTS:
-            self._config.features.analyze_mult_prompts.model.prompt_config = config
+            self.config.features.analyze_mult_prompts.model.prompt_config = config
         return answer
 
     def get_prompt_config(self, qa_mode: QAModesEnum) -> PromptConfig:
@@ -315,11 +315,11 @@ class QAService:
         Returns the prompt for the mode
         """
         if qa_mode == QAModesEnum.SEARCH:
-            return self._config.model.prompt_config
+            return self.config.model.prompt_config
         elif qa_mode == QAModesEnum.ANALYZE:
-            return self._config.features.analyze.model.prompt_config
+            return self.config.features.analyze.model.prompt_config
         elif qa_mode == QAModesEnum.ANALYZE_MULT_PROMPTS:
-            return self._config.features.analyze_mult_prompts.model.prompt_config
+            return self.config.features.analyze_mult_prompts.model.prompt_config
         return PromptConfig()
 
     def remove_file(self, file_name: str) -> QAAnswer:
@@ -366,8 +366,8 @@ class QAService:
             _LOGGER.warning("No document was loaded!")
             return QAAnswer(error_msg="No document was loaded!", status=500)
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=self._config.embedding.chunk_size,
-            chunk_overlap=self._config.embedding.chunk_overlap,
+            chunk_size=self.config.embedding.chunk_size,
+            chunk_overlap=self.config.embedding.chunk_overlap,
         )
         texts = text_splitter.split_documents(documents)
         for i, text in enumerate(texts):
@@ -375,16 +375,16 @@ class QAService:
         if self._vectorstore is None:
             _LOGGER.info("Create new vector store from document.")
             self._vectorstore = create_faiss(
-                texts, self._config.embedding.model.name, self._config.device
+                texts, self.config.embedding.model.name, self.config.device
             )
         else:
             _LOGGER.info("Adding document to existing vector store.")
             tmp = create_faiss(
-                texts, self._config.embedding.model.name, self._config.device
+                texts, self.config.embedding.model.name, self.config.device
             )
             self._vectorstore.merge_from(tmp)
-        if self._config.embedding.db_path:
-            self._vectorstore.save_local(self._config.embedding.db_path)
+        if self.config.embedding.db_path:
+            self._vectorstore.save_local(self.config.embedding.db_path)
         return QAAnswer()
 
     def _create_analyze_mult_prompt(
