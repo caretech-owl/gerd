@@ -36,38 +36,38 @@ class PartialFormatter(string.Formatter):
 
 class GenerationService:
     def __init__(self, config: GenerationConfig) -> None:
-        self._config = config
-        self._model = gerd_loader.load_model_from_config(self._config.model)
+        self.config = config
+        self._model = gerd_loader.load_model_from_config(self.config.model)
 
     def set_prompt_config(
         self,
         config: PromptConfig,
     ) -> PromptConfig:
         """Set the prompt configuration."""
-        self._config.model.prompt_config = config
-        return self._config.model.prompt_config
+        self.config.model.prompt_config = config
+        return self.config.model.prompt_config
 
     def get_prompt_config(self) -> PromptConfig:
         """Get the prompt configuration."""
-        return self._config.model.prompt_config
+        return self.config.model.prompt_config
 
     def generate(
         self, parameters: Dict[str, str], add_prompt: bool = False
     ) -> GenResponse:
-        if self._config.features.prompt_chaining:
+        if self.config.features.prompt_chaining:
             from gerd.features.prompt_chaining import PromptChaining
 
             response = PromptChaining(
-                self._config.features.prompt_chaining,
+                self.config.features.prompt_chaining,
                 self._model,
-                self._config.model.prompt_config,
+                self.config.model.prompt_config,
             ).generate(parameters)
         else:
-            template = self._config.model.prompt_config.template
+            template = self.config.model.prompt_config.template
             resolved = (
                 template.render(**parameters)
                 if template
-                else self._config.model.prompt_config.text.format(**parameters)
+                else self.config.model.prompt_config.text.format(**parameters)
             )
             _LOGGER.debug(
                 "\n====== Resolved prompt =====\n\n%s\n\n=============================",
@@ -82,12 +82,12 @@ class GenerationService:
 
     def gen_continue(self, parameters: Dict[str, str]) -> GenResponse:
         fmt = PartialFormatter()
-        if not self._config.features.continuation:
+        if not self.config.features.continuation:
             return GenResponse(
                 status=400,
                 error_msg="Continuation feature is not configured for this model.",
             )
-        continue_prompt = self._config.features.continuation.model.prompt_config.text
+        continue_prompt = self.config.features.continuation.model.prompt_config.text
         resolved = fmt.format(continue_prompt, **parameters)
         _LOGGER.debug(
             "\n====== Resolved prompt =====\n\n%s\n\n=============================",
