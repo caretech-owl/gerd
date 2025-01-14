@@ -1,13 +1,12 @@
 [project]
 name = "gerd"
-version = "0.4.1"
+version = "0.5.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10, <3.13"
 dependencies = [
     "fastapi>=0.115.5",
     "faiss-cpu>=1.9.0.post1",
-    "gradio>=5.6.0",
     "jinja2>=3.1.4",
     "langchain>=0.3.7",
     "langchain-community>=0.3.7",
@@ -24,6 +23,7 @@ dependencies = [
     "uvicorn>=0.32.1",
     "peft>=0.14.0",
     "datasets>=3.2.0",
+    "gradio>=5.12",
 ]
 
 [dependency-groups]
@@ -42,8 +42,10 @@ dev = [
 [tool.poe.tasks]
 test = "pytest -x"
 lint = "mypy gerd"
-qa = "gradio gerd/frontends/qa_frontend.py"
-gen = "gradio gerd/frontends/gen_frontend.py"
+qa_dev = "gradio gerd/frontends/qa_frontend.py"
+gen_dev = "gradio gerd/frontends/gen_frontend.py"
+router_dev = "gradio gerd/frontends/router.py"
+router = "python -m gerd.frontends.router"
 server = "python -m gerd.backends.rest_server"
 
 # for better isolation run manual tests separately

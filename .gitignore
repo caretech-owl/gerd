@@ -1,6 +1,6 @@
 # GGML/GGUF Models
-models/*.bin
-models/*.gguf
+models/*
+!models/models.txt
 
 # PPT decks
 *.pptx
@@ -147,5 +147,6 @@ data/*.pdf
 sandbox.py
 
 # lora adapters
-models/lora*
+loras/*
+!loras/lora.txt
 tmp/
