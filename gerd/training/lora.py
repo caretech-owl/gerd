@@ -112,6 +112,8 @@ class LoraTrainingConfig(BaseSettings):
 
     @property
     def tokenizer(self) -> transformers.PreTrainedTokenizer:
+        if self._tokenizer is None:
+            self.reset_tokenizer()
         return self._tokenizer
 
     def reset_tokenizer(self) -> None:
@@ -130,7 +132,7 @@ class LoraTrainingConfig(BaseSettings):
                 f"({self.cutoff_len}) but is {self.overlap_len}"
             )
             raise ValueError(msg)
-        self.reset_tokenizer()
+        self._tokenizer = None
 
     @classmethod
     def settings_customise_sources(
