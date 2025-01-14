@@ -1,6 +1,7 @@
 import json
 import logging
 import math
+import shutil
 import sys
 import threading
 from dataclasses import dataclass, field
@@ -273,6 +274,13 @@ class Trainer:
     def save(self) -> None:
         if self.trainer is not None:
             self.trainer.save_model(self.config.output_dir)
+            if self.config.zip_output:
+                shutil.make_archive(
+                    base_name=self.config.output_dir.as_posix(),
+                    root_dir=self.config.output_dir,
+                    # base_dir=self.config.output_dir,
+                    format="zip",
+                )
         else:
             _LOGGER.warning("Trainer not initialized")
 
