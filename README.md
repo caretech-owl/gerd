@@ -13,7 +13,7 @@ If you just want to it try out, you can clone the project and install dependenci
 ```shell
 git clone https://github.com/caretech-owl/gerd.git
 cd gerd
-pip install -e .
+pip install -e ".[full]"
 python examples/hello.py
 ```
 
