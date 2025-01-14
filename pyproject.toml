@@ -48,6 +48,7 @@ gen_dev = "gradio gerd/frontends/gen_frontend.py"
 router_dev = "gradio gerd/frontends/router.py"
 router = "python -m gerd.frontends.router"
 server = "python -m gerd.backends.rest_server"
+release = "python release.py"
 
 # for better isolation run manual tests separately
 test_manual_transformers = "python -m pytest tests/test_no_auto.py -k 'generation_transformers' --no-skip"
