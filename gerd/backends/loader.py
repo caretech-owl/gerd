@@ -42,7 +42,7 @@ class LlamaCppLLM(LLM):
     def __init__(self, config: ModelConfig) -> None:
         from llama_cpp import Llama
 
-        self._config = config
+        self.config = config
         self._model = Llama.from_pretrained(
             repo_id=config.name,
             filename=config.file,
@@ -54,12 +54,12 @@ class LlamaCppLLM(LLM):
     def generate(self, prompt: str) -> str:
         res = self._model(
             prompt,
-            stop=self._config.stop,
-            max_tokens=self._config.max_new_tokens,
-            top_p=self._config.top_p,
-            top_k=self._config.top_k,
-            temperature=self._config.temperature,
-            repeat_penalty=self._config.repetition_penalty,
+            stop=self.config.stop,
+            max_tokens=self.config.max_new_tokens,
+            top_p=self.config.top_p,
+            top_k=self.config.top_k,
+            temperature=self.config.temperature,
+            repeat_penalty=self.config.repetition_penalty,
         )
         output = next(res) if isinstance(res, Iterator) else res
         return output["choices"][0]["text"]
@@ -71,12 +71,12 @@ class LlamaCppLLM(LLM):
             # mypy cannot resolve the role parameter even though
             # is is defined on compatible literals
             [{"role": m["role"], "content": m["content"]} for m in messages],  # type: ignore[misc]
-            stop=self._config.stop,
-            max_tokens=self._config.max_new_tokens,
-            top_p=self._config.top_p,
-            top_k=self._config.top_k,
-            temperature=self._config.temperature,
-            repeat_penalty=self._config.repetition_penalty,
+            stop=self.config.stop,
+            max_tokens=self.config.max_new_tokens,
+            top_p=self.config.top_p,
+            top_k=self.config.top_k,
+            temperature=self.config.temperature,
+            repeat_penalty=self.config.repetition_penalty,
         )
         if not isinstance(res, Iterator):
             msg = res["choices"][0]["message"]
@@ -102,7 +102,7 @@ class TransformerLLM(LLM):
         # use_fast=False is ignored by transformers
         os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-        self._config = config
+        self.config = config
         torch_dtypes: dict[str, torch.dtype] = {
             "bfloat16": torch.bfloat16,
             "float16": torch.float16,
@@ -120,6 +120,7 @@ class TransformerLLM(LLM):
         )
 
         for lora in config.loras:
+            _LOGGER.info("Loading adapter %s", lora)
             model.load_adapter(lora)
             train_params = Path(lora) / "training_parameters.json"
             if train_params.exists() and tokenizer.pad_token_id is None:
@@ -156,11 +157,11 @@ class TransformerLLM(LLM):
     def generate(self, prompt: str) -> str:
         res = self._pipe(
             prompt,
-            max_new_tokens=self._config.max_new_tokens,
-            repetition_penalty=self._config.repetition_penalty,
-            top_k=self._config.top_k,
-            top_p=self._config.top_p,
-            temperature=self._config.temperature,
+            max_new_tokens=self.config.max_new_tokens,
+            repetition_penalty=self.config.repetition_penalty,
+            top_k=self.config.top_k,
+            top_p=self.config.top_p,
+            temperature=self.config.temperature,
             do_sample=True,
         )
         output: str = res[0]["generated_text"]
@@ -171,11 +172,11 @@ class TransformerLLM(LLM):
     ) -> tuple[ChatRole, str]:
         msg = self._pipe(
             messages,
-            max_new_tokens=self._config.max_new_tokens,
-            repetition_penalty=self._config.repetition_penalty,
-            top_k=self._config.top_k,
-            top_p=self._config.top_p,
-            temperature=self._config.temperature,
+            max_new_tokens=self.config.max_new_tokens,
+            repetition_penalty=self.config.repetition_penalty,
+            top_k=self.config.top_k,
+            top_p=self.config.top_p,
+            temperature=self.config.temperature,
             do_sample=True,
         )[0]["generated_text"][-1]
         return (msg["role"], msg["content"].strip())
@@ -183,40 +184,40 @@ class TransformerLLM(LLM):
 
 class RemoteLLM(LLM):
     def __init__(self, config: ModelConfig) -> None:
-        self._config = config
-        if self._config.endpoint is None:
+        self.config = config
+        if self.config.endpoint is None:
             msg = "Endpoint is required for remote LLM"
             raise ValueError(msg)
 
-        self._ep: ModelEndpoint = self._config.endpoint
+        self._ep: ModelEndpoint = self.config.endpoint
         self._prompt_field = "prompt"
         self._header = {"Content-Type": "application/json"}
-        if self._config.endpoint.key:
+        if self.config.endpoint.key:
             self._header["Authorization"] = (
-                f"Bearer {self._config.endpoint.key.get_secret_value()}"
+                f"Bearer {self.config.endpoint.key.get_secret_value()}"
             )
 
-        if self._config.endpoint.type == "openai":
+        if self.config.endpoint.type == "openai":
             self.msg_template = {
-                "model": self._config.name,
-                "temperature": self._config.temperature,
-                "frequency_penalty": self._config.repetition_penalty,
-                "max_completion_tokens": self._config.max_new_tokens,
+                "model": self.config.name,
+                "temperature": self.config.temperature,
+                "frequency_penalty": self.config.repetition_penalty,
+                "max_completion_tokens": self.config.max_new_tokens,
                 "n": 1,
-                "stop": self._config.stop,
-                "top_p": self._config.top_p,
+                "stop": self.config.stop,
+                "top_p": self.config.top_p,
             }
-        elif self._config.endpoint.type == "llama.cpp":
+        elif self.config.endpoint.type == "llama.cpp":
             self.msg_template = {
-                "temperature": self._config.temperature,
-                "top_k": self._config.top_k,
-                "top_p": self._config.top_p,
-                "repeat_penalty": self._config.repetition_penalty,
-                "n_predict": self._config.max_new_tokens,
-                "stop": self._config.stop or [],
+                "temperature": self.config.temperature,
+                "top_k": self.config.top_k,
+                "top_p": self.config.top_p,
+                "repeat_penalty": self.config.repetition_penalty,
+                "n_predict": self.config.max_new_tokens,
+                "stop": self.config.stop or [],
             }
         else:
-            msg = f"Unknown endpoint type: {self._config.endpoint.type}"
+            msg = f"Unknown endpoint type: {self.config.endpoint.type}"
             raise ValueError(msg)
 
     def generate(self, prompt: str) -> str:
@@ -224,7 +225,7 @@ class RemoteLLM(LLM):
 
         import requests
 
-        if self._config.endpoint and self._config.endpoint.type != "llama.cpp":
+        if self.config.endpoint and self.config.endpoint.type != "llama.cpp":
             msg = (
                 "Only llama.cpp supports simple completion yet. "
                 "Use chat completion instead."
