@@ -14,8 +14,8 @@ class ChatService:
     def __init__(
         self, config: GenerationConfig, parameters: Dict[str, str] | None = None
     ) -> None:
-        self._config = config
-        self._model = gerd_loader.load_model_from_config(self._config.model)
+        self.config = config
+        self._model = gerd_loader.load_model_from_config(self.config.model)
         self.messages: list[ChatMessage] = []
         self.reset(parameters)
 
@@ -23,7 +23,7 @@ class ChatService:
         """Reset the chat history."""
         parameters = parameters or {}
         self.messages.clear()
-        for role, message in self._config.model.prompt_setup:
+        for role, message in self.config.model.prompt_setup:
             self.messages.append(
                 {
                     "role": role,
@@ -36,12 +36,12 @@ class ChatService:
         config: PromptConfig,
     ) -> PromptConfig:
         """Set the prompt configuration."""
-        self._config.model.prompt_config = config
-        return self._config.model.prompt_config
+        self.config.model.prompt_config = config
+        return self.config.model.prompt_config
 
     def get_prompt_config(self) -> PromptConfig:
         """Get the prompt configuration."""
-        return self._config.model.prompt_config
+        return self.config.model.prompt_config
 
     def add_message(
         self,
@@ -51,7 +51,7 @@ class ChatService:
     ) -> None:
         """Add a message to the chat history."""
         parameters = parameters or {}
-        user_prompt: PromptConfig = prompt_config or self._config.model.prompt_config
+        user_prompt: PromptConfig = prompt_config or self.config.model.prompt_config
         self.messages.append(
             {
                 "role": role,
@@ -63,9 +63,9 @@ class ChatService:
         self.reset(parameters)
         self.add_message(parameters, role="user")
 
-        if self._config.features.prompt_chaining:
+        if self.config.features.prompt_chaining:
             for i, prompt_config in enumerate(
-                self._config.features.prompt_chaining.prompts, 1
+                self.config.features.prompt_chaining.prompts, 1
             ):
                 self.reset()
                 res = self.submit_user_message(parameters, prompt_config=prompt_config)
