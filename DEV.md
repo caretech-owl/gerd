@@ -102,13 +102,21 @@ uv run mypy gerd
 Either run Generate Frontend:
 
 ```shell
-uv run poe gen
+uv run poe gen_dev
 ```
 
 or QA Frontend:
 
 ```shell
-uv run poe qa
+uv run poe qa_dev
+```
+
+or the GERD Router:
+
+```shell
+# add _dev for the gradio live reload version
+# omit in 'prod'
+uv run router[_dev]
 ```
 
 The backend is chosen via `config.yaml`.
