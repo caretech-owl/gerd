@@ -76,7 +76,7 @@ def test_init(mocker: MockerFixture, qa_config: QAConfig) -> None:
 
 
 def test_query_without_document(qa_service: QAService) -> None:
-    assert qa_service._config.embedding.db_path == ""  # noqa: SLF001
+    assert qa_service.config.embedding.db_path == ""  # noqa: SLF001
     res = qa_service.query(QAQuestion(question="This should return a 404"))
     assert res.status == 404
 
