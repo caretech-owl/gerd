@@ -88,7 +88,7 @@ class AppController:
         return result
 
     def start_gen(self) -> str:
-        self.start("qa_frontend")
+        self.start("gen_frontend")
         self.state = AppState.GENERATE_STARTING
         return self.state.name
 
@@ -115,11 +115,12 @@ def check_state() -> str:
         _LOGGER.info("Waiting for service to start")
         sleep(1)
         cnt += 1
-        if cnt > 10:
+        if cnt > 20:
             app.state = AppState.STOPPED
             msg = "Service did not start in time"
             raise Exception(msg)
     app.state = AppState(app.state.value + 1)
+    gr.Success(f"Service started on port {GRADIO_SERVER_PORT}")
     return app.state.name
 
 
@@ -144,7 +145,7 @@ with demo:
         )
         gr.Button("Instruct ").click(
             lambda: app.start_simple(), outputs=state_txt
-        ).then(
+        ).then(check_state, outputs=state_txt).then(
             lambda: gr.update(interactive=app.state != AppState.STOPPED),
             outputs=service_link,
         )
@@ -157,14 +158,14 @@ with demo:
         gr.Button("Document QA").click(lambda: app.start_qa(), outputs=state_txt).then(
             lambda: gr.update(interactive=app.state != AppState.STOPPED),
             outputs=service_link,
-        )
-        gr.Button("Stop", interactive=app.state != AppState.STOPPED).click(
-            lambda: app.stop(), outputs=state_txt
-        ).then(
+        ).then(check_state, outputs=state_txt).then(
             lambda: gr.update(interactive=app.state != AppState.STOPPED),
             outputs=service_link,
         )
-
+        gr.Button("Stop").click(lambda: app.stop(), outputs=state_txt).then(
+            lambda: gr.update(interactive=app.state != AppState.STOPPED),
+            outputs=service_link,
+        )
 if __name__ == "__main__":
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("gerd").setLevel("DEBUG")
