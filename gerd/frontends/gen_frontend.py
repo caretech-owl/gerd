@@ -29,13 +29,13 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 def _pairwise(
-    fields: Tuple[gr.Textbox, ...],
-) -> Iterable[Tuple[gr.Textbox, gr.Textbox, gr.Textbox]]:
+    fields: Tuple[str, ...],
+) -> Iterable[Tuple[str, str, str]]:
     a = iter(fields)
     return zip(a, a, a, strict=True)
 
 
-def generate(*fields: gr.Textbox) -> Tuple[str, str, gr.TextArea, gr.Button]:
+def generate(*fields: str) -> Tuple[str, str, gr.TextArea, gr.Button]:
     params = {}
     for key, name, value in _pairwise(fields):
         if not value:
