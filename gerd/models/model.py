@@ -111,7 +111,7 @@ class ModelEndpoint(BaseModel):
 
 # Default values chosen by https://github.com/marella/ctransformers#config
 class ModelConfig(BaseModel):
-    name: str
+    name: str = "Qwen/Qwen2.5-0.5B-Instruct"
     prompt_setup: List[Tuple[Literal["system", "user", "assistant"], PromptConfig]] = []
     prompt_config: PromptConfig = PromptConfig()
     endpoint: Optional[ModelEndpoint] = None
