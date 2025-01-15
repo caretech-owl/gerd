@@ -120,7 +120,7 @@ def check_state() -> str:
         _LOGGER.info("Waiting for service to start")
         sleep(1)
         cnt += 1
-        if cnt > 20:
+        if cnt > 30:
             app.state = AppState.STOPPED
             msg = "Service did not start in time"
             raise Exception(msg)
@@ -149,7 +149,7 @@ with demo:
             outputs=service_link,
         )
         gr.Button("Instruct ").click(
-            lambda: app.start_simple(), outputs=state_txt
+            lambda: app.start_instruct(), outputs=state_txt
         ).then(check_state, outputs=state_txt).then(
             lambda: gr.update(interactive=app.state != AppState.STOPPED),
             outputs=service_link,
@@ -176,10 +176,10 @@ with demo:
             lambda: gr.update(interactive=app.state != AppState.STOPPED),
             outputs=service_link,
         )
-        gr.Button("Stop").click(lambda: app.stop(), outputs=state_txt).then(
-            lambda: gr.update(interactive=app.state != AppState.STOPPED),
-            outputs=service_link,
-        )
+    gr.Button("Stop").click(lambda: app.stop(), outputs=state_txt).then(
+        lambda: gr.update(interactive=app.state != AppState.STOPPED),
+        outputs=service_link,
+    )
 if __name__ == "__main__":
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("gerd").setLevel("DEBUG")
