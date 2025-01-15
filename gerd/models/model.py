@@ -119,7 +119,7 @@ class ModelEndpoint(BaseModel):
 class ModelConfig(BaseModel):
     name: str = "Qwen/Qwen2.5-0.5B-Instruct"
     prompt_setup: List[Tuple[Literal["system", "user", "assistant"], PromptConfig]] = []
-    prompt_config: PromptConfig = PromptConfig()
+    prompt_config: PromptConfig = PromptConfig(text="{message}")
     endpoint: Optional[ModelEndpoint] = None
     file: Optional[str] = None
     top_k: int = 40

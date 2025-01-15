@@ -14,9 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 demo = gr.Blocks(title="GERD")
 
 config = GenerationConfig(
-    model=ModelConfig(
-        name="meta-llama/Llama-3.2-1B", prompt_config=PromptConfig(text="{message}")
-    )
+    model=ModelConfig(prompt_config=PromptConfig(text="{message}"))
 )
 lora_dir = LoraTrainingConfig().output_dir.parent
 

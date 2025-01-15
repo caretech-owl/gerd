@@ -61,7 +61,7 @@ class LoraTrainingConfig(BaseSettings):
     )
 
     # custom things
-    model: ModelConfig = ModelConfig(name="meta-llama/Llama-3.2-1B-Instruct")
+    model: ModelConfig = ModelConfig()
     output_dir: Path = Path("loras/lora")
     input_glob: str = ""
     override_existing: bool = False
@@ -87,8 +87,8 @@ class LoraTrainingConfig(BaseSettings):
     # 3e-4 is a good starting base point.
     # 1e-2 is extremely high, 1e-6 is extremely low.
     learning_rate: float = 3e-4
-    batch_size: int = 128
-    micro_batch_size: int = 4
+    batch_size: int = 32
+    micro_batch_size: int = 1
     stop_at_loss: float = 0  # (reasonable numbers are 1.5-1.8)
 
     # optimizer = [
