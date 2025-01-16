@@ -137,8 +137,12 @@ with demo:
         state_txt = gr.Textbox(app.state.name, label="State")
         service_link = gr.Button(
             value=f"Open Service",
-            link=f"//localhost:{GRADIO_SERVER_PORT}",
             interactive=False,
+        )
+        base_url_js = "${window.location.protocol}//${window.location.hostname}"
+        service_link.click(
+            None,
+            js=f"() => {{ window.open(`{base_url_js}:{GRADIO_SERVER_PORT}`); }}",
         )
     gr.Markdown("## Start Service")
     with gr.Row(height="10rem", equal_height=True):
