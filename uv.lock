@@ -571,7 +571,7 @@ http = [
 
 [[package]]
 name = "gerd"
-version = "0.5.5"
+version = "0.5.6"
 source = { editable = "." }
 dependencies = [
     { name = "datasets" },
