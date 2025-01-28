@@ -53,7 +53,10 @@ def train_lora(
 
     if data is None:
         data = InstructTrainingData()
-        for file in Path().glob(lora_config.input_glob):
+        # currently, we expect the input glob to point to a local directory
+        # in the future, we might want to support other sources
+        glob_pattern = lora_config.input_glob.replace("file://", "")
+        for file in Path().glob(glob_pattern):
             if not file.is_file():
                 msg = "Can only read files for now."
                 raise NotImplementedError(msg)

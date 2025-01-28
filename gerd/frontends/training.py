@@ -179,7 +179,7 @@ with demo:
             )
             select_data_origin = gr.Radio(
                 label="Data origin",
-                choices=["Upload", "Local"],
+                choices=["Upload", "Path"],
                 value="Upload",
             )
             # test_input_glob = gr.Textbox(
@@ -374,11 +374,11 @@ with demo:
     text_glob_pattern = gr.Textbox(
         label="Glob pattern",
         value=default_config.input_glob,
-        placeholder="data/*.json",
-        visible=select_data_origin == "Local",
+        placeholder="file://data/*.json",
+        visible=select_data_origin == "Path",
     )
     text_training_files = gr.Textbox(
-        label="Training files", visible=select_data_origin == "Local"
+        label="Training files", visible=select_data_origin == "Path"
     )
     text_glob_pattern.blur(
         get_file_list,
@@ -387,7 +387,7 @@ with demo:
     )
     select_data_origin.change(
         lambda x: [gr.update(visible=x == "Upload")]
-        + [gr.update(visible=x == "Local") for _ in range(2)],
+        + [gr.update(visible=x == "Path") for _ in range(2)],
         inputs=select_data_origin,
         outputs=[file_upload, text_glob_pattern, text_training_files],
     )
