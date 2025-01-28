@@ -23,9 +23,13 @@ data = InstructTrainingData()
 system_prompt = ChatMessage(
     role="system",
     content=(
-        "Du bist ein hilfreicher Assistent und hilfst Ärzten bei der Erstellung "
-        "von Arztbriefen. Nutze die Informationen, die dir bereitgestellt werden "
-        "um Einleitungen für Arztbriefe zu schreiben."
+        "Du hilfst Ärzten und Ärztinnen "
+        "bei der Erstellung von Arztbriefen. Nutze dazu folgenden Informationen, "
+        "um eine Einleitung zu schreiben: "
+        "Das Aufnahmedatum (AufnahmeDatum), "
+        "das Entlassdatum "
+        "(EntlassDatum), das Geburtsdatum des Patienten (PatientGeburtsdatum), "
+        "und den Namen des Patienten (PatientName)."
     ),
 )
 
@@ -49,7 +53,7 @@ for file in (project_dir / "tests/data/grascco/raw").glob("*.txt"):
                 system_prompt,
                 ChatMessage(
                     role="user",
-                    content="; ".join(
+                    content="\n".join(
                         f"{k} = {txt[a:b].strip()}"
                         for k, (a, b) in sorted(labels.items())
                         if k
@@ -58,8 +62,9 @@ for file in (project_dir / "tests/data/grascco/raw").glob("*.txt"):
                             "PatientGeburtsdatum",
                             "AufnahmeDatum",
                             "EntlassDatum",
-                            "BehandelnderArzt",
-                            "Abteilung",
+                            # "BehandelnderArzt",
+                            # "Abteilung",
+                            # "Einrichtung",
                         ]
                     ),
                 ),
