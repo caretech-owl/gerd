@@ -27,12 +27,15 @@ class Global:
 
 def load_model(model_name: str, origin: str) -> dict[str, Any]:
     if Global.service is not None:
+        _LOGGER.debug("Unloading model")
         del Global.service
     model_config = config.model_copy()
     model_config.model.name = model_name
     if origin != "None":
         model_config.model.loras.add(lora_dir / origin)
+    _LOGGER.info("Loading model %s", model_config.model.name)
     Global.service = ChatService(model_config)
+    gr.Info("Model loaded")
     return gr.update(interactive=True)
 
 
