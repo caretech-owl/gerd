@@ -49,6 +49,7 @@ class LlamaCppLLM(LLM):
             n_ctx=config.context_length,
             n_gpu_layers=config.gpu_layers,
             n_threads=config.threads,
+            **config.extra_kwargs,
         )
 
     def generate(self, prompt: str) -> str:
@@ -110,7 +111,7 @@ class TransformerLLM(LLM):
             "float64": torch.float64,
         }
 
-        model_kwargs = {}
+        model_kwargs = config.extra_kwargs or {}
         if config.torch_dtype in torch_dtypes:
             model_kwargs["torch_dtype"] = torch_dtypes[config.torch_dtype]
 
