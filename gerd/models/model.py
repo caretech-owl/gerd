@@ -137,4 +137,4 @@ class ModelConfig(BaseModel):
     gpu_layers: int = 0
     torch_dtype: Optional[str] = None
     loras: set[Path] = set()
-    extra_kwargs: Optional[dict[str, any]] = None
+    extra_kwargs: Optional[dict[str, Any]] = None

@@ -49,7 +49,7 @@ class LlamaCppLLM(LLM):
             n_ctx=config.context_length,
             n_gpu_layers=config.gpu_layers,
             n_threads=config.threads,
-            **config.extra_kwargs,
+            **config.extra_kwargs or {},
         )
 
     def generate(self, prompt: str) -> str:
