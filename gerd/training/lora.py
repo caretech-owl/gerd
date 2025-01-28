@@ -53,6 +53,8 @@ class TrainingFlags(BaseModel):
     use_cpu: bool = not torch.cuda.is_available()
     use_bf16: bool = False
     use_ipex: bool = False
+    use_4bit: bool = False
+    use_8bit: bool = False
 
 
 class LoraTrainingConfig(BaseSettings):

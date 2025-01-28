@@ -111,7 +111,11 @@ class Trainer:
     ) -> None:
         self.config = config
         self.base_model: transformers.PreTrainedModel = (
-            transformers.AutoModelForCausalLM.from_pretrained(config.model.name)
+            transformers.AutoModelForCausalLM.from_pretrained(
+                config.model.name,
+                load_in_4bit=config.flags.use_4bit,
+                load_in_8bit=config.flags.use_8bit,
+            )
         )
 
         training_config = LoraConfig(
