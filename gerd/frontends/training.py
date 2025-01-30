@@ -6,6 +6,7 @@ from typing import Any
 
 import gradio as gr
 
+from gerd.config import CONFIG
 from gerd.models.model import ModelConfig
 from gerd.training.instruct import InstructTrainingData
 from gerd.training.instruct import train_lora as train_instruct
@@ -19,12 +20,14 @@ from gerd.training.unstructured import train_lora as train_unstructured
 
 _LOGGER = logging.getLogger(__name__)
 
+KIOSK_MODE = CONFIG.kiosk_mode
+
 
 class Global:
     trainer: Trainer | None = None
 
 
-demo = gr.Blocks(title="GERD")
+demo = gr.Blocks(title="GERD Training")
 default_config = LoraTrainingConfig()
 gr.set_static_paths(paths=[default_config.output_dir.parent])
 _LOGGER.info(
@@ -74,6 +77,7 @@ def start_training(
     progress = gr.Progress()
     train_config = LoraTrainingConfig(
         model=ModelConfig(name=model_name),
+        mode=mode.lower(),
         output_dir=default_config.output_dir.parent / lora_name,
         override_existing=override,
         modules=LoraModules(**{mod: True for mod in modules}),
@@ -92,7 +96,7 @@ def start_training(
         raise gr.Error(msg)
     progress(0)
     try:
-        if mode == "Unstructured":
+        if train_config.mode == "unstructured":
             Global.trainer = train_unstructured(
                 train_config,
                 (
@@ -101,7 +105,7 @@ def start_training(
                     else None
                 ),
             )
-        elif mode == "Instruct":
+        elif train_config.mode == "instructions":
 
             def load_data() -> InstructTrainingData:
                 data = InstructTrainingData()
@@ -131,7 +135,7 @@ def validate_files(
     Upload a document to vectorstore
     """
     file_paths = file_paths or []
-    if mode == "Instruct":
+    if mode.lower() == "instructions":
 
         def validate(path: Path) -> bool:
             if path.suffix != ".json":
@@ -145,7 +149,7 @@ def validate_files(
                 return False
             return True
 
-    elif mode == "Unstructured":
+    elif mode.lower() == "unstructured":
 
         def validate(path: Path) -> bool:
             if path.suffix != ".txt":
@@ -162,11 +166,18 @@ def validate_files(
 
 
 with demo:
-    gr.Markdown("# GERD - LoRA Trainer")
+    with gr.Row(variant="panel"):
+        with gr.Column(scale=1):
+            gr.Markdown("# 🤖 GERD - LoRA Trainer 💪")
+        with gr.Column(scale=1, visible=KIOSK_MODE):
+            gr.Markdown(
+                f"LoRA name: {default_config.output_dir.stem}<br>"
+                f"Base model: {default_config.model.name}"
+            )
     status = gr.Textbox("idle", label="Training Status", visible=False)
 
-    gr.Markdown("## Configuration")
-    with gr.Row():
+    with gr.Row(visible=not KIOSK_MODE):
+        gr.Markdown("## Configuration")
         with gr.Column():
             text_model_name = gr.Textbox(
                 label="Model Name",
@@ -174,13 +185,8 @@ with demo:
             )
             select_training_mode = gr.Radio(
                 label="Training mode",
-                choices=["Instruct", "Unstructured"],
-                value="Instruct",
-            )
-            select_data_origin = gr.Radio(
-                label="Data origin",
-                choices=["Upload", "Path"],
-                value="Upload",
+                choices=["Instructions", "Unstructured"],
+                value=default_config.mode.capitalize(),
             )
             # test_input_glob = gr.Textbox(
             #     label="File input glob", value=config.input_glob
@@ -360,21 +366,29 @@ with demo:
             #     )
 
     gr.Markdown("## Data")
+    select_data_origin = gr.Radio(
+        label="Data origin",
+        choices=["Upload", "Path"],
+        value="Upload",
+    )
     select_training_mode.change(
         lambda x: tuple(gr.update(visible=x == "Unstructured") for _ in range(2)),
         inputs=select_training_mode,
         outputs=[slider_cutoff_len, slider_overlap_len],
     )
+    file_ext = "txt" if select_training_mode.value == "Unstructured" else "json"
     file_upload = gr.Files(
-        file_types=[".txt", ".json"],
+        label=f"Upload {file_ext} files",
+        file_types=(
+            [".txt"] if select_training_mode.value == "Unstructured" else [".json"]
+        ),
         file_count="multiple",
         height=200,
-        visible=select_data_origin == "Upload",
     )
     text_glob_pattern = gr.Textbox(
-        label="Glob pattern",
+        label=f"Glob pattern (should end with .{file_ext})",
         value=default_config.input_glob,
-        placeholder="file://data/*.json",
+        placeholder=f"file://data/*.{file_ext}",
         visible=select_data_origin == "Path",
     )
     text_training_files = gr.Textbox(
