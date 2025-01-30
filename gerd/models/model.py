@@ -54,7 +54,9 @@ class PromptConfig(BaseModel):
         )
 
     def model_post_init(self, __context: Any) -> None:  # noqa: ANN401
-        if not self.text and self.path:
+        if self.path:
+            # reset self.text when path is set
+            self.text = ""
             path = Path(self.path)
             if path.exists():
                 with path.open("r", encoding="utf-8") as f:
@@ -72,7 +74,7 @@ class PromptConfig(BaseModel):
                         )
                         self.template = env.get_template(path.name)
             else:
-                msg = f"Prompt text is not set and '{self.path}' does not exist!"
+                msg = f"'{self.path}' does not exist!"
                 raise ValueError(msg)
         elif self.text and self.is_template:
             self.template = Environment(autoescape=True).from_string(self.text)
