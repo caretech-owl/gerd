@@ -120,9 +120,14 @@ class TransformerLLM(LLM):
             config.name, **model_kwargs
         )
 
+        loaded_loras = set()
         for lora in config.loras:
             _LOGGER.info("Loading adapter %s", lora)
+            if not Path(lora / "adapter_model.safetensors").exists():
+                _LOGGER.warning("Adapter %s does not exist", lora)
+                continue
             model.load_adapter(lora)
+            loaded_loras.add(lora)
             train_params = Path(lora) / "training_parameters.json"
             if train_params.exists() and tokenizer.pad_token_id is None:
                 from gerd.training.lora import LoraTrainingConfig
@@ -136,7 +141,7 @@ class TransformerLLM(LLM):
                     )
                     # tokenizer.padding_side = lora_config.padding_side
 
-        if config.loras:
+        if loaded_loras:
             model.enable_adapters()
 
         self._pipe = pipeline(
