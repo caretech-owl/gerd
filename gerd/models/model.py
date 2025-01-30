@@ -28,7 +28,7 @@ class ChatMessage(TypedDict):
 
 
 class PromptConfig(BaseModel):
-    text: str = ""
+    text: str = "{message}"
     template: Optional[Template] = Field(
         exclude=True,
         default=None,
@@ -119,7 +119,7 @@ class ModelEndpoint(BaseModel):
 class ModelConfig(BaseModel):
     name: str = "Qwen/Qwen2.5-0.5B-Instruct"
     prompt_setup: List[Tuple[Literal["system", "user", "assistant"], PromptConfig]] = []
-    prompt_config: PromptConfig = PromptConfig(text="{message}")
+    prompt_config: PromptConfig = PromptConfig()
     endpoint: Optional[ModelEndpoint] = None
     file: Optional[str] = None
     top_k: int = 40
