@@ -68,6 +68,7 @@ class LoraTrainingConfig(BaseSettings):
 
     # custom things
     model: ModelConfig = ModelConfig()
+    mode: Literal["unstructured", "instructions"] = "unstructured"
     output_dir: Path = Path("loras/lora")
     input_glob: str = ""
     override_existing: bool = False
