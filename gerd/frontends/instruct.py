@@ -120,17 +120,19 @@ with demo:
         _LOGGER.info("Kiosk mode:\n%s", config.model)
     n_lines = 3 if len(config.model.prompt_config.parameters) < 2 else 1
 
-    txt_fields = []
+    input_items = [temp, top_p, max_tokens, text_system]
     with gr.Group():
-        txt_fields = [
-            gr.Textbox(label=param, lines=n_lines)
-            for param in config.model.prompt_config.parameters
-        ]
+        input_items.extend(
+            [
+                gr.Textbox(label=param, lines=n_lines)
+                for param in config.model.prompt_config.parameters
+            ]
+        )
     btn_generate = gr.Button("Generate", interactive=Global.service is not None)
     text_out = gr.Textbox(label="Output", lines=5)
     btn_generate.click(
         generate,
-        inputs=[temp, top_p, max_tokens, text_system] + txt_fields,
+        inputs=input_items,
         outputs=text_out,
     )
     btn_load.click(load_model, inputs=[model_name, origin], outputs=btn_generate)

@@ -2,7 +2,7 @@ import json
 import logging
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import gradio as gr
 
@@ -75,9 +75,17 @@ def start_training(
         msg = "Invalid LoRA name"
         raise gr.Error(msg)
     progress = gr.Progress()
+    # a bit verbose conversion to appease mypy
+    # since training_mode is a Literal type
+    if mode.lower() not in ["unstructured", "instructions"]:
+        msg = f"Invalid training mode '{mode}'"
+        raise AssertionError(msg)
+    training_mode: Literal["unstructured", "instructions"] = (
+        "unstructured" if mode.lower() == "unstructured" else "instructions"
+    )
     train_config = LoraTrainingConfig(
         model=ModelConfig(name=model_name),
-        mode=mode.lower(),
+        mode=training_mode,
         output_dir=default_config.output_dir.parent / lora_name,
         override_existing=override,
         modules=LoraModules(**{mod: True for mod in modules}),
