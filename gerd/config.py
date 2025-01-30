@@ -39,10 +39,13 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         env_nested_delimiter="__",
+        env_prefix="gerd_config_",
+        extra="ignore",
     )
     logging: LoggingConfig
     server: ServerConfig
     env: EnvVariables = EnvVariables()
+    kiosk_mode: bool = False
 
     @classmethod
     def settings_customise_sources(
