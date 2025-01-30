@@ -35,7 +35,13 @@ class QAFeaturesConfig(BaseModel):
 
 
 class QAConfig(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="gerd_qa_", env_nested_delimiter="__")
+    model_config = SettingsConfigDict(
+        env_prefix="gerd_qa_",
+        env_file=".env",
+        env_file_encoding="utf-8",
+        env_nested_delimiter="__",
+        extra="ignore",
+    )
     model: ModelConfig
     embedding: EmbeddingConfig
     features: QAFeaturesConfig
