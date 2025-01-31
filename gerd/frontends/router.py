@@ -3,6 +3,7 @@ import os
 import re
 import socket
 import subprocess
+import sys
 from enum import Enum, auto
 from time import sleep
 from typing import Optional
@@ -74,7 +75,7 @@ class AppController:
             msg = "Invalid frontend name"
             raise gr.Error(msg)
         self.stop()
-        cmd = ["python", "-m", f"gerd.frontends.{frontend}"]
+        cmd = [sys.executable, "-m", f"gerd.frontends.{frontend}"]
         self.process = subprocess.Popen(  # noqa: S603
             cmd,
             env=os.environ | {"GRADIO_SERVER_PORT": GRADIO_SERVER_PORT},
