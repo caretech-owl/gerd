@@ -46,6 +46,16 @@ dev = [
     "gitpython>=3.1.44",
 ]
 
+[[tool.uv.index]]
+name = "llama-cpp-prebuilt"
+url = "https://abetlen.github.io/llama-cpp-python/whl/metal"
+explicit = true
+
+[tool.uv.sources]
+llama-cpp-python = [
+  { index = "llama-cpp-prebuilt", marker = "sys_platform == 'darwin'" },
+]
+
 [tool.poe.tasks]
 test = "pytest -x"
 lint = "mypy gerd"
