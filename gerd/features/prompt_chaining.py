@@ -1,3 +1,5 @@
+"""The prompt chaining extension"""
+
 import logging
 
 from pydantic import BaseModel
@@ -9,6 +11,8 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class PromptChainingConfig(BaseModel):
+    """Configuration for"""
+
     prompts: list[PromptConfig]
 
 

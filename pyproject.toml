@@ -47,6 +47,8 @@ dev = [
     "mkdocs-material[imaging]>=9.6.1",
     "mike>=2.1.3",
     "mkdocstrings[python]>=0.28.0",
+    "mkdocs-autoapi>=0.3.2",
+    "mkdocs-api-autonav>=0.1.0",
 ]
 
 [[tool.uv.index]]
@@ -68,7 +70,7 @@ router_dev = "gradio gerd/frontends/router.py"
 training_dev = "gradio gerd/frontends/training.py"
 router = "python -m gerd.frontends.router"
 server = "python -m gerd.backends.rest_server"
-release = "python release.py"
+release = "python scripts/release.py"
 
 # for better isolation run manual tests separately
 test_manual_transformers = "python -m pytest tests/test_no_auto.py -k 'generation_transformers' --no-skip"
