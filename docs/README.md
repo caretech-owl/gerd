@@ -1,4 +1,4 @@
-# Generating and evaluating relevant documentation (GERD)
+# Generating and evaluating relevant documentation
 
 [![Documentation](media/mkdocs_logo.svg)](https://caretech-owl.github.io/gerd)
 [![Binder](media/binder_badge.svg)](https://mybinder.org/v2/gh/caretech-owl/gerd/HEAD?labpath=%2Fnotebooks%2Fhello_gerd.ipynb)
@@ -16,7 +16,7 @@ If you just want to it try out, you can clone the project and install dependenci
 git clone https://github.com/caretech-owl/gerd.git
 cd gerd
 pip install -e ".[full]"
-python examples/hello.py
+python docs/examples/hello.py
 ```
 
 If you want to try this out in your browser, head over to binder 👉 [![Binder](media/binder_badge.svg)](https://mybinder.org/v2/gh/caretech-owl/gerd/HEAD?labpath=%2Fnotebooks%2Fhello_gerd.ipynb). 
@@ -40,10 +40,12 @@ Click the 'Click to Upload' button and search for a [GRASCCO](https://pubmed.ncb
 
 ## Prompt Chaining
 
-Prompt chaining is a prompt engineering approach to increase the 'reflection' of a large language model onto its given answer. Check [examples/chaining.py](examples/chaining.py) for an illustration. Also, have a look at how chaining is configured and used with GERD. You can find the config at [config/gen_chaining.yml](config/gen_chaining.yml)
+Prompt chaining is a prompt engineering approach to increase the 'reflection' of a large language model onto its given answer.
+Check [examples/chaining.py](examples/chaining.py) for an illustration.
 
-```shell
-python examples/chaining.py
+
+``` sh
+python docs/examples/chaining.py
 # ...
 ====== Resolved prompt =====
 
@@ -54,12 +56,24 @@ user: What type of mammal lays the biggest eggs?
 Result: Based on the given information, the largest egg-laying mammal is the blue whale, which can lay up to 100 million eggs per year. However, the other assertions provided do not align with this information.
 ```
 
+<details>
+
+<summary>config/gen_chaining.yml</summary>
+
+
+```yaml
+--8<-- "config/gen_chaining.yml"
+```
+
+</details>
+
+
 As you see, the answer does not make much sense with the default model which is rather small.
 Give it a try with [meta-llama/Llama-3.2-3B](https://huggingface.co/meta-llama/Llama-3.2-3B).
 To use this model, you need to login with the huggingface [cli](https://huggingface.co/docs/huggingface_hub/en/guides/cli) and accept the Meta Community License Agreement.
 
 ## Full Documentation
-A more detailled documentation can be found 👉 [![Documentation](media/mkdocs_logo.svg)](https://caretech-owl.github.io/gerd).
+A more detailled documentation can be found here 👉 [![Documentation](media/mkdocs_logo.svg)](https://caretech-owl.github.io/gerd).
 
 ## Used Tools
 - **LangChain**: Framework for developing applications powered by language models

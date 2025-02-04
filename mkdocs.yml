@@ -13,7 +13,7 @@ theme:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: black
+      primary: white
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
@@ -21,7 +21,7 @@ theme:
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: white
+      primary: black
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
@@ -38,8 +38,15 @@ extra:
   version:
     provider: mike
   social:
-    - icon: fontawesome/solid/building-columns
+    - icon: fontawesome/solid/globe
+      name: CareTech OWL Website
       link: https://caretech-owl.de
+    - icon: fontawesome/brands/github
+      name: GitHub Organisation
+      link: https://github.com/caretech-owl
+    - icon: simple/huggingface
+      name: Hugging Face Organisation
+      link: https://huggingface.co/caretech-owl
 markdown_extensions:
   - pymdownx.highlight:
       use_pygments: true
@@ -47,6 +54,7 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.superfences
   - pymdownx.inlinehilite
+  - pymdownx.details
 nav:
   - "README.md"
   - "concepts.md"
@@ -75,8 +83,8 @@ plugins:
             members_order: alphabetical
             unwrap_annotated: true
             # docstring_section_style: spacy
-  - api-autonav:
-      modules: ["gerd"]
-      nav_section_title: "API Reference"
-      api_root_uri: "reference"
-      exclude_private: true
+  # - api-autonav:
+  #     modules: ["gerd"]
+  #     nav_section_title: "API Reference"
+  #     api_root_uri: "reference"
+  #     exclude_private: true
