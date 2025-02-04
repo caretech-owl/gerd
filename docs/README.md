@@ -1,7 +1,7 @@
 # Generating and evaluating relevant documentation (GERD)
 
-[![Documentation Status](https://readthedocs.org/projects/gerd/badge/?version=latest)](https://gerd.readthedocs.io/en/latest/?badge=latest)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/caretech-owl/gerd/HEAD?labpath=%2Fnotebooks%2Fhello_gerd.ipynb)
+[![Documentation](media/mkdocs_logo.svg)](https://caretech-owl.github.io/gerd)
+[![Binder](media/binder_badge.svg)](https://mybinder.org/v2/gh/caretech-owl/gerd/HEAD?labpath=%2Fnotebooks%2Fhello_gerd.ipynb)
 
 GERD is developed as an experimental library to investigate how large language models (LLMs) can be used to generate and analyze (sets of) documents.
 
@@ -19,7 +19,7 @@ pip install -e ".[full]"
 python examples/hello.py
 ```
 
-If you want to try this out in your browser, head over to binder 👉 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/caretech-owl/gerd/HEAD?labpath=%2Fnotebooks%2Fhello_gerd.ipynb). 
+If you want to try this out in your browser, head over to binder 👉 [![Binder](media/binder_badge.svg)](https://mybinder.org/v2/gh/caretech-owl/gerd/HEAD?labpath=%2Fnotebooks%2Fhello_gerd.ipynb). 
 Note that running LLMs on the CPU (and especially on limited virtual machines like binder) takes some time.
 
 ## Question and Answer Example
@@ -59,7 +59,7 @@ Give it a try with [meta-llama/Llama-3.2-3B](https://huggingface.co/meta-llama/L
 To use this model, you need to login with the huggingface [cli](https://huggingface.co/docs/huggingface_hub/en/guides/cli) and accept the Meta Community License Agreement.
 
 ## Full Documentation
-A more detailled documentation can be found [here]([Documentation](caretech-owl.github.io/gerd)).
+A more detailled documentation can be found 👉 [![Documentation](media/mkdocs_logo.svg)](https://caretech-owl.github.io/gerd).
 
 ## Used Tools
 - **LangChain**: Framework for developing applications powered by language models
