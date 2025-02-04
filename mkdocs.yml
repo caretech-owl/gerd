@@ -8,11 +8,12 @@ theme:
   icon: 
     logo: fontawesome/solid/robot
   palette:
-    - primary: white
+
 
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
+      primary: black
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
@@ -20,6 +21,7 @@ theme:
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
+      primary: white
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
@@ -51,8 +53,9 @@ nav:
   - "develop.md"
 
 plugins:
+  - search
   - mkdocstrings:
-      default_hander: python
+      default_handler: python
       handlers:
         python:
           options:
