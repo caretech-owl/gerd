@@ -28,4 +28,4 @@ jobs:
           restore-keys: |
             mkdocs-material-
       - run: pip install mkdocs-material[imaging] pillow cairosvg mike
-      - run: mike deploy --push develop --update-aliases develop latest
+      - run: mike deploy --push --update-aliases develop latest
