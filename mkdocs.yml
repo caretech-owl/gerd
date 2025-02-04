@@ -39,7 +39,7 @@ plugins:
         python:
           options:
             docstring_section_style: list # or "table"
-            docstring_style: "numpy"
+            # docstring_style: "numpy"
             filters: ["!^_"]
             heading_level: 1
             merge_init_into_class: true
