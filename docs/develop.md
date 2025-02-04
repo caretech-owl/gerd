@@ -124,8 +124,8 @@ uv run router[_dev]
 
 ### GitHub Actions
 
-GitHub Actions can be found under [.github/workflows](./.github/workflows/).
-There is currently one main CI workflow called `pythin-ci.yml`:
+GitHub Actions can be found under [.github/workflows](https://github.com/caretech-owl/gerd/tree/main/.github/workflows).
+There is currently one main CI workflow called `python-ci.yml`:
 
 ``` yaml
 --8<-- ".github/workflows/python-ci.yml"
