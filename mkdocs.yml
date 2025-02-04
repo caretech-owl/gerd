@@ -30,5 +30,22 @@ markdown_extensions:
 nav:
   - "README.md"
   - "concepts.md"
-# plugins:
-#   - social
+  - "develop.md"
+  - "Api Documentation":
+    - "reference/config.md"
+
+plugins:
+  - mkdocstrings:
+      default_hander: python
+      handlers:
+        python:
+          options:
+            inherited_members: true
+            members_order: source
+            separate_signature: true
+            unwrap_annotated: true
+            merge_init_into_class: true
+            # docstring_section_style: spacy
+            signature_crossrefs: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
