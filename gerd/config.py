@@ -1,3 +1,5 @@
+"""Configuration for the application."""
+
 from pathlib import Path
 from typing import Any, Dict, Tuple, Type
 
@@ -19,6 +21,8 @@ PROJECT_DIR = Path(__file__).parent.parent
 
 
 class YamlConfig(PydanticBaseSettingsSource):
+    """YAML configuration source."""
+
     def get_field_value(
         self, field: FieldInfo, field_name: str
     ) -> Tuple[Any, str, bool]:
@@ -31,10 +35,14 @@ class YamlConfig(PydanticBaseSettingsSource):
 
 
 class EnvVariables(BaseModel):
+    """Environment variables."""
+
     api_token: SecretStr | None = None
 
 
 class Settings(BaseSettings):
+    """Settings for the application."""
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
@@ -68,8 +76,10 @@ class Settings(BaseSettings):
 def load_gen_config(config: str = "gen_default") -> GenerationConfig:
     """Load the LLM model configuration.
 
-    :param config: The name of the configuration.
-    :return: The model configuration.
+    Parameters:
+        config: The name of the configuration.
+    Returns:
+        The model configuration.
     """
     config_path = (
         Path(config)
@@ -86,8 +96,10 @@ def load_gen_config(config: str = "gen_default") -> GenerationConfig:
 def load_qa_config(config: str = "qa_default") -> QAConfig:
     """Load the LLM model configuration.
 
-    :param config: The name of the configuration.
-    :return: The model configuration.
+    Parameters:
+        config: The name of the configuration.
+    Returns:
+        The model configuration.
     """
     config_path = (
         Path(config)
