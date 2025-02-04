@@ -27,6 +27,6 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      - run: pip install mkdocs-material[imaging] mkdocstrings[python] pillow cairosvg mike
+      - run: pip install mkdocs-material[imaging] mkdocstrings[python] mkdocs-api-autonav pillow cairosvg mike
       # - run: mike set-default --push latest
       - run: mike deploy --push develop
