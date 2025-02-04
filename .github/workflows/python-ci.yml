@@ -13,11 +13,11 @@ jobs:
   linting:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install uv
         run: pipx install uv
       - name: Set up Python 3.12
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Install development dependencies with extras
@@ -36,29 +36,22 @@ jobs:
         python-version: ["3.12", "3.10"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@4
       - name: Cache HuggingFace models and data
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
           key: ${{ runner.os }}-hf
       - name: Install uv
         run: pipx install uv
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install development dependencies with extras
         run: uv sync
-      # - name: Install torch cpu version for Linux
-      #   if: matrix.os == 'ubuntu-latest'
-      #   run: pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
       - name: Run tests
         run: uv run poe test
-    # - name: Test with pytest
-    #   run: |
-    #     coverage run --source=transitions -m pytest --doctest-modules tests/
-    #     coverage xml --ignore-errors
     # - name: Upload coverage to Codecov
     #   uses: codecov/codecov-action@v3
     #   with:
