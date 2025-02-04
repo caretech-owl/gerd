@@ -31,8 +31,6 @@ nav:
   - "README.md"
   - "concepts.md"
   - "develop.md"
-  - "Api Documentation":
-    - "reference/config.md"
 
 plugins:
   - mkdocstrings:
@@ -40,12 +38,25 @@ plugins:
       handlers:
         python:
           options:
-            inherited_members: true
-            members_order: source
-            separate_signature: true
-            unwrap_annotated: true
+            docstring_section_style: list # or "table"
+            docstring_style: "numpy"
+            filters: ["!^_"]
+            heading_level: 1
             merge_init_into_class: true
-            # docstring_section_style: spacy
-            signature_crossrefs: true
+            parameter_headings: true
+            separate_signature: true
+            show_root_heading: true
+            show_signature_annotations: true
             show_symbol_type_heading: true
             show_symbol_type_toc: true
+            summary: true
+            inherited_members: true
+            members_order: alphabetical
+            unwrap_annotated: true
+            # docstring_section_style: spacy
+  - api-autonav:
+      modules: ["gerd"]
+      nav_section_title: "API Reference"
+      api_root_uri: "reference"
+      exclude_private: true
+    

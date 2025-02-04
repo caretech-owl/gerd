@@ -1,3 +1,0 @@
-# gerd.config
-
-::: gerd.config

@@ -115,3 +115,4 @@ def load_qa_config(config: str = "qa_default") -> QAConfig:
 
 
 CONFIG = Settings()  # type: ignore[call-arg]
+"""The global configuration object."""
