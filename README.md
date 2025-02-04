@@ -4,7 +4,6 @@ GERD is developed as an experimental library to investigate how large language m
 
 This project was initially forked from [Llama-2-Open-Source-LLM-CPU-Inference
 ](https://github.com/kennethleungty/Llama-2-Open-Source-LLM-CPU-Inference) by [Kenneth Leung](https://github.com/kennethleungty).
-___
 
 ## Quickstart
 
@@ -22,7 +21,7 @@ If you want to try this out in your browser, head over to binder 👉 [![Binder]
 Note that running LLMs on the CPU (and especially on limited virtual machines like binder) takes some time.
 If you are in a hurry you might be better off by cloning the repo and running the [examples](./examples/) or [notebooks](./notebooks/) locally.
 
-## Question and Answer example
+## Question and Answer Example
 
 Follow quickstart but execute `gradio` with the `qa_frontend` instead of the example file.
 When the server is done loading, open `http://127.0.0.1:7860` in your browser.
@@ -58,7 +57,9 @@ As you see, the answer does not make much sense with the default model which is 
 Give it a try with [meta-llama/Llama-3.2-3B](https://huggingface.co/meta-llama/Llama-3.2-3B).
 To use this model, you need to login with the huggingface [cli](https://huggingface.co/docs/huggingface_hub/en/guides/cli) and accept the Meta Community License Agreement.
 
-___
+## Full Documentation
+A more detailled documentation can be found [here]([Documentation](caretech-owl.github.io/gerd)).
+
 ## Used Tools
 - **LangChain**: Framework for developing applications powered by language models
 - **C Transformers**: Python bindings for the Transformer models implemented in C/C++ using GGML library
@@ -66,7 +67,7 @@ ___
 - **Sentence-Transformers (all-MiniLM-L6-v2)**: Open-source pre-trained transformer model for embedding text to a 384-dimensional dense vector space for tasks like
 - **Poetry**: Tool for dependency management and Python packaging
 
-___
+
 ## Files and Content
 - `/assets`: Images relevant to the project
 - `/config`: Configuration files for LLM applications
@@ -79,6 +80,7 @@ ___
 - `/tests`: Unit tests for `GERD`
 - `/vectorstore`: FAISS vector store for documents
 - `pyproject.toml`: TOML file to specify which versions of the dependencies used (Poetry)
+
 ___
 
 ## References
