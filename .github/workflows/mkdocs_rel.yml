@@ -1,9 +1,8 @@
 name: Build/Publish Develop Docs 
 on:
-  push:
-    branches:
-      - main
-      - dev-docs
+  release:
+    types:
+      - published
 permissions:
   contents: write
 jobs:
@@ -28,5 +27,4 @@ jobs:
           restore-keys: |
             mkdocs-material-
       - run: pip install mkdocs-material[imaging] pillow cairosvg mike
-      # - run: mike set-default --push latest
-      - run: mike deploy --push develop
+      - run: mike deploy --push --update-aliases stable latest
