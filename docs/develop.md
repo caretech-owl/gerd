@@ -49,7 +49,7 @@ uv run pre-commit install
 
 ### Poe Task Runner
 
-See [pyproject.toml](pyproject.toml) for task runner configurations.
+Task runner configuration are stored in the `pyproject.toml` file.
 You can run most of the tools mentioned above with a (shorter) call to `poe`.
 
 ```shell
@@ -58,7 +58,8 @@ uv run poe lint  # do some linting (with mypy)
 
 ### PyTest
 
-Test case are run via pytest. Tests can be found in the [tests folder](./tests).
+Test case are run via pytest.
+Tests can be found in the `/tests` folder.
 Tests will not be run via pre-commit since they might be too complex to be done before commits.
 To run the standard set of tests use the `poe` task `test`:
 
@@ -118,8 +119,6 @@ or the GERD Router:
 # omit in 'prod'
 uv run router[_dev]
 ```
-
-The backend is chosen via `config.yaml`.
 
 ## CI/CD and Distribution
 
