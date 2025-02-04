@@ -16,8 +16,15 @@ If you just want to it try out, you can clone the project and install dependenci
 git clone https://github.com/caretech-owl/gerd.git
 cd gerd
 pip install -e ".[full]"
-python docs/examples/hello.py
+python examples/hello.py
 ```
+
+<details>
+<summary>Source: examples/hello.py</summary>
+```python
+--8<-- "examples/hello.py"
+```
+</details>
 
 If you want to try this out in your browser, head over to binder 👉 [![Binder](media/binder_badge.svg)](https://mybinder.org/v2/gh/caretech-owl/gerd/HEAD?labpath=%2Fnotebooks%2Fhello_gerd.ipynb). 
 Note that running LLMs on the CPU (and especially on limited virtual machines like binder) takes some time.
@@ -41,11 +48,10 @@ Click the 'Click to Upload' button and search for a [GRASCCO](https://pubmed.ncb
 ## Prompt Chaining
 
 Prompt chaining is a prompt engineering approach to increase the 'reflection' of a large language model onto its given answer.
-Check [examples/chaining.py](examples/chaining.py) for an illustration.
-
+Check `examples/chaining.py` for an illustration.
 
 ``` sh
-python docs/examples/chaining.py
+python examples/chaining.py
 # ...
 ====== Resolved prompt =====
 
@@ -57,14 +63,16 @@ Result: Based on the given information, the largest egg-laying mammal is the blu
 ```
 
 <details>
-
-<summary>config/gen_chaining.yml</summary>
-
-
+<summary>Source: examples/chaining.py</summary>
+```python
+--8<-- "examples/chaining.py"
+```
+</details>
+<details>
+<summary>Config: config/gen_chaining.yml</summary>
 ```yaml
 --8<-- "config/gen_chaining.yml"
 ```
-
 </details>
 
 
