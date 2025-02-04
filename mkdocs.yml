@@ -1,0 +1,34 @@
+site_name: GERD
+site_url: https://caretech-owl.github.io/gerd
+repo_url: https://github.com/caretech-owl/gerd
+copyright: "&copy; 2025 CareTech OWL"
+
+theme:
+  name: material
+  features:
+    - content.code.copy
+    - content.code.annotate
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.footer
+    - header.autohide
+    - toc.follow
+    - toc.integrate
+extra:
+  version:
+    provider: mike
+  social:
+    - icon: fontawesome/solid/building-columns
+      link: https://caretech-owl.de
+markdown_extensions:
+  - pymdownx.highlight:
+      use_pygments: true
+      anchor_linenums: true
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+nav:
+  - "README.md"
+  - "concepts.md"
+# plugins:
+#   - social
