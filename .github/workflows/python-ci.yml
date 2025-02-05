@@ -36,7 +36,7 @@ jobs:
         python-version: ["3.12", "3.10"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@4
+      - uses: actions/checkout@v4
       - name: Cache HuggingFace models and data
         uses: actions/cache@v4
         with:
