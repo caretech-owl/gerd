@@ -1,8 +1,8 @@
 name: Build/Publish Stable Docs 
 on:
-  release:
-    types:
-      - published
+  push:
+    tags:        
+      - 'v*'
 permissions:
   contents: write
 jobs:
@@ -26,5 +26,10 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      - run: pip install mkdocs-material[imaging] mkdocstrings[python] mkdocs-api-autonav pillow cairosvg mike
-      - run: mike deploy --push --update-aliases stable latest
+      - name: Install dependencies
+        run: pip install mkdocs-material[imaging] mkdocstrings[python] mkdocs-api-autonav pillow cairosvg mike
+      - name: Deploy documentation
+        run: |
+          major=$(echo "${GITHUB_REF_NAME:1}" | cut -d "." -f 1)
+          minor=$(echo "${GITHUB_REF_NAME:1}" | cut -d "." -f 2)
+          mike deploy --push --update-aliases "${major}.${minor}" latest
