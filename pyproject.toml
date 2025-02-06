@@ -49,6 +49,7 @@ dev = [
     "mkdocstrings[python]>=0.28.0",
     "mkdocs-autoapi>=0.3.2",
     "mkdocs-api-autonav>=0.1.0",
+    "coverage>=7.6.10",
 ]
 
 [[tool.uv.index]]
@@ -63,6 +64,7 @@ llama-cpp-python = [
 
 [tool.poe.tasks]
 test = "pytest -x"
+cov = "coverage run -m pytest -x"
 lint = "mypy gerd"
 qa_dev = "gradio gerd/frontends/qa_frontend.py"
 gen_dev = "gradio gerd/frontends/gen_frontend.py"
