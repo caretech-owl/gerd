@@ -22,10 +22,6 @@ jobs:
           python-version: "3.12"
       - name: Install development dependencies with extras
         run: uv sync
-      - name: Run ruff linting via pre-commit on all files and verbose
-        uses: pre-commit/action@v3.0.0
-        with:
-          extra_args: ruff --all-files -v
       - name: Run linting
         run: uv run poe lint
   testing:
