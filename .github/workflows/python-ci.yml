@@ -50,13 +50,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install development dependencies with extras
         run: uv sync
-      - name: Run tests
-        run: uv run poe test
-    # - name: Upload coverage to Codecov
-    #   uses: codecov/codecov-action@v3
-    #   with:
-    #     env_vars: OS,PYTHON
-    #     fail_ci_if_error: true
-    #     files: ./coverage.xml
-    #     name: codecov-umbrella
-    #     verbose: true
+      - name: Run Tests
+        run: uv run poe cov
+      - name: Report Coverage
+        run: uv run coverage report --skip-covered --omit="tests/*" --format=markdown >> $GITHUB_STEP_SUMMARY
