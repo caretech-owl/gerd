@@ -64,8 +64,10 @@ llama-cpp-python = [
 
 [tool.poe.tasks]
 test = "pytest -x"
-cov = "coverage run -m pytest -x"
-lint = "mypy gerd"
+cov = "coverage run --source=gerd -m pytest -x"
+lint_ruff = "uv run pre-commit run ruff --all-files"
+lint_mypy = "mypy gerd"
+lint = ["lint_ruff", "lint_mypy"]
 qa_dev = "gradio gerd/frontends/qa_frontend.py"
 gen_dev = "gradio gerd/frontends/gen_frontend.py"
 router_dev = "gradio gerd/frontends/router.py"
@@ -101,7 +103,7 @@ select = [
     "ARG",  # no unused arguments
     "PERF", # performance anti pattern
     # "FURB",  # enforces modern python
-    # "D",     # enforce documented functions [will be enabled soon]
+    # "D",     # enforce documented functions
 ]
 
 # 2. Fix everything except flake8-bugbear (`B`) violations.
