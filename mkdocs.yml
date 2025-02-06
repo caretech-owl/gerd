@@ -83,8 +83,8 @@ plugins:
             members_order: alphabetical
             unwrap_annotated: true
             # docstring_section_style: spacy
-  # - api-autonav:
-  #     modules: ["gerd"]
-  #     nav_section_title: "API Reference"
-  #     api_root_uri: "reference"
-  #     exclude_private: true
+  - api-autonav:
+      modules: ["gerd"]
+      nav_section_title: "API Reference"
+      api_root_uri: "reference"
+      exclude_private: true
