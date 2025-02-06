@@ -103,7 +103,7 @@ select = [
     "ARG",  # no unused arguments
     "PERF", # performance anti pattern
     # "FURB",  # enforces modern python
-    # "D",     # enforce documented functions
+    "D",     # enforce documented functions
 ]
 
 # 2. Fix everything except flake8-bugbear (`B`) violations.
