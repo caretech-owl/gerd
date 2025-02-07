@@ -7,7 +7,7 @@ from typing import List
 import pytest
 from pytest_mock import MockerFixture
 
-from gerd.backends.loader import MockLLM
+from gerd.loader import MockLLM
 from gerd.models.model import PromptConfig
 from gerd.models.qa import QAConfig
 from gerd.qa import QAService

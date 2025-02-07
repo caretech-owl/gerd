@@ -8,9 +8,9 @@ from datetime import datetime
 
 import pytest
 
-from gerd.backends.loader import LlamaCppLLM, TransformerLLM
 from gerd.config import load_gen_config
 from gerd.gen.generation_service import GenerationService
+from gerd.loader import LlamaCppLLM, TransformerLLM
 from gerd.qa.qa_service import QAService
 from gerd.transport import QAQuestion
 

@@ -8,7 +8,7 @@ import logging
 import string
 from typing import Any, Dict
 
-import gerd.backends.loader as gerd_loader
+import gerd.loader as gerd_loader
 from gerd.models.gen import GenerationConfig
 from gerd.models.model import PromptConfig
 from gerd.transport import GenResponse

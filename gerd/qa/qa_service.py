@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
 
-import gerd.backends.loader as gerd_loader
+import gerd.loader as gerd_loader
 from gerd.backends.rag import FAISS, Rag, create_faiss, load_faiss
 from gerd.models.qa import QAConfig
 from gerd.transport import (

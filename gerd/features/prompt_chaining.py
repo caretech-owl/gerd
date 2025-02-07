@@ -10,7 +10,7 @@ import logging
 
 from pydantic import BaseModel
 
-from gerd.backends.loader import LLM
+from gerd.loader import LLM
 from gerd.models.model import PromptConfig
 
 _LOGGER = logging.getLogger(__name__)

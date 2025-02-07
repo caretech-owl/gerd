@@ -9,4 +9,4 @@ from gerd.backends.bridge import Bridge
 from gerd.transport import Transport
 
 TRANSPORTER: Transport = Bridge()
-"""The default transport that connects the backend services to the frontend."""
+"""The default transporter that connects the backend services to the frontend."""
