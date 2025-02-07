@@ -23,7 +23,7 @@ def gen_service(
         A GenerationService instance
     """
     _ = mocker.patch(
-        "gerd.backends.loader.load_model_from_config",
+        "gerd.loader.load_model_from_config",
         return_value=MockLLM(generation_config.model),
     )
     return GenerationService(generation_config)
@@ -37,7 +37,7 @@ def test_init(mocker: MockerFixture, generation_config: GenerationConfig) -> Non
         generation_config: The generation configuration fixture
     """
     loader = mocker.patch(
-        "gerd.backends.loader.load_model_from_config",
+        "gerd.loader.load_model_from_config",
         return_value=MockLLM(generation_config.model),
     )
     _ = GenerationService(generation_config)
