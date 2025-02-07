@@ -12,7 +12,7 @@ easier to setup a prompt according to the model's requirements.
 import logging
 from typing import Dict, Literal, Optional
 
-import gerd.backends.loader as gerd_loader
+import gerd.loader as gerd_loader
 from gerd.models.gen import GenerationConfig
 from gerd.models.model import ChatMessage, ModelConfig, PromptConfig
 from gerd.transport import GenResponse

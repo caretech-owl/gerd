@@ -11,7 +11,7 @@ from langchain.docstore.document import Document
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 
-from gerd.backends.loader import LLM
+from gerd.loader import LLM
 from gerd.models.model import ModelConfig, PromptConfig
 from gerd.transport import DocumentSource, QAAnswer, QAQuestion
 

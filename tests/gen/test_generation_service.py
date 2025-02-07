@@ -3,8 +3,8 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from gerd.backends.loader import MockLLM
 from gerd.gen.generation_service import GenerationService
+from gerd.loader import MockLLM
 from gerd.models.gen import GenerationConfig
 from gerd.transport import PromptConfig
 
