@@ -7,12 +7,6 @@ model: &qa_model
   prompt_config:
     path: "prompts/qa.txt"
 features:
-  fact_checking:
-    enabled: false
-    model:
-      <<: *qa_model
-      prompt_config:
-        path: "prompts/qa_fact_checking.txt"
   analyze:
     model:
       <<: *qa_model

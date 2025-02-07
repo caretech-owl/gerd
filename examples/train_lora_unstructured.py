@@ -1,3 +1,5 @@
+"""Example script to train a LoRA model on unstructured data."""
+
 import logging
 import time
 from pathlib import Path

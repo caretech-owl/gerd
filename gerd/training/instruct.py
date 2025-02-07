@@ -1,3 +1,10 @@
+"""Training module for instruction text sets.
+
+In contrast to the [`unstructured`](gerd.training.unstructured) training module,
+data must be prepared in a specific format to train LoRA models.
+Make sure to provide the training data in the correct format.
+"""
+
 import json
 import logging
 import os
@@ -16,16 +23,38 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class InstructTrainingSample(BaseModel):
+    """Dataclass to hold a training sample for instruction text sets.
+
+    A training sample consists of a list of chat messages.
+    """
+
     messages: list[ChatMessage]
+    """The list of chat messages."""
 
 
 class InstructTrainingData(BaseModel):
+    """Dataclass to hold training data for instruction text sets.
+
+    A training data object consists of a list of training samples.
+    """
+
     samples: list[InstructTrainingSample] = []
+    """The list of training samples."""
 
 
 def train_lora(
     config: str | LoraTrainingConfig, data: InstructTrainingData | None = None
 ) -> Trainer:
+    """Train a LoRA model on instruction text sets.
+
+    Parameters:
+        config: The configuration name or the configuration itself
+        data: The training data to train on, if None,
+            the input_glob from the config is used
+
+    Returns:
+        The trainer instance that is used for training
+    """
     # Disable parallelism to avoid issues with transformers
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
 

@@ -1,3 +1,5 @@
+"""Data utilities for training and data processing."""
+
 import re
 from typing import Dict, Generator, List
 
@@ -10,11 +12,31 @@ from transformers import PreTrainedTokenizer
 def split_chunks(
     arr: List[int], size: int, step: int
 ) -> Generator[List[int], None, None]:
+    """Splits a list of encoded tokens into chunks of a given size.
+
+    Parameters:
+        arr: The list of encoded tokens.
+        size: The size of the chunks.
+        step: The step size for the chunks.
+
+    Returns:
+        A generator that yields the chunks
+    """
     for i in range(0, len(arr), step):
         yield arr[i : i + size]
 
 
 def despacyfy(text: str) -> str:
+    """Removes spacy-specific tokens from a text.
+
+    For instance, -RRB- is replaced with ')', -LRB- with '(' and -UNK- with '*'.
+
+    Parameters:
+        text: The text to despacyfy.
+
+    Returns:
+        The despacyfied text
+    """
     res = (
         text.replace("-RRB-", ")")
         .replace("-LRB-", "(")
@@ -35,6 +57,17 @@ def despacyfy(text: str) -> str:
 def encode(
     text: str, add_bos_token: bool, tokenizer: PreTrainedTokenizer, cutoff_len: int
 ) -> List[int]:
+    """Encodes a text using a tokenizer.
+
+    Parameters:
+        text: The text to encode
+        add_bos_token: Whether to add the beginning of sentence token
+        tokenizer: The tokenizer to use
+        cutoff_len: The maximum length of the encoded text
+
+    Returns:
+        The text encoded as a list of tokenizer tokens
+    """
     result: list[int] = tokenizer.encode(text, truncation=True, max_length=cutoff_len)
     # Check if the first two tokens are BOS
     if len(result) >= 2 and result[:2] == [
@@ -54,6 +87,21 @@ def tokenize(
     cutoff_len: int,
     append_eos_token: bool = False,
 ) -> Dict[str, torch.Tensor | list[int]]:
+    """Converts a prompt into a tokenized input for a model.
+
+    The methods returns the tokenized input as a dictionary with the keys
+    "input_ids", "labels" and "attention_mask" where the input_ids are the
+    tokenized input, the labels assign the same label ('1') to each token
+    and the attention_mask masks out the padding tokens.
+    Parameters:
+        prompt: The prompt to tokenize
+        tokenizer: The tokenizer to use
+        cutoff_len: The maximum length of the encoded text
+        append_eos_token: Whether to append an end of sentence token
+
+    Returns:
+        The tokenized input as a dictionary
+    """
     input_ids = encode(prompt, True, tokenizer, cutoff_len)
 
     if tokenizer.pad_token_id is None or tokenizer.padding_side is None:
@@ -79,52 +127,3 @@ def tokenize(
         "labels": labels,
         "attention_mask": input_tensors.ne(tokenizer.pad_token_id),
     }
-
-
-def generate_and_tokenize_prompt(
-    data_point: Dict[str, str],
-    format_template: Dict[str, str],
-    tokenizer: PreTrainedTokenizer,
-    cutoff_len: int,
-    append_eos_token: bool = False,
-) -> Dict[str, torch.Tensor | list[int]]:
-    for options, prompt in format_template.items():
-        if set(options.split(",")) == {
-            x[0]
-            for x in data_point.items()
-            if (isinstance(x[1], str) and len(x[1].strip()) > 0)
-        }:
-            for key, val in data_point.items():
-                if isinstance(val, str):
-                    prompt = prompt.replace(f"%{key}%", val)
-            return tokenize(
-                prompt,
-                tokenizer,
-                cutoff_len=cutoff_len,
-                append_eos_token=append_eos_token,
-            )
-    msg = (
-        f'Data-point "{data_point}" has no keyset match '
-        'within format "{list(format_data.keys())}"'
-    )
-    raise RuntimeError(msg)
-
-
-def split_plain_text(txt: str) -> List[Document]:
-    splitter = RecursiveCharacterTextSplitter(chunk_size=256, chunk_overlap=25)
-    res = []
-    txts = splitter.split_text(txt)
-    for substring in txts:
-        pos = txt.index(substring)
-        col = 0
-        line = 0
-        for c in txt[:pos]:
-            if c == "\n":
-                line += 1
-                col = 0
-            else:
-                col += 1
-        res.append(
-            Document(page_content=substring, metadata={"position": f"{line}:{col}"})
-        )
-    return res

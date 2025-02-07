@@ -1,3 +1,8 @@
+"""Training module for LoRA models.
+
+Can be used to train LoRA models on structured or unstructured data.
+"""
+
 import json
 import logging
 import math
@@ -19,17 +24,33 @@ _LOGGER = logging.getLogger(__name__)
 
 @dataclass
 class Tracked:
+    """Dataclass to track the training progress."""
+
     lora_model: PeftModel
+    """The training model."""
     config: LoraTrainingConfig
+    """The training configuration."""
     train_log: Dict = field(default_factory=dict)
+    """The training log."""
     current_steps: int = 0
+    """The current training steps."""
     interrupted: bool = False
+    """Whether the training was interrupted."""
     max_steps: int = 0
+    """The maximum number of training steps."""
     did_save: bool = False
+    """Whether the model was saved."""
 
 
 class Callbacks(transformers.TrainerCallback):
+    """Custom callbacks for the LoRA training."""
+
     def __init__(self, tracked: Tracked) -> None:
+        """Initialize the callbacks based on tracking data config.
+
+        Parameters:
+            tracked: The tracking data
+        """
         super().__init__()
         self.tracked = tracked
         self.gradient_accumulation_steps = (
@@ -41,11 +62,12 @@ class Callbacks(transformers.TrainerCallback):
 
     def on_save(
         self,
-        args: transformers.TrainingArguments,  # noqa: ARG002
-        state: transformers.TrainerState,  # noqa: ARG002
-        control: transformers.TrainerControl,  # noqa: ARG002
+        _args: transformers.TrainingArguments,  # noqa: ARG002
+        _state: transformers.TrainerState,  # noqa: ARG002
+        _control: transformers.TrainerControl,  # noqa: ARG002
         **kwargs: int,  # noqa: ARG002
     ) -> None:
+        """Saves the training log when the model is saved."""
         # Save log
         with open(
             f"{self.tracked.config.output_dir}/{self.tracked.current_steps}-training_log.json",
@@ -56,11 +78,21 @@ class Callbacks(transformers.TrainerCallback):
 
     def on_step_begin(
         self,
-        args: transformers.TrainingArguments,  # noqa: ARG002
+        _args: transformers.TrainingArguments,  # noqa: ARG002
         state: transformers.TrainerState,
         control: transformers.TrainerControl,
         **kwargs: int,  # noqa: ARG002
     ) -> None:
+        """Update the training progress.
+
+        This callback updates the current training steps and
+        checks if the training was interrupted.
+
+        Parameters:
+            _args: The training arguments (not used)
+            state: The trainer state
+            control: The trainer control
+        """
         self.tracked.current_steps = (
             state.global_step * self.gradient_accumulation_steps
         )
@@ -71,11 +103,18 @@ class Callbacks(transformers.TrainerCallback):
 
     def on_substep_end(
         self,
-        args: transformers.TrainingArguments,  # noqa: ARG002
-        state: transformers.TrainerState,  # noqa: ARG002
+        _args: transformers.TrainingArguments,  # noqa: ARG002
+        _state: transformers.TrainerState,  # noqa: ARG002
         control: transformers.TrainerControl,
         **kwargs: int,  # noqa: ARG002
     ) -> None:
+        """Update the training progress and check for interruption.
+
+        Parameters:
+            _args: The training arguments (not used)
+            _state: The trainer state (not used)
+            control: The trainer control
+        """
         self.tracked.current_steps += 1
         if self.tracked.interrupted:
             control.should_epoch_stop = True
@@ -83,12 +122,20 @@ class Callbacks(transformers.TrainerCallback):
 
     def on_log(
         self,
-        args: transformers.TrainingArguments,  # noqa: ARG002
-        state: transformers.TrainerState,  # noqa: ARG002
+        _args: transformers.TrainingArguments,  # noqa: ARG002
+        _state: transformers.TrainerState,  # noqa: ARG002
         control: transformers.TrainerControl,
         logs: Dict,
         **kwargs: int,  # noqa: ARG002
     ) -> None:
+        """Callback to log the training progress.
+
+        Parameters:
+            _args: The training arguments (not used)
+            _state: The trainer state (not used)
+            control: The trainer control
+            logs: The training logs
+        """
         self.tracked.train_log.update(logs)
         self.tracked.train_log.update({"current_steps": self.tracked.current_steps})
         if self.tracked.interrupted:
@@ -104,11 +151,26 @@ class Callbacks(transformers.TrainerCallback):
 
 
 class Trainer:
+    """The LoRA trainer class.
+
+    This class is used to train LoRA models on structured or unstructured data.
+    Since the training process is asynchronous, the trainer can be used to track
+    or interrupt the training process.
+    """
+
     def __init__(
         self,
         config: LoraTrainingConfig,
         callback_cls: Optional[List[Type[transformers.TrainerCallback]]] = None,
     ) -> None:
+        """The LoRa traininer requires a configuration and optional list of callbacks.
+
+        If no callbacks are provided,
+        the default Callbacks class [`Tracked`][gerd.training.trainer.Tracked] is used.
+        Parameters:
+            config: The training configuration
+            callback_cls: The list of callbacks
+        """
         self.config = config
         self.base_model: transformers.PreTrainedModel = (
             transformers.AutoModelForCausalLM.from_pretrained(
@@ -180,6 +242,11 @@ class Trainer:
         )
 
     def train(self) -> threading.Thread:
+        """Start the training process.
+
+        Returns:
+            The training thread
+        """
         model_type = type(self.base_model).__name__
         model_id = MODEL_CLASSES[model_type]
 
@@ -245,6 +312,13 @@ class Trainer:
         train_template: Dict,
         torch_compile: bool = False,
     ) -> None:
+        """Setup the training process and initialize the transformer trainer.
+
+        Parameters:
+            train_data: The training data
+            train_template: The training template
+            torch_compile: Whether to use torch compile
+        """
         self.trainer = transformers.Trainer(
             model=self.lora_model,
             train_dataset=train_data,
@@ -276,6 +350,10 @@ class Trainer:
             json.dump(train_template, file, indent=2)
 
     def save(self) -> None:
+        """Save the model and log files to the path set in the trainer configuration.
+
+        When the `zip_output` flag is set, the output directory is zipped as well.
+        """
         if self.trainer is not None:
             self.trainer.save_model(self.config.output_dir)
             if self.config.zip_output:
@@ -289,4 +367,5 @@ class Trainer:
             _LOGGER.warning("Trainer not initialized")
 
     def interrupt(self) -> None:
+        """Interrupt the training process."""
         self.tracked.interrupted = True

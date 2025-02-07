@@ -1,3 +1,9 @@
+"""Training of LoRA models on unstructured text data.
+
+This module provides functions to train LoRA models to 'imitate' the style
+of a given text corpus.
+"""
+
 import json
 import logging
 import os
@@ -16,6 +22,16 @@ _LOGGER = logging.getLogger(__name__)
 def train_lora(
     config: str | LoraTrainingConfig, texts: list[str] | None = None
 ) -> Trainer:
+    """Train a LoRA model on unstructured text data.
+
+    Parameters:
+        config: The configuration name or the configuration itself
+        texts: The list of texts to train on, if None,
+            the input_glob from the config is used
+
+    Returns:
+        The trainer instance that is used for training
+    """
     # Disable parallelism to avoid issues with transformers
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
 

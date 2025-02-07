@@ -1,3 +1,5 @@
+"""A gradio frontend to interact with the GERD instruct service."""
+
 import json
 import logging
 from typing import Any
@@ -12,6 +14,10 @@ from gerd.training.lora import LoraTrainingConfig
 
 _LOGGER = logging.getLogger(__name__)
 KIOSK_MODE = CONFIG.kiosk_mode
+"""Whether the frontend is running in kiosk mode.
+
+Kiosk mode reduces the number of options to a minimum and automatically loads the model.
+"""
 
 demo = gr.Blocks(title="GERD Instruct")
 
@@ -20,10 +26,18 @@ lora_dir = LoraTrainingConfig().output_dir.parent
 
 
 class Global:
+    """Singleton to store the service."""
+
     service: ChatService | None = None
 
 
 def load_model(model_name: str, origin: str = "None") -> dict[str, Any]:
+    """Load a global large language model.
+
+    Parameters:
+        model_name: The name of the model
+        origin: Whether to use an extra LoRA
+    """
     if Global.service is not None:
         _LOGGER.debug("Unloading model")
         del Global.service
@@ -44,6 +58,15 @@ def generate(
     system_text: str,
     *args: str,
 ) -> str:
+    """Generate text from the model.
+
+    Parameters:
+        temperature: The temperature for the generation
+        top_p: The top-p value for the generation
+        max_tokens: The maximum number of tokens to generate
+        system_text: The system text to set up the context
+        args: The user input
+    """
     fields = dict(zip(config.model.prompt_config.parameters, args, strict=True))
     if Global.service is None:
         msg = "Model not loaded"

@@ -1,10 +1,12 @@
+"""A gradio frontend to query the QA service and upload files to the vectorstore."""
+
 import logging
 import pathlib
 from typing import Any, Dict, List, Optional
 
 import gradio as gr
 
-from gerd.backend import TRANSPORTER
+from gerd.backends import TRANSPORTER
 from gerd.transport import PromptConfig, QAFileUpload, QAModesEnum, QAQuestion
 
 _LOGGER = logging.getLogger(__name__)
@@ -19,8 +21,13 @@ qa_modes_dict: Dict[str, QAModesEnum] = {
 
 
 def get_qa_mode(search_type: str) -> QAModesEnum:
-    """
-    Get QAMode from string
+    """Get QAMode from string.
+
+    Parameters:
+        search_type: The search type
+
+    Returns:
+        The QAMode
     """
     if search_type in qa_modes_dict:
         return qa_modes_dict[search_type]
@@ -29,8 +36,16 @@ def get_qa_mode(search_type: str) -> QAModesEnum:
 
 
 def query(question: str, search_type: str, k_source: int, search_strategy: str) -> str:
-    """
-    Start the selected QA Mode
+    """Starts the selected QA Mode.
+
+    Parameters:
+        question: The question to ask
+        search_type: The search type
+        k_source: The number of sources
+        search_strategy: The search strategy
+
+    Returns:
+        The response from the QA service
     """
     q = QAQuestion(
         question=question, search_strategy=search_strategy, max_sources=k_source
@@ -44,7 +59,7 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
                 f" (Error Code {qa_res.status})"
             )
             raise gr.Error(msg)
-        return qa_res.answer
+        return qa_res.response
     # start analyze mode
     elif search_type == "Analyze":
         qa_analyze_res = TRANSPORTER.analyze_query()
@@ -107,8 +122,13 @@ store_set: set[str] = set()
 
 
 def files_changed(file_paths: Optional[list[str]]) -> None:
-    """
-    Upload a document to vectorstore
+    """Check if the file upload element has changed.
+
+    If so, upload the new files to the vectorstore and delete the one that
+    have been removed.
+
+    Parameters:
+        file_paths: The file paths to upload
     """
     file_paths = file_paths or []
     progress = gr.Progress()
@@ -141,8 +161,19 @@ def files_changed(file_paths: Optional[list[str]]) -> None:
 
 
 def handle_type_radio_selection_change(search_type: str) -> List[Any]:
-    """
-    Enable/disable gui elements depend on which mode is selected
+    """Enable/disable gui elements depend on which mode is selected.
+
+    This order of the updates elements must be considered:
+        - input text
+        - prompt
+        - k_slider
+        - search strategy_dropdown
+
+    Parameters:
+        search_type: The current search type
+
+    Returns:
+        The list of GUI element property changes to update
     """
     if search_type == "LLM":
         return [
@@ -168,8 +199,13 @@ def handle_type_radio_selection_change(search_type: str) -> List[Any]:
 
 
 def handle_developer_mode_checkbox_change(check: bool) -> List[Any]:
-    """
-    Enable/disable developermode
+    """Enable/disable developermode.
+
+    Enables or disables the developer mode and the corresponding GUI elements.
+    Parameters:
+        check: The current state of the developer mode checkbox
+    Returns:
+        The list of GUI element property changes to update
     """
     return [
         gr.update(visible=check),
@@ -189,8 +225,12 @@ def handle_developer_mode_checkbox_change(check: bool) -> List[Any]:
 def set_prompt(
     prompt: str, search_type: str, progress: Optional[gr.Progress] = None
 ) -> None:
-    """
-    Update the prompt of the selected QA Mode
+    """Updates the prompt of the selected QA Mode.
+
+    Parameters:
+        prompt: The new prompt
+        search_type: The search type
+        progress: The progress bar to update
     """
     if progress is None:
         progress = gr.Progress()

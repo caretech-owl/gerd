@@ -1,3 +1,5 @@
+"""A 'hello world' example for GERD."""
+
 import logging
 
 from gerd.config import load_gen_config

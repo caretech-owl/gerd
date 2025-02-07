@@ -1,3 +1,9 @@
+"""Release script.
+
+Checks for a clean repository, syncs the project, lints, tests,
+creates a tag and pushes it to origin.
+"""
+
 import logging
 import subprocess
 

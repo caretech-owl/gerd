@@ -1,3 +1,5 @@
+"""A chaining example for the chat service."""
+
 import logging
 
 from gerd.config import load_gen_config

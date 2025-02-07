@@ -1,3 +1,8 @@
+"""GRASCCO dataset preparation for instruction training.
+
+This example demonstrates how to generate training data for the Instruct model using
+the Grascco dataset.
+"""
 # %%
 # import packages
 

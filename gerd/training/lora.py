@@ -1,3 +1,5 @@
+"""Configuration dataclasses for training LoRA models."""
+
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Protocol, Type
 
@@ -25,11 +27,24 @@ MODEL_CLASSES: dict[str, str] = {
 
 
 class LLMModelProto(Protocol):
+    """Protocol for the LoRA model.
+
+    A model model needs to implement the named_modules method for
+    it to be used in LoRA Training.
+    """
+
     def named_modules(self) -> list[tuple[str, torch.nn.Module]]:
+        """Get the named modules of the model.
+
+        Returns:
+            The named modules.
+        """
         pass
 
 
 class LoraModules(BaseModel):
+    """Configuration for the modules to be trained in LoRA models."""
+
     q: Optional[bool] = None
     v: Optional[bool] = None
     k: Optional[bool] = None
@@ -40,7 +55,15 @@ class LoraModules(BaseModel):
     default: bool = True
 
     def target_modules(self, model: LLMModelProto) -> List[str]:
-        avail = find_target_modules(model)
+        """Get the target modules for the given model.
+
+        Parameters:
+            model: The model to be trained.
+
+        Returns:
+            The list of target modules
+        """
+        avail = _find_target_modules(model)
         return [
             f"{name}_proj"
             for name, enabled in self.model_dump().items()
@@ -50,6 +73,8 @@ class LoraModules(BaseModel):
 
 
 class TrainingFlags(BaseModel):
+    """Training flags for LoRA models."""
+
     use_cpu: bool = not torch.cuda.is_available()
     use_bf16: bool = False
     use_ipex: bool = False
@@ -58,6 +83,8 @@ class TrainingFlags(BaseModel):
 
 
 class LoraTrainingConfig(BaseSettings):
+    """Configuration for training LoRA models."""
+
     model_config = SettingsConfigDict(
         env_prefix="gerd_lora_",
         env_file=".env",
@@ -119,11 +146,17 @@ class LoraTrainingConfig(BaseSettings):
 
     @property
     def tokenizer(self) -> transformers.PreTrainedTokenizer:
+        """Get the tokenizer for the model."""
         if self._tokenizer is None:
             self.reset_tokenizer()
         return self._tokenizer
 
     def reset_tokenizer(self) -> None:
+        """Resets the tokenizer.
+
+        When a tokenizer has been used it needs to be reset
+        before changig parameters to avoid issues with parallelism.
+        """
         self._tokenizer = transformers.AutoTokenizer.from_pretrained(
             self.model.name, trust_remote_code=False, use_fast=True
         )
@@ -133,6 +166,10 @@ class LoraTrainingConfig(BaseSettings):
             self._tokenizer.padding_side = self.padding_side
 
     def model_post_init(self, _: Any) -> None:  # noqa: ANN401
+        """Post-initialization hook for the model.
+
+        This method currently checks whether cutoff is larger than overlap.
+        """
         if self.cutoff_len <= self.overlap_len:
             msg = (
                 "Overlap must be smaller than cutoff"
@@ -150,6 +187,21 @@ class LoraTrainingConfig(BaseSettings):
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
+        """Customize the settings sources used by pydantic-settings.
+
+        The order of the sources is important.
+        The first source has the highest priority.
+
+        Parameters:
+            cls: The class of the settings.
+            init_settings: The settings from the initialization.
+            env_settings: The settings from the environment.
+            dotenv_settings: The settings from the dotenv file.
+            file_secret_settings: The settings from the secret file.
+
+        Returns:
+            The customized settings sources.
+        """
         return (
             file_secret_settings,
             env_settings,
@@ -158,7 +210,15 @@ class LoraTrainingConfig(BaseSettings):
         )
 
 
-def find_target_modules(model: LLMModelProto) -> List[str]:
+def _find_target_modules(model: LLMModelProto) -> List[str]:
+    """Find the modules to be trained for the given model.
+
+    Parameters:
+        model: The model to be trained.
+
+    Returns:
+        The list of modules to be trained.
+    """
     # Initialize a Set to Store Unique Layers
     unique_layers = set()
 
@@ -179,8 +239,11 @@ def find_target_modules(model: LLMModelProto) -> List[str]:
 def load_training_config(config: str) -> LoraTrainingConfig:
     """Load the LLM model configuration.
 
-    :param config: The name of the configuration.
-    :return: The model configuration.
+    Parameters:
+        config: The name of the configuration.
+
+    Returns:
+        The model configuration.
     """
     config_path = (
         Path(config)

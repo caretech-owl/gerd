@@ -1,3 +1,5 @@
+"""Example of using a previously trained LoRA with a chat model."""
+
 from pathlib import Path
 
 from gerd.config import PROJECT_DIR, load_gen_config
@@ -25,7 +27,7 @@ res = chat.generate({"text": "Sehr geehrte Frau Kollegin,"})
 print(res.text)  # noqa: T201
 
 print("\n\nMit LoRA\n========")  # noqa: T201
-config.model.loras.append(lora_config.output_dir)
+config.model.loras.add(lora_config.output_dir)
 chat = ChatService(config)
 res = chat.generate({"text": "Sehr geehrte Frau Kollegin,"})
 print(res.text)  # noqa: T201

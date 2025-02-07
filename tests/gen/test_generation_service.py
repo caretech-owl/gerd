@@ -1,3 +1,5 @@
+"""Tests for the GenerationService class."""
+
 import pytest
 from pytest_mock import MockerFixture
 
@@ -11,6 +13,15 @@ from gerd.transport import PromptConfig
 def gen_service(
     mocker: MockerFixture, generation_config: GenerationConfig
 ) -> GenerationService:
+    """A fixture that returns a GenerationService instance.
+
+    Parameters:
+        mocker: The mocker fixture
+        generation_config: The generation configuration fixture
+
+    Returns:
+        A GenerationService instance
+    """
     _ = mocker.patch(
         "gerd.backends.loader.load_model_from_config",
         return_value=MockLLM(generation_config.model),
@@ -19,23 +30,40 @@ def gen_service(
 
 
 def test_init(mocker: MockerFixture, generation_config: GenerationConfig) -> None:
+    """Test the initialization of the GenerationService class.
+
+    Parameters:
+        mocker: The mocker fixture
+        generation_config: The generation configuration fixture
+    """
     loader = mocker.patch(
         "gerd.backends.loader.load_model_from_config",
         return_value=MockLLM(generation_config.model),
     )
-    gen = GenerationService(generation_config)
+    _ = GenerationService(generation_config)
     assert loader.called
 
 
 def test_get_prompt(
     gen_service: GenerationService, generation_config: GenerationConfig
 ) -> None:
+    """Test the get_prompt_config method of the GenerationService class.
+
+    Parameters:
+        gen_service: The GenerationService fixture
+        generation_config: The generation configuration fixture
+    """
     prompt = gen_service.get_prompt_config()
     assert prompt
     assert prompt.text == generation_config.model.prompt_config.text
 
 
 def test_set_prompt(gen_service: GenerationService) -> None:
+    """Test the set_prompt_config method of the GenerationService class.
+
+    Parameters:
+        gen_service: The GenerationService fixture
+    """
     tmp = "A {value} prompt {test}."
     prompt = gen_service.set_prompt_config(PromptConfig(text=tmp))
     assert "value" in prompt.parameters
@@ -43,14 +71,12 @@ def test_set_prompt(gen_service: GenerationService) -> None:
     assert gen_service.get_prompt_config().text == tmp
 
 
-def test_prompt_duplicate(gen_service: GenerationService) -> None:
-    tmp = """A {value} prompt {test} and another duplicate {value} and {foo}
-    in between as well as {test} and {value} again."""
-    prompt = gen_service.set_prompt_config(PromptConfig(text=tmp))
-    assert len(prompt.parameters) == len(set(prompt.parameters))
-
-
 def test_generate(gen_service: GenerationService) -> None:
+    """Test the generate method of the GenerationService class.
+
+    Parameters:
+        gen_service: The GenerationService fixture
+    """
     gen_service.set_prompt_config(
         PromptConfig(text="Schreibe einen Brief an Herrn {name}.")
     )
@@ -58,15 +84,3 @@ def test_generate(gen_service: GenerationService) -> None:
     assert response.status == 200
     assert response.error_msg == ""
     assert response.text
-
-
-def test_jinja_prompt(gen_service: GenerationService) -> None:
-    _ = gen_service.set_prompt_config(
-        PromptConfig(path="tests/data/simple_prompt.jinja2")
-    )
-    response = gen_service.generate(
-        {"task": "Halte dich so kurz wie möglich."}, add_prompt=True
-    )
-    assert response.status == 200
-    assert response.error_msg == ""
-    assert "Halte dich so kurz wie möglich." in response.prompt

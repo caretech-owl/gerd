@@ -1,3 +1,14 @@
+"""Implementation of the ChatService class.
+
+This features the currently favoured approach of instruction-based work with
+large language models. Thus, models fined tuned for chat or instructions work
+best with this service. The service can be used to generate text as well as long
+as the model features a chat template.
+In this case this service should be prefered over the
+[GenerationService][gerd.gen.generation_service.GenerationService] since it is
+easier to setup a prompt according to the model's requirements.
+"""
+
 import logging
 from typing import Dict, Literal, Optional
 
@@ -11,9 +22,19 @@ _LOGGER.addHandler(logging.NullHandler())
 
 
 class ChatService:
+    """Service to generate text based on a chat history."""
+
     def __init__(
         self, config: GenerationConfig, parameters: Dict[str, str] | None = None
     ) -> None:
+        """The service is initialized with a config and parameters.
+
+        The parameters are used to initialize the message history.
+        However, future reset will not consider them.
+        loads a model according to this config.
+        The used LLM is loaded according to the model configuration
+        right on initialization.
+        """
         self.config = config
         self._model = gerd_loader.load_model_from_config(self.config.model)
         self.messages: list[ChatMessage] = []
@@ -60,6 +81,20 @@ class ChatService:
         )
 
     def generate(self, parameters: Dict[str, str]) -> GenResponse:
+        """Generate a response based on the chat history.
+
+        This method can be used as a replacement for
+        [GenerationService.generate][gerd.gen.generation_service.GenerationService.generate]
+        in cases where the used model provides a chat template.
+        When this is the case, using this method is more reliable as it requires less
+        manual configuration to set up the prompt according to the model's requirements.
+
+        Parameters:
+            parameters: The parameters to format the prompt with
+
+        Returns:
+            The generation result
+        """
         self.reset(parameters)
         self.add_message(parameters, role="user")
 
@@ -96,6 +131,17 @@ class ChatService:
         parameters: Dict[str, str] | None = None,
         prompt_config: Optional[PromptConfig] = None,
     ) -> GenResponse:
+        """Submit a message with the user role and generates a response.
+
+        The service's prompt configuration is used to format the prompt unless
+        a different prompt configuration is provided.
+        Parameters:
+            parameters: The parameters to format the prompt with
+            prompt_config: The optional prompt configuration to be used
+
+        Returns:
+            The generation result
+        """
         self.add_message(parameters, role="user", prompt_config=prompt_config)
         _LOGGER.debug(
             "\n"
