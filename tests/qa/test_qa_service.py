@@ -31,7 +31,7 @@ def qa_service(mocker: MockerFixture, qa_config: QAConfig) -> QAService:
         The (mocked) QAService instance
     """
     _ = mocker.patch(
-        "gerd.backends.loader.load_model_from_config",
+        "gerd.loader.load_model_from_config",
         return_value=MockLLM(qa_config.model),
     )
     return QAService(qa_config)
@@ -104,7 +104,7 @@ def test_init(mocker: MockerFixture, qa_config: QAConfig) -> None:
         qa_config: The QA configuration fixture
     """
     loader = mocker.patch(
-        "gerd.backends.loader.load_model_from_config",
+        "gerd.loader.load_model_from_config",
         return_value=MockLLM(qa_config.model),
     )
     qa = QAService(qa_config)

@@ -41,4 +41,4 @@ def test_prompt_duplicate() -> None:
     tmp = """A {value} prompt {test} and another duplicate {value} and {foo}
     in between as well as {test} and {value} again."""
     prompt = PromptConfig(text=tmp)
-    assert prompt.parameters == {"test", "value", "foo"}
+    assert prompt.parameters == ["foo", "test", "value"]  # order matters!
