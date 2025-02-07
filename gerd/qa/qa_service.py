@@ -1,3 +1,10 @@
+"""Implements the QAService class.
+
+The question and answer service is used to query a language model with questions related
+to a specific context. The context is usually a set of documents that are loaded into
+a vector store.
+"""
+
 import json
 import logging
 import re
@@ -33,9 +40,16 @@ _LOGGER.addHandler(logging.NullHandler())
 
 
 class QAService:
+    """The question and answer service class."""
+
     def __init__(self, config: QAConfig) -> None:
-        """
-        Init the llm and set default values
+        """The service is initialized with a configuration.
+
+        Depending on the configuration, the service will create a new in-memory
+        vector store or load an existing one from a file.
+
+        Parameters:
+            config: The configuration for the QA service
         """
         self.config = config
         self._llm = gerd_loader.load_model_from_config(config.model)
@@ -55,8 +69,16 @@ class QAService:
             )
 
     def db_query(self, question: QAQuestion) -> List[DocumentSource]:
-        """
-        To pass a question directly to the vectorstore
+        """Queries the vector store with a question.
+
+        The number of sources that are returned is defined by the max_sources parameter
+        of the service's configuration.
+
+        Parameters:
+            question: The question to query the vector store with.
+
+        Returns:
+            A list of document sources
         """
         if not self._vectorstore:
             return []
@@ -75,18 +97,33 @@ class QAService:
         ]
 
     def db_embedding(self, question: QAQuestion) -> List[float]:
-        """
-        Generate embeddings
+        """Converts a question to an embedding.
+
+        The embedding to be used is defined by the vector store or more specifically
+        by the configured parameters passed to initialize the vector store.
+
+        Parameters:
+            question: The question to convert to an embedding.
+
+        Returns:
+            The embedding of the question
         """
         if self._vectorstore is None or self._vectorstore.embeddings is None:
             return []
         return self._vectorstore.embeddings.embed_documents([question.question])[0]
 
     def query(self, question: QAQuestion) -> QAAnswer:
-        """
-        Pass a single question to the llm and returns the answer
-        """
+        """Pass a question to the language model.
 
+        The language model will generate an answer based on the question and
+        the context derived from the vector store.
+
+        Parameters:
+            question: The question to be answered
+
+        Returns:
+            The answer from the language model
+        """
         if not self._database:
             if not self._vectorstore:
                 return QAAnswer(error_msg="No database available!", status=404)
@@ -100,15 +137,19 @@ class QAService:
         return self._database.query(question)
 
     def analyze_query(self) -> QAAnalyzeAnswer:
-        """
-        Read a set of data from doc
-        Loads the data via single prompt
-        Data:
-            patient_name
-            patient_date_of_birth
-            attending_doctors
-            recording_date
-            release_date
+        """Read a set of data from a set of documents.
+
+        Loads the data via single prompt.
+
+        *Data*
+            - patient_name
+            - patient_date_of_birth
+            - attending_doctors
+            - recording_date
+            - release_date
+
+        Returns:
+            The answer from the language model
         """
         if not self._vectorstore:
             msg = "No vector store initialized! Upload documents first."
@@ -201,15 +242,20 @@ class QAService:
         return answer
 
     def analyze_mult_prompts_query(self) -> QAAnalyzeAnswer:
-        """
-        Read a set of data from doc.
-        Loads the data via multiple prompts
-        Data:
-            patient_name
-            patient_date_of_birth
-            attending_doctors
-            recording_date
-            release_date
+        """Reads a set of data from doc.
+
+        Loads the data via multiple prompts by asking for each data field
+        separately.
+
+        *Data*
+            - patient_name
+            - patient_date_of_birth
+            - attending_doctors
+            - recording_date
+            - release_date
+
+        Returns:
+            The answer from the language model
         """
         if not self._vectorstore:
             msg = "No vector store initialized! Upload documents first."
@@ -288,8 +334,14 @@ class QAService:
         return answer
 
     def set_prompt_config(self, config: PromptConfig, qa_mode: QAModesEnum) -> QAAnswer:
-        """
-        Set the prompt for the mode
+        """Sets the prompt config for the given mode.
+
+        Parameters:
+            config: The prompt config to set
+            qa_mode: The mode to set the prompt config for
+
+        Returns:
+            an answer object with status 200 if successful
         """
         answer = QAAnswer()
         if qa_mode == QAModesEnum.SEARCH:
@@ -311,8 +363,13 @@ class QAService:
         return answer
 
     def get_prompt_config(self, qa_mode: QAModesEnum) -> PromptConfig:
-        """
-        Returns the prompt for the mode
+        """Returns the prompt config for the given mode.
+
+        Parameters:
+            qa_mode: The mode to get the prompt config for
+
+        Returns:
+            The prompt config for the given mode
         """
         if qa_mode == QAModesEnum.SEARCH:
             return self.config.model.prompt_config
@@ -323,8 +380,13 @@ class QAService:
         return PromptConfig()
 
     def remove_file(self, file_name: str) -> QAAnswer:
-        """
-        Remove a document from the vectorstore
+        """Removes a document from the vectorstore.
+
+        Parameters:
+            file_name: The name of the file to remove
+
+        Returns:
+            an answer object with status 200 if successful
         """
         if not self._vectorstore:
             return QAAnswer(error_msg="No vector store initialized!", status=404)
@@ -338,6 +400,14 @@ class QAService:
         return QAAnswer(status=200)
 
     def add_file(self, file: QAFileUpload) -> QAAnswer:
+        """Add a document to the vectorstore.
+
+        Parameters:
+            file: The file to add to the vectorstore
+
+        Returns:
+            an answer object with status 200 if successful
+        """
         documents: Optional[List[Document]] = None
         file_path = Path(file.name)
         try:
@@ -390,10 +460,6 @@ class QAService:
     def _create_analyze_mult_prompt(
         self, model_q: str, vector_q: str, prompt: str
     ) -> Tuple[Dict[str, List[DocumentSource]], str]:
-        """
-        Create a prompt for the analyze multiple question mode
-        and return prompt and context
-        """
         if not self._vectorstore:
             msg = "No vector store initialized! Upload documents first."
             _LOGGER.error(msg)
@@ -413,9 +479,6 @@ class QAService:
         return (questions_dict, prompt.format(**parameters))
 
     def _format_response_query(self, response: str) -> str:
-        """
-        format response for the search mode
-        """
         response = response.replace('"""', '"')
         response = re.sub(r'""\n*(?=(\,|\\n}|}))', '" ', response)
         response = re.sub(r'\:\s*""(?=.)', ': "', response)  # noqa W605
@@ -441,10 +504,6 @@ class QAService:
     def _format_response_analyze_mult_prompt(
         self, response: str, field: str
     ) -> str | List[str]:
-        """
-        format response for the analyze multiple question mode
-        to put in jsonfield
-        """
         try:
             # load in json structur
             answer = json.loads(response)["answer"]
@@ -464,10 +523,6 @@ class QAService:
                 return ""
 
     def _format_response_analyze(self, response: str) -> QAAnalyzeAnswer:
-        """
-        format response for the analyze mode
-        to put in jsonfield
-        """
         try:
             # load in json structure
             answer_dict = json.loads(response)
@@ -486,16 +541,10 @@ class QAService:
             return QAAnalyzeAnswer()
 
     def _clean_response(self, response: str) -> str:
-        """
-        Remove "\t" and "\n" and "" from response
-        """
         response = response.replace('"""', '"').replace("\t", "").replace("\n", "")
         return response
 
     def _format_attending_doctors(self, attending_doctors: str) -> List[str] | str:
-        """
-        Format the attending_doctors field to list
-        """
         if (
             attending_doctors is not None
             and "[" not in attending_doctors

@@ -1,6 +1,12 @@
+"""Implements the Generation class.
+
+The generation services is meant to generate text based on a prompt and/or the
+continuation of a provided text.
+"""
+
 import logging
 import string
-from typing import Any, Dict, Literal
+from typing import Any, Dict
 
 import gerd.backends.loader as gerd_loader
 from gerd.models.gen import GenerationConfig
@@ -11,31 +17,15 @@ _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
 
 
-class PartialFormatter(string.Formatter):
-    def __init__(self, missing: str = "", bad_fmt: str = "!!") -> None:
-        self.missing, self.bad_fmt = missing, bad_fmt
-
-    def get_field(self, field_name: str, args: Any, kwargs: Any) -> Any:  # noqa: ANN401
-        try:
-            val = super(PartialFormatter, self).get_field(field_name, args, kwargs)
-            return val
-        except (KeyError, AttributeError):
-            return None, field_name
-
-    def format_field(self, value: Any, spec: Any) -> Any:  # noqa: ANN401
-        if value is None:
-            return self.missing
-        try:
-            return super(PartialFormatter, self).format_field(value, spec)
-        except ValueError:
-            if self.bad_fmt is not None:
-                return self.bad_fmt
-            else:
-                raise
-
-
 class GenerationService:
+    """Service to generate text based on a prompt."""
+
     def __init__(self, config: GenerationConfig) -> None:
+        """Initialize the generation service and loads the model.
+
+        Parameters:
+            config: The configuration for the generation service
+        """
         self.config = config
         self._model = gerd_loader.load_model_from_config(self.config.model)
 
@@ -43,17 +33,41 @@ class GenerationService:
         self,
         config: PromptConfig,
     ) -> PromptConfig:
-        """Set the prompt configuration."""
+        """Sets the prompt configuration.
+
+        Parameters:
+            config: The prompt configuration
+        Returns:
+            The prompt configuration; Should be the same as the input in most cases
+        """
         self.config.model.prompt_config = config
         return self.config.model.prompt_config
 
     def get_prompt_config(self) -> PromptConfig:
-        """Get the prompt configuration."""
+        """Get the prompt configuration.
+
+        Returns:
+            The prompt configuration
+        """
         return self.config.model.prompt_config
 
     def generate(
         self, parameters: Dict[str, str], add_prompt: bool = False
     ) -> GenResponse:
+        """Generate text based on the prompt configuration.
+
+        The actual prompt is provided by the prompt configuration.
+        The list of parameters is used to format the prompt
+        and replace the placeholders. The list can be empty if
+        the prompt does not contain any placeholders.
+
+        Parameters:
+            parameters: The parameters to format the prompt with
+            add_prompt: Whether to add the prompt to the response
+
+        Returns:
+            The generation result
+        """
         if self.config.features.prompt_chaining:
             from gerd.features.prompt_chaining import PromptChaining
 
@@ -79,22 +93,3 @@ class GenerationService:
                 response,
             )
         return GenResponse(text=response, prompt=resolved if add_prompt else None)
-
-    def gen_continue(self, parameters: Dict[str, str]) -> GenResponse:
-        fmt = PartialFormatter()
-        if not self.config.features.continuation:
-            return GenResponse(
-                status=400,
-                error_msg="Continuation feature is not configured for this model.",
-            )
-        continue_prompt = self.config.features.continuation.model.prompt_config.text
-        resolved = fmt.format(continue_prompt, **parameters)
-        _LOGGER.debug(
-            "\n====== Resolved prompt =====\n\n%s\n\n=============================",
-            resolved,
-        )
-        response = self._model.generate(resolved)
-        _LOGGER.debug(
-            "\n====== Response =====\n\n%s\n\n=============================", response
-        )
-        return GenResponse(text=response)

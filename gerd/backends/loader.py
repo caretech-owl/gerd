@@ -1,8 +1,17 @@
+"""Module for loading language models.
+
+Depending on the configuration, different language models are loaded and
+different libraries are used. The main goal is to provide a unified interface
+to the different models and libraries.
+"""
+
 import abc
 import logging
 import os
 from pathlib import Path
 from typing import Iterator
+
+from typing_extensions import override
 
 from gerd.models.model import ChatMessage, ChatRole, ModelConfig, ModelEndpoint
 
@@ -11,34 +20,68 @@ _LOGGER.addHandler(logging.NullHandler())
 
 
 class LLM:
+    """The abstract base class for large language models.
+
+    Should be implemented by all language model backends.
+    """
+
     @abc.abstractmethod
     def __init__(self, config: ModelConfig) -> None:
+        """A language model is initialized with a configuration.
+
+        Parameters:
+            config: The configuration for the language model
+        """
         pass
 
     @abc.abstractmethod
     def generate(self, prompt: str) -> str:
+        """Generate text based on a prompt.
+
+        Parameters:
+            prompt: The prompt to generate text from
+
+        Returns:
+            The generated text
+        """
         pass
 
     @abc.abstractmethod
     def create_chat_completion(
         self, messages: list[ChatMessage]
     ) -> tuple[ChatRole, str]:
+        """Create a chat completion based on a list of messages.
+
+        Parameters:
+            messages: The list of messages in the chat history
+
+        Returns:
+            The role of the generated message and the content
+        """
         pass
 
 
 class MockLLM(LLM):
+    """A mock language model for testing purposes."""
+
+    @override
     def __init__(self, _: ModelConfig) -> None:
         self.ret_value = "MockLLM"
         pass
 
+    @override
     def generate(self, _: str) -> str:
         return self.ret_value
 
+    @override
     def create_chat_completion(self, _: list[ChatMessage]) -> tuple[ChatRole, str]:
         return ("assistant", self.ret_value)
 
 
 class LlamaCppLLM(LLM):
+    """A language model using the Llama.cpp library."""
+
+    @override
     def __init__(self, config: ModelConfig) -> None:
         from llama_cpp import Llama
 
@@ -52,6 +95,7 @@ class LlamaCppLLM(LLM):
             **config.extra_kwargs or {},
         )
 
+    @override
     def generate(self, prompt: str) -> str:
         res = self._model(
             prompt,
@@ -65,6 +109,7 @@ class LlamaCppLLM(LLM):
         output = next(res) if isinstance(res, Iterator) else res
         return output["choices"][0]["text"]
 
+    @override
     def create_chat_completion(
         self, messages: list[ChatMessage]
     ) -> tuple[ChatRole, str]:
@@ -91,6 +136,9 @@ class LlamaCppLLM(LLM):
 
 
 class TransformerLLM(LLM):
+    """A language model using the transformers library."""
+
+    @override
     def __init__(self, config: ModelConfig) -> None:
         import torch
         from transformers import (
@@ -160,6 +208,7 @@ class TransformerLLM(LLM):
             use_fast=False,
         )
 
+    @override
     def generate(self, prompt: str) -> str:
         res = self._pipe(
             prompt,
@@ -173,6 +222,7 @@ class TransformerLLM(LLM):
         output: str = res[0]["generated_text"]
         return output
 
+    @override
     def create_chat_completion(
         self, messages: list[ChatMessage]
     ) -> tuple[ChatRole, str]:
@@ -189,6 +239,14 @@ class TransformerLLM(LLM):
 
 
 class RemoteLLM(LLM):
+    """A language model using a remote endpoint.
+
+    The endpoint can be any service that are compatible with llama.cpp and openai API.
+    For further information, please refer to the llama.cpp
+    [server API](https://github.com/ggerganov/llama.cpp/blob/master/examples/server/README.md).
+    """
+
+    @override
     def __init__(self, config: ModelConfig) -> None:
         self.config = config
         if self.config.endpoint is None:
@@ -226,6 +284,7 @@ class RemoteLLM(LLM):
             msg = f"Unknown endpoint type: {self.config.endpoint.type}"
             raise ValueError(msg)
 
+    @override
     def generate(self, prompt: str) -> str:
         import json
 
@@ -251,6 +310,7 @@ class RemoteLLM(LLM):
             _LOGGER.warning("Server returned error code %d", res.status_code)
         return ""
 
+    @override
     def create_chat_completion(
         self, messages: list[ChatMessage]
     ) -> tuple[ChatRole, str]:
@@ -274,6 +334,20 @@ class RemoteLLM(LLM):
 
 
 def load_model_from_config(config: ModelConfig) -> LLM:
+    """Loads a language model based on the configuration.
+
+    Which language model is loaded depends on the configuration.
+    For instance, if an endpoint is provided, a remote language model is loaded.
+    If a file is provided, Llama.cpp is used.
+    Otherwise, transformers is used.
+
+    Parameters:
+        config: The configuration for the language model
+
+    Returns:
+        The loaded language model
+
+    """
     if config.endpoint:
         _LOGGER.info("Using remote endpoint %s", config.endpoint.url)
         return RemoteLLM(config)

@@ -1,3 +1,5 @@
+"""Example of how to use the chat service to generate text."""
+
 import logging
 
 from gerd.config import load_gen_config

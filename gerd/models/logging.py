@@ -1,9 +1,16 @@
+"""Logging configuration and utilities."""
+
 from enum import Enum
 
 from pydantic import BaseModel
 
 
 class LogLevel(Enum):
+    """Wrapper for string-based log levels.
+
+    Translates log levels to integers for Python's logging framework.
+    """
+
     DEBUG = "debug"
     INFO = "info"
     WARNING = "warning"
@@ -11,6 +18,7 @@ class LogLevel(Enum):
     FATAL = "fatal"
 
     def as_int(self) -> int:
+        """Convert the log level to an integer."""
         return {
             LogLevel.DEBUG: 10,
             LogLevel.INFO: 20,
@@ -21,4 +29,7 @@ class LogLevel(Enum):
 
 
 class LoggingConfig(BaseModel):
+    """Configuration for logging."""
+
     level: LogLevel
+    """The log level."""

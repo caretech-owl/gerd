@@ -1,6 +1,11 @@
+"""Retrieval-Augmented Generation (RAG) backend.
+
+This module provides the RAG backend for the GERD system which is currently
+based on FAISS.
+"""
+
 import logging
 from pathlib import Path
-from typing import Iterable, Protocol
 
 from langchain.docstore.document import Document
 from langchain_community.vectorstores import FAISS
@@ -15,6 +20,16 @@ _LOGGER.addHandler(logging.NullHandler())
 
 
 def create_faiss(documents: list[Document], model_name: str, device: str) -> FAISS:
+    """Create a new FAISS store from a list of documents.
+
+    Parameters:
+        documents: The list of documents to index
+        model_name: The name of the Hugging Face model to for the embeddings
+        device: The device to use for the model
+
+    Returns:
+        The newly created FAISS store
+    """
     return FAISS.from_documents(
         documents,
         HuggingFaceEmbeddings(
@@ -25,6 +40,16 @@ def create_faiss(documents: list[Document], model_name: str, device: str) -> FAI
 
 
 def load_faiss(dp_path: Path, model_name: str, device: str) -> FAISS:
+    """Load a FAISS store from a disk path.
+
+    Parameters:
+        dp_path: The path to the disk path
+        model_name: The name of the Hugging Face model to for the embeddings
+        device: The device to use for the model
+
+    Returns:
+        The loaded FAISS store
+    """
     return FAISS.load_local(
         dp_path.as_posix(),
         HuggingFaceEmbeddings(
@@ -35,6 +60,8 @@ def load_faiss(dp_path: Path, model_name: str, device: str) -> FAISS:
 
 
 class Rag:
+    """The RAG backend for GERD."""
+
     def __init__(
         self,
         model: LLM,
@@ -43,6 +70,18 @@ class Rag:
         store: FAISS,
         return_source: bool,
     ) -> None:
+        """The RAG backend will check for a context parameter in the prompt.
+
+        If the context parameter is not included, a warning will be logged.
+        Without the context parameter, no context will be added to the query.
+
+        Parameters:
+            model: The LLM model to use
+            model_config: The model configuration
+            prompt: The prompt configuration
+            store: The FAISS store to use
+            return_source: Whether to return the source documents
+        """
         self.model = model
         self.model_config = model_config
         self.prompt = prompt
@@ -56,6 +95,14 @@ class Rag:
             )
 
     def query(self, question: QAQuestion) -> QAAnswer:
+        """Query the RAG backend with a question.
+
+        Parameters:
+            question: The question to ask
+
+        Returns:
+            The answer to the question including the sources
+        """
         docs = self.store.search(
             question.question,
             search_type=question.search_strategy,
@@ -63,10 +110,10 @@ class Rag:
         )
         context = "\n".join(doc.page_content for doc in docs)
         resolved = self.prompt.text.format(context=context, question=question.question)
-        role, response = self.model.create_chat_completion(
+        _, response = self.model.create_chat_completion(
             [{"role": "user", "content": resolved}]
         )
-        answer = QAAnswer(answer=response)
+        answer = QAAnswer(response=response)
         if self.return_source:
             for doc in docs:
                 answer.sources.append(

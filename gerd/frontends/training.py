@@ -1,3 +1,5 @@
+"""A [gradio](https://www.gradio.app/) frontend to train LoRAs with."""
+
 import json
 import logging
 import time
@@ -24,6 +26,8 @@ KIOSK_MODE = CONFIG.kiosk_mode
 
 
 class Global:
+    """A singleton class handle to store the current trainer instance."""
+
     trainer: Trainer | None = None
 
 
@@ -37,6 +41,14 @@ _LOGGER.info(
 
 # Should this be limited to relative files or allowed directories
 def get_file_list(glob_pattern: str) -> str:
+    """Get a list of files matching the glob pattern.
+
+    Parameters:
+        glob_pattern: The glob pattern to search for files
+
+    Returns:
+        A string with the list of files
+    """
     if not glob_pattern:
         return ""
     res = [str(f) for f in Path().glob(glob_pattern)]
@@ -44,6 +56,16 @@ def get_file_list(glob_pattern: str) -> str:
 
 
 def check_trainer() -> dict[str, Any]:
+    """Check if the trainer is (still) running.
+
+    When the trainer is running, a progress bar is shown.
+    The method returns a gradio property update of 'visible'
+    which can be used to activate and deactivate elements based
+    on the current training status.
+
+    Returns:
+        A dictionary with the status of gradio 'visible' property
+    """
     if Global.trainer is not None:
         progress = gr.Progress()
         progress(0)
@@ -71,6 +93,29 @@ def start_training(
     cutoff_len: int,
     overlap_len: int,
 ) -> str:
+    """Start the training process.
+
+    While training, the method will update the progress bar.
+
+    Parameters:
+        files: The list of files to train on
+        model_name: The name of the model to train
+        lora_name: The name of the LoRA to train
+        mode: The training mode
+        data_source: The source of the data
+        input_glob: The glob pattern to search for files
+        override: Whether to override existing models
+        modules: The modules to train
+        flags: The flags to set
+        epochs: The number of epochs to train
+        batch_size: The batch size
+        micro_batch_size: The micro batch size
+        cutoff_len: The cutoff length
+        overlap_len: The overlap length
+
+    Returns:
+        A string with the status of the training
+    """
     if ".." in lora_name:
         msg = "Invalid LoRA name"
         raise gr.Error(msg)
@@ -139,8 +184,16 @@ def start_training(
 def validate_files(
     file_paths: list[str] | None, mode: str
 ) -> tuple[list[str], dict[str, bool]]:
-    """
-    Upload a document to vectorstore
+    """Validate the uploaded files.
+
+    Whether the property 'interactive' is True depends on whether
+    any files were valid.
+    Parameters:
+        file_paths: The list of file paths
+        mode: The training mode
+
+    Returns:
+        A tuple with the validated file paths and gradio property 'interactive'
     """
     file_paths = file_paths or []
     if mode.lower() == "instructions":
@@ -422,6 +475,14 @@ with demo:
     train_btn = gr.Button("Train", interactive=False)
 
     def get_loras() -> dict[str, Path]:
+        """Get a list of available LoRAs.
+
+        LORAs are loaded from the path defined in the default
+        [LoraTrainingConfig][gerd.training.lora.LoraTrainingConfig].
+
+        Returns:
+            A dictionary with the LoRA names as keys and the paths as values
+        """
         return {
             path.stem: path
             for path in default_config.output_dir.parent.iterdir()

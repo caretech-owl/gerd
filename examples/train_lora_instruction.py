@@ -1,3 +1,9 @@
+"""Example script to train a LoRA model on a simple instruction dataset.
+
+The generated data set is very simple and should only illustrate the intended
+usage of the InstructTrainingData and InstructTrainingSample classes.
+"""
+
 import logging
 import time
 from pathlib import Path

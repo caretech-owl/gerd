@@ -1,9 +1,15 @@
+"""A gradio frontend to interact with the generation service.
+
+This frontend is tailored to the letter of discharge generation task.
+For a more general frontend see [`gerd.frontend.generate`][gerd.frontends.generate].
+"""
+
 import logging
 from typing import Dict, Iterable, Tuple
 
 import gradio as gr
 
-from gerd.backend import TRANSPORTER
+from gerd.backends import TRANSPORTER
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
@@ -36,6 +42,15 @@ def _pairwise(
 
 
 def generate(*fields: str) -> Tuple[str, str, gr.TextArea, gr.Button]:
+    """Generate a letter of discharge based on the provided fields.
+
+    Parameters:
+        *fields: The fields to generate the letter of discharge from.
+
+    Returns:
+        The generated letter of discharge, a text area to display it,
+        and a button state to continue the generation
+    """
     params = {}
     for key, name, value in _pairwise(fields):
         if not value:
@@ -52,6 +67,15 @@ def generate(*fields: str) -> Tuple[str, str, gr.TextArea, gr.Button]:
 
 
 def compare_paragraphs(src_doc: str, mod_doc: str) -> Dict[str, str]:
+    """Compare paragraphs of two documents and return the modified parts.
+
+    Parameters:
+        src_doc: The source document
+        mod_doc: The modified document
+
+    Returns:
+        The modified parts of the document
+    """
     mod_parts = {}
     src_doc_split = src_doc.split("\n\n")
     mod_doc_split = mod_doc.split("\n\n")
@@ -63,6 +87,15 @@ def compare_paragraphs(src_doc: str, mod_doc: str) -> Dict[str, str]:
 
 
 def insert_paragraphs(src_doc: str, new_para: Dict[str, str]) -> str:
+    """Insert modified paragraphs into the source document.
+
+    Parameters:
+        src_doc: The source document
+        new_para: The modified paragraphs
+
+    Returns:
+        The updated document
+    """
     for section_order, mod_para in new_para.items():
         split_doc = src_doc.split("\n\n")[sections.index(section_order)]
         src_doc = src_doc.replace(split_doc, mod_para)
@@ -70,6 +103,14 @@ def insert_paragraphs(src_doc: str, new_para: Dict[str, str]) -> str:
 
 
 def response_parser(response: str) -> Dict[str, str]:
+    """Parse the response from the generation service.
+
+    Parameters:
+        response: The response from the generation service
+
+    Returns:
+        The parsed response
+    """
     parsed_response = {}
     split_response = response.split("\n\n")
     for paragraph in split_response:
@@ -78,14 +119,6 @@ def response_parser(response: str) -> Dict[str, str]:
                 parsed_response[section] = paragraph
                 break
     return parsed_response
-
-
-def gen_continue(src_doc: str, mod_doc: str) -> Tuple[str, str]:
-    params = compare_paragraphs(src_doc, mod_doc)
-    response = TRANSPORTER.gen_continue(params)
-    parsed_response = response_parser(response.text)
-    updated_document = insert_paragraphs(src_doc, parsed_response)
-    return (updated_document, updated_document)
 
 
 demo = gr.Blocks()
@@ -109,10 +142,6 @@ with demo:
         inputs=fields,
         outputs=[output, temp_output, output, continuation_button],
     )
-    continuation_button.click(
-        fn=gen_continue, inputs=[temp_output, output], outputs=[output, temp_output]
-    )
-
 
 if __name__ == "__main__":
     demo.launch()

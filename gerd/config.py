@@ -26,9 +26,20 @@ class YamlConfig(PydanticBaseSettingsSource):
     def get_field_value(
         self, field: FieldInfo, field_name: str
     ) -> Tuple[Any, str, bool]:
+        """Overrides a method from `PydanticBaseSettingsSource`.
+
+        Fails if it should ever be called.
+        Parameters:
+            field: The field to get the value for.
+            field_name: The name of the field.
+
+        Raises:
+            NotImplementedError: Always.
+        """
         raise NotImplementedError()
 
     def __call__(self) -> Dict[str, Any]:
+        """Load the configuration from a YAML file."""
         with Path(PROJECT_DIR, "config", "config.yml").open("r", encoding="utf-8") as f:
             d: Dict[str, Any] = safe_load(f)
         return d
@@ -64,6 +75,21 @@ class Settings(BaseSettings):
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> Tuple[PydanticBaseSettingsSource, ...]:
+        """Customize the settings sources used by pydantic-settings.
+
+        The order of the sources is important.
+        The first source has the highest priority.
+
+        Parameters:
+            cls: The class of the settings.
+            init_settings: The settings from the initialization.
+            env_settings: The settings from the environment.
+            dotenv_settings: The settings from the dotenv file.
+            file_secret_settings: The settings from the secret file.
+
+        Returns:
+            The customized settings sources.
+        """
         return (
             file_secret_settings,
             env_settings,
@@ -78,6 +104,7 @@ def load_gen_config(config: str = "gen_default") -> GenerationConfig:
 
     Parameters:
         config: The name of the configuration.
+
     Returns:
         The model configuration.
     """
@@ -98,6 +125,7 @@ def load_qa_config(config: str = "qa_default") -> QAConfig:
 
     Parameters:
         config: The name of the configuration.
+
     Returns:
         The model configuration.
     """

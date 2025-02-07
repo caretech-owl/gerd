@@ -1,4 +1,5 @@
-import os
+"""Model configuration for supported model classes."""
+
 import sys
 from pathlib import Path
 from string import Formatter
@@ -19,28 +20,50 @@ from pydantic import (
 )
 
 ChatRole = Literal["system", "user", "assistant"]
+"""Currently supported chat roles."""
 EndpointType = Literal["llama.cpp", "openai"]
+"""Endpoint for remote llm services."""
 
 
 class ChatMessage(TypedDict):
+    """Data structure for chat messages."""
+
     role: ChatRole
+    """The role or source of the chat message."""
     content: str
+    """The content of the chat message."""
 
 
 class PromptConfig(BaseModel):
+    """Configuration for prompts."""
+
     text: str = "{message}"
+    """The text of the prompt. Can contain placeholders."""
     template: Optional[Template] = Field(
         exclude=True,
         default=None,
     )
+    """Optional template of the prompt. This should follow the Jinja2 syntax."""
     path: Optional[str] = None
+    """The path to an external prompt file.
+
+    This will overload the values of text and/or template."""
     is_template: bool = False
+    """Whether the config uses jinja2 templates."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def format(
         self, parameters: Mapping[str, str | list[ChatMessage]] | None = None
     ) -> str:
+        """Format the prompt with the given parameters.
+
+        Parameters:
+            parameters: The parameters to format the prompt with.
+
+        Returns:
+            The formatted prompt
+        """
         if parameters is None:
             parameters = {}
         return (
@@ -54,6 +77,16 @@ class PromptConfig(BaseModel):
         )
 
     def model_post_init(self, __context: Any) -> None:  # noqa: ANN401
+        """Post-initialization hook for pyandic.
+
+        When path is set, the text or template is read from the file and
+        the template is created.
+        Path ending with '.jinja2' will be treated as a template.
+        If no path is set, the text parameter is used to initialize the template
+        if is_template is set to True.
+        Parameters:
+            __context: The context of the model (not used)
+        """
         if self.path:
             # reset self.text when path is set
             self.text = ""
@@ -81,7 +114,14 @@ class PromptConfig(BaseModel):
 
     @computed_field  # type: ignore[prop-decorator]
     @property
-    def parameters(self) -> List[str]:
+    def parameters(self) -> list[str]:
+        """Retrieves and returns the parameters of the prompt.
+
+        This happens on-the-fly and is not stored in the model.
+
+        Returns:
+            The parameters of the prompt.
+        """
         field_names = (
             {fn for _, fn, _, _ in Formatter().parse(self.text or "") if fn is not None}
             if not self.is_template
@@ -112,31 +152,75 @@ class PromptConfig(BaseModel):
 
 
 class ModelEndpoint(BaseModel):
+    """Configuration for model endpoints where models are hosted remotely."""
+
     url: str
     type: EndpointType
     key: Optional[SecretStr] = None
 
 
-# Default values chosen by https://github.com/marella/ctransformers#config
 class ModelConfig(BaseModel):
+    """Configuration for large language models.
+
+    Most llm libraries and/or services share common parameters for configuration.
+    Explaining each parameter is out of scope for this documentation.
+    The most essential parameters are explained for instance
+    [here](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/prompts/adjust-parameter-values).
+    Default values have been chosen according to
+    [ctransformers](https://github.com/marella/ctransformers#config) library.
+    """
+
     name: str = "Qwen/Qwen2.5-0.5B-Instruct"
+    """The name of the model. Can be a path to a local model or a huggingface handle."""
     prompt_setup: List[Tuple[Literal["system", "user", "assistant"], PromptConfig]] = []
+    """A list of predefined prompts for the model.
+
+    When a model context is inialized or reset,
+    this will be used to set up the context."""
     prompt_config: PromptConfig = PromptConfig()
+    """The prompt configuration.
+
+    This is used to process the input passed to the services."""
     endpoint: Optional[ModelEndpoint] = None
+    """The endpoint of the model when hosted remotely."""
     file: Optional[str] = None
+    """The path to the model file. For local models only."""
     top_k: int = 40
+    """The number of tokens to consider for the top-k sampling."""
     top_p: float = 0.95
+    """The cumulative probability for the top-p sampling."""
     temperature: float = 0.8
+    """The temperature for the sampling."""
     repetition_penalty: float = 1.1
+    """The repetition penalty."""
     last_n_tokens: int = 64
+    """The number of tokens to consider for the repetition penalty."""
     seed: int = -1
+    """The seed for the random number generator."""
     max_new_tokens: int = 256
+    """The maximum number of new tokens to generate."""
     stop: Optional[List[str]] = None
+    """The stop tokens for the generation."""
     stream: bool = False
+    """Whether to stream the output."""
     batch_size: int = 8
+    """The batch size for the generation."""
     threads: Optional[int] = None
-    context_length: int = 0  # Currently only LLaMA, MPT and Falcon
+    """The number of threads to use for the generation."""
+    context_length: int = 0
+    """The context length for the model. Currently only LLaMA, MPT and Falcon"""
     gpu_layers: int = 0
+    """The number of layers to run on the GPU.
+
+    The actual number is only used llama.cpp. The other model libraries will determine
+    whether to run on the GPU just by checking of this value is larger than 0.
+    """
     torch_dtype: Optional[str] = None
+    """The torch data type for the model."""
     loras: set[Path] = set()
+    """The list of additional LoRAs files to load."""
     extra_kwargs: Optional[dict[str, Any]] = None
+    """Additional keyword arguments for the model library.
+
+    The accepted keys and values depend on the model library used.
+    """

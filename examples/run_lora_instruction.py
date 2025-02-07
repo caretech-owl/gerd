@@ -1,3 +1,5 @@
+"""An example of using LoRA to instruct a model to generate a certain response."""
+
 from pathlib import Path
 
 from gerd.config import PROJECT_DIR, load_gen_config
@@ -25,7 +27,7 @@ res = chat.submit_user_message({"content": "Bitte erweitere die Zahl 42."})
 print(res.text)  # noqa: T201
 
 print("\n\nMit LoRA\n========")  # noqa: T201
-config.model.loras.append(lora_config.output_dir)
+config.model.loras.add(lora_config.output_dir)
 chat = ChatService(config)
 res = chat.submit_user_message({"content": "Bitte erweitere die Zahl 42."})
 print(res.text)  # noqa: T201
