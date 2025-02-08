@@ -27,9 +27,12 @@ jobs:
           restore-keys: |
             mkdocs-material-
       - name: Install dependencies
-        run: pip install mkdocs-material[imaging] mkdocstrings[python] mkdocs-api-autonav pillow cairosvg mike
+        run: |
+          pipx install uv
+          uv sync --only-group docs
+      # - run: uv run --only-group docs mike set-default --push latest
       - name: Deploy documentation
         run: |
           major=$(echo "${GITHUB_REF_NAME:1}" | cut -d "." -f 1)
           minor=$(echo "${GITHUB_REF_NAME:1}" | cut -d "." -f 2)
-          mike deploy --push --update-aliases "${major}.${minor}" latest
+          uv run --only-group docs mike deploy --push --update-aliases "${major}.${minor}" latest
