@@ -28,6 +28,8 @@ jobs:
           restore-keys: |
             mkdocs-material-
       - name: Install dependencies
-        run: pip install mkdocs-material[imaging] mkdocstrings[python] mkdocs-api-autonav pillow cairosvg mike
+        run: |
+          pipx install uv
+          uv sync --only-group docs
       # - run: mike set-default --push latest
-      - run: mike deploy --push develop
+      - run: uv run --only-group docs mike deploy --push develop
