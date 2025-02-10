@@ -50,8 +50,6 @@ def load_model(model_name: str, origin: str) -> dict[str, Any]:
     model_config.model.name = model_name
     if origin != "None":
         model_config.model.loras.add(lora_dir / origin)
-    else:
-        model_config.model.loras.clear()
     Global.service = ChatService(model_config)
     return gr.update(interactive=True)
 
