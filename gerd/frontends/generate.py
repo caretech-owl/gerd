@@ -136,7 +136,7 @@ with demo:
             LoraTrainingConfig.model_validate(
                 json.loads((lora_dir / x / "training_parameters.json").read_text())
             ).model.name
-            if x
+            if x != "None"
             else d
         ),
         inputs=[origin, model_name],
