@@ -133,7 +133,7 @@ def start_training(
         mode=training_mode,
         output_dir=default_config.output_dir.parent / lora_name,
         override_existing=override,
-        modules=LoraModules(**{mod: True for mod in modules}),
+        modules=LoraModules(default=False, **{mod: True for mod in modules}),
         flags=TrainingFlags(**{flag: True for flag in flags}),
         epochs=epochs,
         batch_size=batch_size,
