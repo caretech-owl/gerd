@@ -133,7 +133,7 @@ def start_training(
         mode=training_mode,
         output_dir=default_config.output_dir.parent / lora_name,
         override_existing=override,
-        modules=LoraModules(**{mod: True for mod in modules}),
+        modules=LoraModules(default=False, **{mod: True for mod in modules}),
         flags=TrainingFlags(**{flag: True for flag in flags}),
         epochs=epochs,
         batch_size=batch_size,
@@ -313,7 +313,7 @@ with demo:
                 maximum=1024,
                 step=1,
                 value=default_config.cutoff_len,
-                visible=select_training_mode == "Unstructured",
+                visible=select_training_mode.value == "Unstructured",
             )
             slider_overlap_len = gr.Slider(
                 label="Overlap Length",
@@ -321,7 +321,7 @@ with demo:
                 maximum=1024,
                 step=1,
                 value=default_config.overlap_len,
-                visible=select_training_mode == "Unstructured",
+                visible=select_training_mode.value == "Unstructured",
             )
             # slider_stop_at_loss = gr.Slider(
             #     label="Stop at Loss",
@@ -450,10 +450,10 @@ with demo:
         label=f"Glob pattern (should end with .{file_ext})",
         value=default_config.input_glob,
         placeholder=f"file://data/*.{file_ext}",
-        visible=select_data_origin == "Path",
+        visible=select_data_origin.value == "Path",
     )
     text_training_files = gr.Textbox(
-        label="Training files", visible=select_data_origin == "Path"
+        label="Training files", visible=select_data_origin.value == "Path"
     )
     text_glob_pattern.blur(
         get_file_list,
