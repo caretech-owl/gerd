@@ -46,7 +46,7 @@ def load_model(model_name: str, origin: str) -> dict[str, Any]:
     """
     if Global.service is not None:
         del Global.service
-    model_config = config.model_copy()
+    model_config = config.model_copy(deep=True)
     model_config.model.name = model_name
     if origin != "None":
         model_config.model.loras.add(lora_dir / origin)
