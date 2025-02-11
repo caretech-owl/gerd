@@ -90,8 +90,11 @@ def upload_lora(file_upload: str) -> None:
     p = Path(file_upload)
     if p.exists() is False:
         gr.Warning("File does not exist")
+    if (lora_dir / p.stem).exists():
+        _LOGGER.info("Removing existing '%s'", p.stem)
+        shutil.rmtree(lora_dir / p.stem)
     shutil.unpack_archive(p.as_posix(), lora_dir / p.stem)
-    gr.Info(f"Uploaded '{p.stem}'")
+    gr.Success(f"Uploaded '{p.stem}'")
 
 
 with demo:
