@@ -895,6 +895,30 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#gerd.frontends.generate.upload_lora" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;upload_lora
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" upload_lora">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gerd.frontends.generate.upload_lora(file_upload)" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-parameter"></code>&nbsp;file_upload
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1737,6 +1761,14 @@
                 </div>
               </td>
             </tr>
+            <tr class="doc-section-item">
+              <td><code><a class="autorefs autorefs-internal" title="gerd.frontends.generate.upload_lora" href="#gerd.frontends.generate.upload_lora">upload_lora</a></code></td>
+              <td>
+                <div class="doc-md-description">
+                  <p>Upload a LoRA archive.</p>
+                </div>
+              </td>
+            </tr>
       </tbody>
     </table>
 
@@ -1967,10 +1999,7 @@
 
             <details class="quote">
               <summary>Source code in <code>gerd/frontends/generate.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-57">57</a></span>
-<span class="normal"><a href="#__codelineno-0-58">58</a></span>
-<span class="normal"><a href="#__codelineno-0-59">59</a></span>
-<span class="normal"><a href="#__codelineno-0-60">60</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-60">60</a></span>
 <span class="normal"><a href="#__codelineno-0-61">61</a></span>
 <span class="normal"><a href="#__codelineno-0-62">62</a></span>
 <span class="normal"><a href="#__codelineno-0-63">63</a></span>
@@ -1985,25 +2014,28 @@
 <span class="normal"><a href="#__codelineno-0-72">72</a></span>
 <span class="normal"><a href="#__codelineno-0-73">73</a></span>
 <span class="normal"><a href="#__codelineno-0-74">74</a></span>
-<span class="normal"><a href="#__codelineno-0-75">75</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="k">def</span> <span class="nf">generate</span><span class="p">(</span><span class="n">textbox</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">top_p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate text from the model.</span>
-<a id="__codelineno-0-59" name="__codelineno-0-59"></a>
-<a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">    Parameters:</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">        textbox: The text to generate from</span>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">        temp: The temperature for the generation</span>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">        top_p: The top p value for the generation</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">        max_tokens: The maximum number of tokens to generate</span>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">        The generated text</span>
-<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a>    <span class="k">if</span> <span class="n">Global</span><span class="o">.</span><span class="n">service</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a>        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Model not loaded&quot;</span>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a>        <span class="k">raise</span> <span class="n">gr</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a>    <span class="n">Global</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">top_p</span> <span class="o">=</span> <span class="n">top_p</span>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a>    <span class="n">Global</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temp</span>
-<a id="__codelineno-0-74" name="__codelineno-0-74"></a>    <span class="n">Global</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">max_new_tokens</span> <span class="o">=</span> <span class="n">max_tokens</span>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a>    <span class="k">return</span> <span class="n">Global</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">generate</span><span class="p">({</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="n">textbox</span><span class="p">})</span><span class="o">.</span><span class="n">text</span>
+<span class="normal"><a href="#__codelineno-0-75">75</a></span>
+<span class="normal"><a href="#__codelineno-0-76">76</a></span>
+<span class="normal"><a href="#__codelineno-0-77">77</a></span>
+<span class="normal"><a href="#__codelineno-0-78">78</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="k">def</span> <span class="nf">generate</span><span class="p">(</span><span class="n">textbox</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">top_p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate text from the model.</span>
+<a id="__codelineno-0-62" name="__codelineno-0-62"></a>
+<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    Parameters:</span>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">        textbox: The text to generate from</span>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">        temp: The temperature for the generation</span>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        top_p: The top p value for the generation</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">        max_tokens: The maximum number of tokens to generate</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">        The generated text</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a>    <span class="k">if</span> <span class="n">Global</span><span class="o">.</span><span class="n">service</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a>        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Model not loaded&quot;</span>
+<a id="__codelineno-0-74" name="__codelineno-0-74"></a>        <span class="k">raise</span> <span class="n">gr</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a>    <span class="n">Global</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">top_p</span> <span class="o">=</span> <span class="n">top_p</span>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a>    <span class="n">Global</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temp</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a>    <span class="n">Global</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">max_new_tokens</span> <span class="o">=</span> <span class="n">max_tokens</span>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a>    <span class="k">return</span> <span class="n">Global</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">generate</span><span class="p">({</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="n">textbox</span><span class="p">})</span><span class="o">.</span><span class="n">text</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -2097,10 +2129,7 @@
 
             <details class="quote">
               <summary>Source code in <code>gerd/frontends/generate.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-37">37</a></span>
-<span class="normal"><a href="#__codelineno-0-38">38</a></span>
-<span class="normal"><a href="#__codelineno-0-39">39</a></span>
-<span class="normal"><a href="#__codelineno-0-40">40</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-40">40</a></span>
 <span class="normal"><a href="#__codelineno-0-41">41</a></span>
 <span class="normal"><a href="#__codelineno-0-42">42</a></span>
 <span class="normal"><a href="#__codelineno-0-43">43</a></span>
@@ -2114,24 +2143,137 @@
 <span class="normal"><a href="#__codelineno-0-51">51</a></span>
 <span class="normal"><a href="#__codelineno-0-52">52</a></span>
 <span class="normal"><a href="#__codelineno-0-53">53</a></span>
-<span class="normal"><a href="#__codelineno-0-54">54</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">origin</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a global large language model.</span>
-<a id="__codelineno-0-39" name="__codelineno-0-39"></a>
-<a id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="sd">    Parameters:</span>
-<a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="sd">        model_name: The name of the model</span>
-<a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="sd">        origin: Whether to use an extra LoRA</span>
-<a id="__codelineno-0-43" name="__codelineno-0-43"></a>
-<a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">        The updated interactive state, returns interactive=True when the model is loaded</span>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-47" name="__codelineno-0-47"></a>    <span class="k">if</span> <span class="n">Global</span><span class="o">.</span><span class="n">service</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-48" name="__codelineno-0-48"></a>        <span class="k">del</span> <span class="n">Global</span><span class="o">.</span><span class="n">service</span>
-<a id="__codelineno-0-49" name="__codelineno-0-49"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-50" name="__codelineno-0-50"></a>    <span class="n">model_config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">model_name</span>
-<a id="__codelineno-0-51" name="__codelineno-0-51"></a>    <span class="k">if</span> <span class="n">origin</span> <span class="o">!=</span> <span class="s2">&quot;None&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a>        <span class="n">model_config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">loras</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">lora_dir</span> <span class="o">/</span> <span class="n">origin</span><span class="p">)</span>
-<a id="__codelineno-0-53" name="__codelineno-0-53"></a>    <span class="n">Global</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">ChatService</span><span class="p">(</span><span class="n">model_config</span><span class="p">)</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a>    <span class="k">return</span> <span class="n">gr</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">interactive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-54">54</a></span>
+<span class="normal"><a href="#__codelineno-0-55">55</a></span>
+<span class="normal"><a href="#__codelineno-0-56">56</a></span>
+<span class="normal"><a href="#__codelineno-0-57">57</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">origin</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a global large language model.</span>
+<a id="__codelineno-0-42" name="__codelineno-0-42"></a>
+<a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">    Parameters:</span>
+<a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">        model_name: The name of the model</span>
+<a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">        origin: Whether to use an extra LoRA</span>
+<a id="__codelineno-0-46" name="__codelineno-0-46"></a>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="sd">        The updated interactive state, returns interactive=True when the model is loaded</span>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50"></a>    <span class="k">if</span> <span class="n">Global</span><span class="o">.</span><span class="n">service</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-51" name="__codelineno-0-51"></a>        <span class="k">del</span> <span class="n">Global</span><span class="o">.</span><span class="n">service</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-53" name="__codelineno-0-53"></a>    <span class="n">model_config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">model_name</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a>    <span class="k">if</span> <span class="n">origin</span> <span class="o">!=</span> <span class="s2">&quot;None&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a>        <span class="n">model_config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">loras</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">lora_dir</span> <span class="o">/</span> <span class="n">origin</span><span class="p">)</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56"></a>    <span class="n">Global</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">ChatService</span><span class="p">(</span><span class="n">model_config</span><span class="p">)</span>
+<a id="__codelineno-0-57" name="__codelineno-0-57"></a>    <span class="k">return</span> <span class="n">gr</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">interactive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="gerd.frontends.generate.upload_lora" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">upload_lora</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">upload_lora</span><span class="p">(</span><span class="n">file_upload</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Upload a LoRA archive.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+<h3 id="gerd.frontends.generate.upload_lora(file_upload)" class="doc doc-heading doc-heading-parameter">                  <code>file_upload</code>
+</h3>            </td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The path to the uploaded archive</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>an empty string to clear the input</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>gerd/frontends/generate.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-81">81</a></span>
+<span class="normal"><a href="#__codelineno-0-82">82</a></span>
+<span class="normal"><a href="#__codelineno-0-83">83</a></span>
+<span class="normal"><a href="#__codelineno-0-84">84</a></span>
+<span class="normal"><a href="#__codelineno-0-85">85</a></span>
+<span class="normal"><a href="#__codelineno-0-86">86</a></span>
+<span class="normal"><a href="#__codelineno-0-87">87</a></span>
+<span class="normal"><a href="#__codelineno-0-88">88</a></span>
+<span class="normal"><a href="#__codelineno-0-89">89</a></span>
+<span class="normal"><a href="#__codelineno-0-90">90</a></span>
+<span class="normal"><a href="#__codelineno-0-91">91</a></span>
+<span class="normal"><a href="#__codelineno-0-92">92</a></span>
+<span class="normal"><a href="#__codelineno-0-93">93</a></span>
+<span class="normal"><a href="#__codelineno-0-94">94</a></span>
+<span class="normal"><a href="#__codelineno-0-95">95</a></span>
+<span class="normal"><a href="#__codelineno-0-96">96</a></span>
+<span class="normal"><a href="#__codelineno-0-97">97</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="k">def</span> <span class="nf">upload_lora</span><span class="p">(</span><span class="n">file_upload</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Upload a LoRA archive.</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">    Parameters:</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">        file_upload: The path to the uploaded archive</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a>
+<a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">        an empty string to clear the input</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a>    <span class="k">if</span> <span class="n">file_upload</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-91" name="__codelineno-0-91"></a>        <span class="n">gr</span><span class="o">.</span><span class="n">Warning</span><span class="p">(</span><span class="s2">&quot;No file uploaded&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a>    <span class="n">p</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file_upload</span><span class="p">)</span>
+<a id="__codelineno-0-93" name="__codelineno-0-93"></a>    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+<a id="__codelineno-0-94" name="__codelineno-0-94"></a>        <span class="n">gr</span><span class="o">.</span><span class="n">Warning</span><span class="p">(</span><span class="s2">&quot;File does not exist&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-95" name="__codelineno-0-95"></a>    <span class="n">shutil</span><span class="o">.</span><span class="n">unpack_archive</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span> <span class="n">lora_dir</span> <span class="o">/</span> <span class="n">p</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a>    <span class="n">gr</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Uploaded &#39;</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a>    <span class="k">return</span> <span class="s2">&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

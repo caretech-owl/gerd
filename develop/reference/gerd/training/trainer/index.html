@@ -3064,7 +3064,8 @@ Parameters:
 <span class="normal"><a href="#__codelineno-0-239">239</a></span>
 <span class="normal"><a href="#__codelineno-0-240">240</a></span>
 <span class="normal"><a href="#__codelineno-0-241">241</a></span>
-<span class="normal"><a href="#__codelineno-0-242">242</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-242">242</a></span>
+<span class="normal"><a href="#__codelineno-0-243">243</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">LoraTrainingConfig</span><span class="p">,</span>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a>    <span class="n">callback_cls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">transformers</span><span class="o">.</span><span class="n">TrainerCallback</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3142,10 +3143,11 @@ Parameters:
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a>        <span class="n">ddp_find_unused_parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a>        <span class="n">use_ipex</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">use_ipex</span><span class="p">,</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>        <span class="n">save_steps</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">save_steps</span><span class="p">,</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>        <span class="c1"># any of these two will set `torch_compile=True`</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="c1"># torch_compile_backend=&quot;inductor&quot;,</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>        <span class="c1"># torch_compile_mode=&quot;reduce-overhead&quot;,</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a>    <span class="p">)</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>        <span class="n">use_cpu</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">use_cpu</span><span class="p">,</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="c1"># any of these two will set `torch_compile=True`</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>        <span class="c1"># torch_compile_backend=&quot;inductor&quot;,</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>        <span class="c1"># torch_compile_mode=&quot;reduce-overhead&quot;,</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -3178,11 +3180,11 @@ Parameters:
 
             <details class="quote">
               <summary>Source code in <code>gerd/training/trainer.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-369">369</a></span>
-<span class="normal"><a href="#__codelineno-0-370">370</a></span>
-<span class="normal"><a href="#__codelineno-0-371">371</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="k">def</span> <span class="nf">interrupt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Interrupt the training process.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">tracked</span><span class="o">.</span><span class="n">interrupted</span> <span class="o">=</span> <span class="kc">True</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-371">371</a></span>
+<span class="normal"><a href="#__codelineno-0-372">372</a></span>
+<span class="normal"><a href="#__codelineno-0-373">373</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="k">def</span> <span class="nf">interrupt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Interrupt the training process.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">tracked</span><span class="o">.</span><span class="n">interrupted</span> <span class="o">=</span> <span class="kc">True</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -3207,9 +3209,7 @@ Parameters:
 
             <details class="quote">
               <summary>Source code in <code>gerd/training/trainer.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-352">352</a></span>
-<span class="normal"><a href="#__codelineno-0-353">353</a></span>
-<span class="normal"><a href="#__codelineno-0-354">354</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-354">354</a></span>
 <span class="normal"><a href="#__codelineno-0-355">355</a></span>
 <span class="normal"><a href="#__codelineno-0-356">356</a></span>
 <span class="normal"><a href="#__codelineno-0-357">357</a></span>
@@ -3222,22 +3222,24 @@ Parameters:
 <span class="normal"><a href="#__codelineno-0-364">364</a></span>
 <span class="normal"><a href="#__codelineno-0-365">365</a></span>
 <span class="normal"><a href="#__codelineno-0-366">366</a></span>
-<span class="normal"><a href="#__codelineno-0-367">367</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Save the model and log files to the path set in the trainer configuration.</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">    When the `zip_output` flag is set, the output directory is zipped as well.</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">zip_output</span><span class="p">:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>            <span class="n">shutil</span><span class="o">.</span><span class="n">make_archive</span><span class="p">(</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>                <span class="n">base_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>                <span class="n">root_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a>                <span class="c1"># base_dir=self.config.output_dir,</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;zip&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>            <span class="p">)</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="n">_LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Trainer not initialized&quot;</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-367">367</a></span>
+<span class="normal"><a href="#__codelineno-0-368">368</a></span>
+<span class="normal"><a href="#__codelineno-0-369">369</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Save the model and log files to the path set in the trainer configuration.</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">    When the `zip_output` flag is set, the output directory is zipped as well.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">zip_output</span><span class="p">:</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>            <span class="n">shutil</span><span class="o">.</span><span class="n">make_archive</span><span class="p">(</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>                <span class="n">base_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>                <span class="n">root_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>                <span class="c1"># base_dir=self.config.output_dir,</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;zip&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>            <span class="p">)</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="n">_LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Trainer not initialized&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -3324,8 +3326,7 @@ Parameters:
 
             <details class="quote">
               <summary>Source code in <code>gerd/training/trainer.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-309">309</a></span>
-<span class="normal"><a href="#__codelineno-0-310">310</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-310">310</a></span>
 <span class="normal"><a href="#__codelineno-0-311">311</a></span>
 <span class="normal"><a href="#__codelineno-0-312">312</a></span>
 <span class="normal"><a href="#__codelineno-0-313">313</a></span>
@@ -3365,48 +3366,51 @@ Parameters:
 <span class="normal"><a href="#__codelineno-0-347">347</a></span>
 <span class="normal"><a href="#__codelineno-0-348">348</a></span>
 <span class="normal"><a href="#__codelineno-0-349">349</a></span>
-<span class="normal"><a href="#__codelineno-0-350">350</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="k">def</span> <span class="nf">setup_training</span><span class="p">(</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="n">train_template</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="n">torch_compile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Setup the training process and initialize the transformer trainer.</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Parameters:</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        train_data: The training data</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        train_template: The training template</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        torch_compile: Whether to use torch compile</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">Trainer</span><span class="p">(</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>        <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lora_model</span><span class="p">,</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>        <span class="n">train_dataset</span><span class="o">=</span><span class="n">train_data</span><span class="p">,</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="n">eval_dataset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="n">args</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="n">data_collator</span><span class="o">=</span><span class="n">transformers</span><span class="o">.</span><span class="n">DataCollatorForLanguageModeling</span><span class="p">(</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">mlm</span><span class="o">=</span><span class="kc">False</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="p">),</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="n">callbacks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">,</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="p">)</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="c1"># This must be done after Trainer init because otherwise</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="c1"># the trainer cannot identify the relevant (as in &#39;trainable&#39;) parameters</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="c1"># and will remove required information from the training data set.</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="c1"># Whether it is useful to compile after reassignment.</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">if</span> <span class="n">torch_compile</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">__version__</span> <span class="o">&gt;=</span> <span class="s2">&quot;2&quot;</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">!=</span> <span class="s2">&quot;win32&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">lora_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lora_model</span><span class="p">)</span>  <span class="c1"># type: ignore[assignment]</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>    <span class="c1"># == Save parameters for reuse ==</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">/training_parameters.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>    <span class="c1"># == Save training prompt ==</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">/training_prompt.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">train_template</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-350">350</a></span>
+<span class="normal"><a href="#__codelineno-0-351">351</a></span>
+<span class="normal"><a href="#__codelineno-0-352">352</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="k">def</span> <span class="nf">setup_training</span><span class="p">(</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="n">train_data</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="n">train_template</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="n">torch_compile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Setup the training process and initialize the transformer trainer.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    Parameters:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        train_data: The training data</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        train_template: The training template</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        torch_compile: Whether to use torch compile</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="n">_LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Training parameter</span><span class="se">\n</span><span class="s2">============</span><span class="se">\n</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">Trainer</span><span class="p">(</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lora_model</span><span class="p">,</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="n">train_dataset</span><span class="o">=</span><span class="n">train_data</span><span class="p">,</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="n">eval_dataset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>        <span class="n">args</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="n">data_collator</span><span class="o">=</span><span class="n">transformers</span><span class="o">.</span><span class="n">DataCollatorForLanguageModeling</span><span class="p">(</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">mlm</span><span class="o">=</span><span class="kc">False</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="p">),</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="n">callbacks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">,</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="p">)</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="c1"># This must be done after Trainer init because otherwise</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="c1"># the trainer cannot identify the relevant (as in &#39;trainable&#39;) parameters</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="c1"># and will remove required information from the training data set.</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="c1"># Whether it is useful to compile after reassignment.</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="k">if</span> <span class="n">torch_compile</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">__version__</span> <span class="o">&gt;=</span> <span class="s2">&quot;2&quot;</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">!=</span> <span class="s2">&quot;win32&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">lora_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lora_model</span><span class="p">)</span>  <span class="c1"># type: ignore[assignment]</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>    <span class="c1"># == Save parameters for reuse ==</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">/training_parameters.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>    <span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>    <span class="c1"># == Save training prompt ==</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">/training_prompt.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>    <span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">train_template</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -3453,8 +3457,7 @@ Parameters:
 
             <details class="quote">
               <summary>Source code in <code>gerd/training/trainer.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-244">244</a></span>
-<span class="normal"><a href="#__codelineno-0-245">245</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-245">245</a></span>
 <span class="normal"><a href="#__codelineno-0-246">246</a></span>
 <span class="normal"><a href="#__codelineno-0-247">247</a></span>
 <span class="normal"><a href="#__codelineno-0-248">248</a></span>
@@ -3516,70 +3519,71 @@ Parameters:
 <span class="normal"><a href="#__codelineno-0-304">304</a></span>
 <span class="normal"><a href="#__codelineno-0-305">305</a></span>
 <span class="normal"><a href="#__codelineno-0-306">306</a></span>
-<span class="normal"><a href="#__codelineno-0-307">307</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">:</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Start the training process.</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">        The training thread</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a>    <span class="n">model_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_model</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a>    <span class="n">model_id</span> <span class="o">=</span> <span class="n">MODEL_CLASSES</span><span class="p">[</span><span class="n">model_type</span><span class="p">]</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>    <span class="n">projections_string</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a>        <span class="p">[</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>            <span class="n">projection</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_proj&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>            <span class="k">for</span> <span class="n">projection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">target_modules</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_model</span><span class="p">)</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>        <span class="p">]</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="p">)</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="n">_LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a>        <span class="s2">&quot;Training &#39;</span><span class="si">%s</span><span class="s2">&#39; model using (</span><span class="si">%s</span><span class="s2">) projections&quot;</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">projections_string</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>    <span class="p">)</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="c1"># == Main run and monitor loop ==</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="n">log</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracked</span><span class="o">.</span><span class="n">train_log</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="n">log</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;base_model_config&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name</span><span class="p">})</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>    <span class="n">log</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;base_model_class&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">})</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>    <span class="n">log</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="p">{</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>            <span class="s2">&quot;base_loaded_in_4bit&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">lora_model</span><span class="p">,</span> <span class="s2">&quot;is_loaded_in_4bit&quot;</span><span class="p">,</span> <span class="kc">False</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>            <span class="p">)</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>        <span class="p">}</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>    <span class="p">)</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a>    <span class="n">log</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>        <span class="p">{</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>            <span class="s2">&quot;base_loaded_in_8bit&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">lora_model</span><span class="p">,</span> <span class="s2">&quot;is_loaded_in_8bit&quot;</span><span class="p">,</span> <span class="kc">False</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>            <span class="p">)</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>        <span class="p">}</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>    <span class="p">)</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>    <span class="n">log</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;projections&quot;</span><span class="p">:</span> <span class="n">projections_string</span><span class="p">})</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_at_loss</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="n">_LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>            <span class="s2">&quot;Monitoring loss </span><span class="se">\033</span><span class="s2">[1;31;1m(Auto-Stop at: </span><span class="si">%f</span><span class="s2">)</span><span class="se">\033</span><span class="s2">[0;37;0m&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_at_loss</span><span class="p">,</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="p">)</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>    <span class="k">def</span> <span class="nf">threaded_run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Trainer not initialized&quot;</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="c1"># Note: save in the thread in case the gradio thread breaks</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="c1"># (eg browser closed)</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">tracked</span><span class="o">.</span><span class="n">did_save</span> <span class="o">=</span> <span class="kc">True</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="c1"># Save log</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">/training_log.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tracked</span><span class="o">.</span><span class="n">train_log</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">threaded_run</span><span class="p">)</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread</span>
+<span class="normal"><a href="#__codelineno-0-307">307</a></span>
+<span class="normal"><a href="#__codelineno-0-308">308</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">:</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Start the training process.</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        The training thread</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>    <span class="n">model_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_model</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="n">model_id</span> <span class="o">=</span> <span class="n">MODEL_CLASSES</span><span class="p">[</span><span class="n">model_type</span><span class="p">]</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="n">projections_string</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>        <span class="p">[</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>            <span class="n">projection</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_proj&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>            <span class="k">for</span> <span class="n">projection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">target_modules</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_model</span><span class="p">)</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>        <span class="p">]</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>    <span class="p">)</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>    <span class="n">_LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>        <span class="s2">&quot;Training &#39;</span><span class="si">%s</span><span class="s2">&#39; model using (</span><span class="si">%s</span><span class="s2">) projections&quot;</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">projections_string</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="p">)</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="c1"># == Main run and monitor loop ==</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="n">log</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracked</span><span class="o">.</span><span class="n">train_log</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>    <span class="n">log</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;base_model_config&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name</span><span class="p">})</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>    <span class="n">log</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;base_model_class&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">})</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>    <span class="n">log</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>        <span class="p">{</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>            <span class="s2">&quot;base_loaded_in_4bit&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">lora_model</span><span class="p">,</span> <span class="s2">&quot;is_loaded_in_4bit&quot;</span><span class="p">,</span> <span class="kc">False</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>            <span class="p">)</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>        <span class="p">}</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a>    <span class="p">)</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>    <span class="n">log</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>        <span class="p">{</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>            <span class="s2">&quot;base_loaded_in_8bit&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">lora_model</span><span class="p">,</span> <span class="s2">&quot;is_loaded_in_8bit&quot;</span><span class="p">,</span> <span class="kc">False</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>            <span class="p">)</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>        <span class="p">}</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>    <span class="p">)</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>    <span class="n">log</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;projections&quot;</span><span class="p">:</span> <span class="n">projections_string</span><span class="p">})</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_at_loss</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="n">_LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>            <span class="s2">&quot;Monitoring loss </span><span class="se">\033</span><span class="s2">[1;31;1m(Auto-Stop at: </span><span class="si">%f</span><span class="s2">)</span><span class="se">\033</span><span class="s2">[0;37;0m&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_at_loss</span><span class="p">,</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>        <span class="p">)</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>    <span class="k">def</span> <span class="nf">threaded_run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Trainer not initialized&quot;</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="c1"># Note: save in the thread in case the gradio thread breaks</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="c1"># (eg browser closed)</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">tracked</span><span class="o">.</span><span class="n">did_save</span> <span class="o">=</span> <span class="kc">True</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="c1"># Save log</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">/training_log.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tracked</span><span class="o">.</span><span class="n">train_log</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">threaded_run</span><span class="p">)</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
