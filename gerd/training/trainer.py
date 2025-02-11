@@ -236,6 +236,7 @@ class Trainer:
             ddp_find_unused_parameters=None,
             use_ipex=config.flags.use_ipex,
             save_steps=config.save_steps,
+            use_cpu=config.flags.use_cpu,
             # any of these two will set `torch_compile=True`
             # torch_compile_backend="inductor",
             # torch_compile_mode="reduce-overhead",
