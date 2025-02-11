@@ -686,7 +686,7 @@ http = [
 
 [[package]]
 name = "gerd"
-version = "0.7.0"
+version = "0.7.2"
 source = { editable = "." }
 dependencies = [
     { name = "bitsandbytes", marker = "sys_platform != 'darwin'" },

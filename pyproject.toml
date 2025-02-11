@@ -1,6 +1,6 @@
 [project]
 name = "gerd"
-version = "0.7.1"
+version = "0.7.2"
 description = "Add your description here"
 readme = "docs/README.md"
 requires-python = ">=3.10, <3.13"
@@ -25,7 +25,7 @@ dependencies = [
     "peft>=0.14.0",
     "datasets>=3.2.0",
     "gradio>=5.12",
-    "bitsandbytes>=0.45.2 ; sys_platform != 'darwin'",
+    "bitsandbytes>=0.45.0 ; sys_platform != 'darwin'",
 ]
 
 [project.optional-dependencies]
