@@ -143,6 +143,9 @@ def start_training(
         overlap_len=overlap_len,
         zip_output=True,
     )
+    # init settings will be overriden by env settings
+    # we need to set the output_dir explicitly
+    train_config.output_dir = default_config.output_dir.parent / lora_name
 
     if files is None or not files and data_source == "Upload":
         msg = "No files uploaded"
