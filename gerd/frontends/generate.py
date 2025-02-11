@@ -9,7 +9,6 @@ from typing import Any
 import gradio as gr
 
 from gerd.config import CONFIG
-from gerd.frontends.training import get_loras
 from gerd.gen.chat_service import ChatService
 from gerd.models.gen import GenerationConfig
 from gerd.models.model import PromptConfig
@@ -78,14 +77,13 @@ def generate(textbox: str, temp: float, top_p: float, max_tokens: int) -> str:
     return Global.service.generate({"message": textbox}).text
 
 
-def upload_lora(file_upload: str) -> str:
+def upload_lora(file_upload: str) -> None:
     """Upload a LoRA archive.
+
+    Returns None to reset file upload state.
 
     Parameters:
         file_upload: The path to the uploaded archive
-
-    Returns:
-        an empty string to clear the input
     """
     if file_upload is None:
         gr.Warning("No file uploaded")
@@ -94,7 +92,6 @@ def upload_lora(file_upload: str) -> str:
         gr.Warning("File does not exist")
     shutil.unpack_archive(p.as_posix(), lora_dir / p.stem)
     gr.Info(f"Uploaded '{p.stem}'")
-    return ""
 
 
 with demo:
@@ -119,10 +116,14 @@ with demo:
             model_name = gr.Textbox(config.model.name, label="Model Name")
             origin = gr.Dropdown(
                 label="LoRA",
-                choices=["None"] + list(get_loras().keys()),
+                choices=["None"]
+                + [path.stem for path in lora_dir.iterdir() if path.is_dir()],
             )
             origin.blur(
-                lambda: gr.update(choices=["None"] + list(get_loras().keys())),
+                lambda: gr.update(
+                    choices=["None"]
+                    + [path.stem for path in lora_dir.iterdir() if path.is_dir()]
+                ),
                 outputs=origin,
             )
             file_upload = gr.File(
