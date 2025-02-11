@@ -746,7 +746,7 @@ docs = [
 
 [package.metadata]
 requires-dist = [
-    { name = "bitsandbytes", marker = "sys_platform != 'darwin'", specifier = ">=0.45.2" },
+    { name = "bitsandbytes", marker = "sys_platform != 'darwin'", specifier = ">=0.45.0" },
     { name = "datasets", specifier = ">=3.2.0" },
     { name = "faiss-cpu", specifier = ">=1.9.0.post1" },
     { name = "fastapi", specifier = ">=0.115.5" },
