@@ -320,6 +320,7 @@ class Trainer:
             train_template: The training template
             torch_compile: Whether to use torch compile
         """
+        _LOGGER.debug("Training parameter\n============\n %s", self.args)
         self.trainer = transformers.Trainer(
             model=self.lora_model,
             train_dataset=train_data,
