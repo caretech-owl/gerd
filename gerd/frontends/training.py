@@ -435,11 +435,6 @@ with demo:
         choices=["Upload", "Path"],
         value="Upload",
     )
-    select_training_mode.change(
-        lambda x: tuple(gr.update(visible=x == "Unstructured") for _ in range(2)),
-        inputs=select_training_mode,
-        outputs=[slider_cutoff_len, slider_overlap_len],
-    )
     file_ext = "txt" if select_training_mode.value == "Unstructured" else "json"
     file_upload = gr.Files(
         label=f"Upload {file_ext} files",
@@ -448,6 +443,18 @@ with demo:
         ),
         file_count="multiple",
         height=200,
+    )
+    select_training_mode.change(
+        lambda x: tuple(gr.update(visible=x == "Unstructured") for _ in range(2)),
+        inputs=select_training_mode,
+        outputs=[slider_cutoff_len, slider_overlap_len],
+    )
+    select_training_mode.change(
+        lambda x: gr.update(
+            label=f"Upload {'txt' if x == 'Unstructured' else 'json'} files",
+            file_types=([".txt"] if x == "Unstructured" else [".json"]),
+        ),
+        outputs=file_upload,
     )
     text_glob_pattern = gr.Textbox(
         label=f"Glob pattern (should end with .{file_ext})",
