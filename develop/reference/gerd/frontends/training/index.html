@@ -2156,33 +2156,33 @@ on the current training status.</p>
 
             <details class="quote">
               <summary>Source code in <code>gerd/frontends/training.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-480">480</a></span>
-<span class="normal"><a href="#__codelineno-0-481">481</a></span>
-<span class="normal"><a href="#__codelineno-0-482">482</a></span>
-<span class="normal"><a href="#__codelineno-0-483">483</a></span>
-<span class="normal"><a href="#__codelineno-0-484">484</a></span>
-<span class="normal"><a href="#__codelineno-0-485">485</a></span>
-<span class="normal"><a href="#__codelineno-0-486">486</a></span>
-<span class="normal"><a href="#__codelineno-0-487">487</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-487">487</a></span>
 <span class="normal"><a href="#__codelineno-0-488">488</a></span>
 <span class="normal"><a href="#__codelineno-0-489">489</a></span>
 <span class="normal"><a href="#__codelineno-0-490">490</a></span>
 <span class="normal"><a href="#__codelineno-0-491">491</a></span>
 <span class="normal"><a href="#__codelineno-0-492">492</a></span>
-<span class="normal"><a href="#__codelineno-0-493">493</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="k">def</span> <span class="nf">get_loras</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a list of available LoRAs.</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">    LORAs are loaded from the path defined in the default</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">    [LoraTrainingConfig][gerd.training.lora.LoraTrainingConfig].</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">        A dictionary with the LoRA names as keys and the paths as values</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>    <span class="k">return</span> <span class="p">{</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>        <span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="p">:</span> <span class="n">path</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">default_config</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;.zip&quot;</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>    <span class="p">}</span>
+<span class="normal"><a href="#__codelineno-0-493">493</a></span>
+<span class="normal"><a href="#__codelineno-0-494">494</a></span>
+<span class="normal"><a href="#__codelineno-0-495">495</a></span>
+<span class="normal"><a href="#__codelineno-0-496">496</a></span>
+<span class="normal"><a href="#__codelineno-0-497">497</a></span>
+<span class="normal"><a href="#__codelineno-0-498">498</a></span>
+<span class="normal"><a href="#__codelineno-0-499">499</a></span>
+<span class="normal"><a href="#__codelineno-0-500">500</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="k">def</span> <span class="nf">get_loras</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a list of available LoRAs.</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">    LORAs are loaded from the path defined in the default</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">    [LoraTrainingConfig][gerd.training.lora.LoraTrainingConfig].</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">        A dictionary with the LoRA names as keys and the paths as values</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a>    <span class="k">return</span> <span class="p">{</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a>        <span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="p">:</span> <span class="n">path</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">default_config</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;.zip&quot;</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>    <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
