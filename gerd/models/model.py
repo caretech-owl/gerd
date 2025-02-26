@@ -34,16 +34,11 @@ class ChatMessage(TypedDict):
     """The content of the chat message."""
 
 
-class PromptConfig(BaseModel):
-    """Configuration for prompts."""
+class PromptConfigBase(BaseModel):
+    """Parameters for a prompt configuration."""
 
     text: str = "{message}"
     """The text of the prompt. Can contain placeholders."""
-    template: Optional[Template] = Field(
-        exclude=True,
-        default=None,
-    )
-    """Optional template of the prompt. This should follow the Jinja2 syntax."""
     path: Optional[str] = None
     """The path to an external prompt file.
 
@@ -51,7 +46,26 @@ class PromptConfig(BaseModel):
     is_template: bool = False
     """Whether the config uses jinja2 templates."""
 
+
+class PromptConfig(PromptConfigBase):
+    """Configuration for prompts."""
+
+    template: Optional[Template] = Field(
+        exclude=True,
+        default=None,
+    )
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    def as_base(self) -> PromptConfigBase:
+        """Returns parameter of the prompt configurations.
+
+        Returns:
+            Basic prompt configuration parameters
+        """
+        return PromptConfigBase(
+            text=self.text, path=self.path, is_template=self.is_template
+        )
 
     def format(
         self, parameters: Mapping[str, str | list[ChatMessage]] | None = None

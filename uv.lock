@@ -714,12 +714,12 @@ bitsandbytes = [
     { name = "bitsandbytes" },
 ]
 full = [
-    { name = "llama-cpp-python", version = "0.3.5", source = { registry = "https://abetlen.github.io/llama-cpp-python/whl/metal" }, marker = "sys_platform == 'darwin'" },
-    { name = "llama-cpp-python", version = "0.3.6", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform != 'darwin'" },
+    { name = "llama-cpp-python", version = "0.3.2", source = { registry = "https://abetlen.github.io/llama-cpp-python/whl/metal" }, marker = "sys_platform == 'darwin'" },
+    { name = "llama-cpp-python", version = "0.3.2", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform != 'darwin'" },
 ]
 llama-cpp = [
-    { name = "llama-cpp-python", version = "0.3.5", source = { registry = "https://abetlen.github.io/llama-cpp-python/whl/metal" }, marker = "sys_platform == 'darwin'" },
-    { name = "llama-cpp-python", version = "0.3.6", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform != 'darwin'" },
+    { name = "llama-cpp-python", version = "0.3.2", source = { registry = "https://abetlen.github.io/llama-cpp-python/whl/metal" }, marker = "sys_platform == 'darwin'" },
+    { name = "llama-cpp-python", version = "0.3.2", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform != 'darwin'" },
 ]
 
 [package.dev-dependencies]
@@ -1322,7 +1322,7 @@ wheels = [
 
 [[package]]
 name = "llama-cpp-python"
-version = "0.3.5"
+version = "0.3.2"
 source = { registry = "https://abetlen.github.io/llama-cpp-python/whl/metal" }
 resolution-markers = [
     "python_full_version < '3.11' and sys_platform == 'darwin'",
@@ -1337,14 +1337,14 @@ dependencies = [
     { name = "typing-extensions", marker = "sys_platform == 'darwin'" },
 ]
 wheels = [
-    { url = "https://github.com/abetlen/llama-cpp-python/releases/download/v0.3.5-metal/llama_cpp_python-0.3.5-cp310-cp310-macosx_11_0_arm64.whl" },
-    { url = "https://github.com/abetlen/llama-cpp-python/releases/download/v0.3.5-metal/llama_cpp_python-0.3.5-cp311-cp311-macosx_11_0_arm64.whl" },
-    { url = "https://github.com/abetlen/llama-cpp-python/releases/download/v0.3.5-metal/llama_cpp_python-0.3.5-cp312-cp312-macosx_11_0_arm64.whl" },
+    { url = "https://github.com/abetlen/llama-cpp-python/releases/download/v0.3.2-metal/llama_cpp_python-0.3.2-cp310-cp310-macosx_11_0_arm64.whl" },
+    { url = "https://github.com/abetlen/llama-cpp-python/releases/download/v0.3.2-metal/llama_cpp_python-0.3.2-cp311-cp311-macosx_11_0_arm64.whl" },
+    { url = "https://github.com/abetlen/llama-cpp-python/releases/download/v0.3.2-metal/llama_cpp_python-0.3.2-cp312-cp312-macosx_11_0_arm64.whl" },
 ]
 
 [[package]]
 name = "llama-cpp-python"
-version = "0.3.6"
+version = "0.3.2"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version < '3.11' and sys_platform != 'darwin'",
@@ -1358,7 +1358,7 @@ dependencies = [
     { name = "numpy", marker = "sys_platform != 'darwin'" },
     { name = "typing-extensions", marker = "sys_platform != 'darwin'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/72/cd/efae0a18621ba66baf19d19507bb17f1aa2dd5e7f0d5dd4aa008c9bc7091/llama_cpp_python-0.3.6.tar.gz", hash = "sha256:86e35a8888274466958e24201b856cd71c8def0ea72e14312be13da96c15c7a4", size = 66893177 }
+sdist = { url = "https://files.pythonhosted.org/packages/5f/0e/ff129005a33b955088fc7e4ecb57e5500b604fb97eca55ce8688dbe59680/llama_cpp_python-0.3.2.tar.gz", hash = "sha256:8fbf246a55a999f45015ed0d48f91b4ae04ae959827fac1cd6ac6ec65aed2e2f", size = 64964148 }
 
 [[package]]
 name = "markdown"
