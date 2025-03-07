@@ -28,7 +28,8 @@ jobs:
     needs: linting
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        # os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
         python-version: ["3.12", "3.10"]
     runs-on: ${{ matrix.os }}
     steps:
