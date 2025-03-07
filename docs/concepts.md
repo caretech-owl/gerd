@@ -26,6 +26,9 @@ And can be used with a `ChatService` via `load_gen_config` shown in the followin
 Parameters in a configuration can be overwritten by environment variables.
 This is useful for secrets or other sensitive information or when using the same configuration in different environments.
 Environment variables may be provided in a `.env` file in the root directory of the project.
+You can find sample environment files in the project root directory.
+Their name starts with `env.` and is followed by the name of the use case.
+
 `GenerationConfig` are prefixed with `gerd_gen_`, so to override the temperature of a model, the environment variable `gerd_gen_model__temperature` needs to be set.
 Similarly, `QAConfig` configurations are prefixed with `gerd_qa_`.
 The path for the used vector store can be set with `gerd_qa_embedding__db_path`.
