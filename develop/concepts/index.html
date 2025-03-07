@@ -1685,7 +1685,9 @@ A simple configutation file may look like this:</p>
 <p>Parameters in a configuration can be overwritten by environment variables.
 This is useful for secrets or other sensitive information or when using the same configuration in different environments.
 Environment variables may be provided in a <code>.env</code> file in the root directory of the project.
-<code>GenerationConfig</code> are prefixed with <code>gerd_gen_</code>, so to override the temperature of a model, the environment variable <code>gerd_gen_model__temperature</code> needs to be set.
+You can find sample environment files in the project root directory.
+Their name starts with <code>env.</code> and is followed by the name of the use case.</p>
+<p><code>GenerationConfig</code> are prefixed with <code>gerd_gen_</code>, so to override the temperature of a model, the environment variable <code>gerd_gen_model__temperature</code> needs to be set.
 Similarly, <code>QAConfig</code> configurations are prefixed with <code>gerd_qa_</code>.
 The path for the used vector store can be set with <code>gerd_qa_embedding__db_path</code>.
 Note that nested configurations are separated by <code>__</code>.
