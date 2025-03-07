@@ -59,6 +59,7 @@ nav:
   - "README.md"
   - "concepts.md"
   - "develop.md"
+  - "related.md"
 
 plugins:
   - search

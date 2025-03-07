@@ -169,8 +169,11 @@ class ModelEndpoint(BaseModel):
     """Configuration for model endpoints where models are hosted remotely."""
 
     url: str
+    """URL of the remote service"""
     type: EndpointType
+    """Type of the remote service"""
     key: Optional[SecretStr] = None
+    """Token to use the remote service"""
 
 
 class ModelConfig(BaseModel):
