@@ -82,31 +82,3 @@ To use this model, you need to login with the huggingface [cli](https://huggingf
 
 ## Full Documentation
 A more detailled documentation can be found here 👉 [![Documentation](media/mkdocs_logo.svg)](https://caretech-owl.github.io/gerd).
-
-## Used Tools
-- **LangChain**: Framework for developing applications powered by language models
-- **C Transformers**: Python bindings for the Transformer models implemented in C/C++ using GGML library
-- **FAISS**: Open-source library for efficient similarity search and clustering of dense vectors.
-- **Sentence-Transformers (all-MiniLM-L6-v2)**: Open-source pre-trained transformer model for embedding text to a 384-dimensional dense vector space for tasks like
-- **Poetry**: Tool for dependency management and Python packaging
-
-
-## Files and Content
-- `/assets`: Images relevant to the project
-- `/config`: Configuration files for LLM applications
-- `/examples`: Examples that demonstrate the different usage scenarios
-- `/gerd`: Code related to `GERD`
-- `/images`: Images for the documentation
-- `/models`: Binary file of GGML quantized LLM model (i.e., Llama-2-7B-Chat)
-- `/prompts`: Plain text prompt files
-- `/templates`: Prompt files as jinja2 templates 
-- `/tests`: Unit tests for `GERD`
-- `/vectorstore`: FAISS vector store for documents
-- `pyproject.toml`: TOML file to specify which versions of the dependencies used (Poetry)
-
-___
-
-## References
-- https://github.com/kennethleungty/Llama-2-Open-Source-LLM-CPU-Inference
-- https://pubmed.ncbi.nlm.nih.gov/36073490
-- https://huggingface.co
