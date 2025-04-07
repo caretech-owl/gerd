@@ -45,17 +45,22 @@ class ChatService:
             Lock() if not isinstance(self._model, gerd_loader.RemoteLLM) else None
         )
         # Lock is only needed for remote models
-        self._enter_message = None
+        self._enter_messages = None
 
         self.reset(parameters)
 
     def __enter__(self) -> "ChatService":
-        """Enter the runtime context related to this object."""
+        """Enter the runtime context related to this object.
+
+        When a remote model is used, a deepcopy of the service is returned.
+        For local models, the service itself is returned but config and message history
+        restored when the context is exited.
+        """
         _LOGGER.debug("Entering ChatService context.")
         if self._enter_lock:
             self._enter_lock.acquire()
-            self._enter_config = self.config
-            self._enter_message = self.messages
+            self._enter_config = deepcopy(self.config)
+            self._enter_messages = deepcopy(self.messages)
             service = self
         else:
             service = deepcopy(self)
@@ -66,7 +71,7 @@ class ChatService:
         _LOGGER.debug("Exiting ChatService context.")
         if self._enter_lock:
             self.config = self._enter_config
-            self.messages = self._enter_message
+            self.messages = self._enter_messages
             self._enter_lock.release()
 
     def reset(self, parameters: Dict[str, str] | None = None) -> None:
