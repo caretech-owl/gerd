@@ -10,11 +10,13 @@ easier to setup a prompt according to the model's requirements.
 """
 
 import logging
+from copy import deepcopy
+from threading import Lock
 from typing import Dict, Literal, Optional
 
 import gerd.loader as gerd_loader
 from gerd.models.gen import GenerationConfig
-from gerd.models.model import ChatMessage, ModelConfig, PromptConfig
+from gerd.models.model import ChatMessage, PromptConfig
 from gerd.transport import GenResponse
 
 _LOGGER = logging.getLogger(__name__)
@@ -38,7 +40,34 @@ class ChatService:
         self.config = config
         self._model = gerd_loader.load_model_from_config(self.config.model)
         self.messages: list[ChatMessage] = []
+        self._enter_config = None
+        self._enter_lock = (
+            Lock() if not isinstance(self._model, gerd_loader.RemoteLLM) else None
+        )
+        # Lock is only needed for remote models
+        self._enter_message = None
+
         self.reset(parameters)
+
+    def __enter__(self) -> "ChatService":
+        """Enter the runtime context related to this object."""
+        _LOGGER.debug("Entering ChatService context.")
+        if self._enter_lock:
+            self._enter_lock.acquire()
+            self._enter_config = self.config
+            self._enter_message = self.messages
+            service = self
+        else:
+            service = deepcopy(self)
+        return service
+
+    def __exit__(self, exc_type, exc_value, traceback) -> None:  # noqa: ANN001
+        """Exit the runtime context related to this object."""
+        _LOGGER.debug("Exiting ChatService context.")
+        if self._enter_lock:
+            self.config = self._enter_config
+            self.messages = self._enter_message
+            self._enter_lock.release()
 
     def reset(self, parameters: Dict[str, str] | None = None) -> None:
         """Reset the chat history."""
