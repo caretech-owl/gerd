@@ -1,5 +1,8 @@
+"""Unit tests for the chat service."""
+
 from threading import Thread
 from time import sleep
+
 import pytest
 from pytest_mock import MockerFixture
 

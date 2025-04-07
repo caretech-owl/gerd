@@ -12,7 +12,8 @@ easier to setup a prompt according to the model's requirements.
 import logging
 from copy import deepcopy
 from threading import Lock
-from typing import Dict, Literal, Optional
+from types import TracebackType
+from typing import Dict, Literal, Optional, Type
 
 import gerd.loader as gerd_loader
 from gerd.models.gen import GenerationConfig
@@ -37,15 +38,14 @@ class ChatService:
         The used LLM is loaded according to the model configuration
         right on initialization.
         """
-        self.config = config
-        self._model = gerd_loader.load_model_from_config(self.config.model)
+        self.config = self._enter_config = config
         self.messages: list[ChatMessage] = []
-        self._enter_config = None
-        self._enter_lock = (
+        self._enter_messages = self.messages
+        self._model = gerd_loader.load_model_from_config(self.config.model)
+        self._enter_lock: Lock | None = (
             Lock() if not isinstance(self._model, gerd_loader.RemoteLLM) else None
         )
         # Lock is only needed for remote models
-        self._enter_messages = None
 
         self.reset(parameters)
 
@@ -66,7 +66,12 @@ class ChatService:
             service = deepcopy(self)
         return service
 
-    def __exit__(self, exc_type, exc_value, traceback) -> None:  # noqa: ANN001
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc: Optional[BaseException],
+        traceback: Optional[TracebackType],
+    ) -> None:
         """Exit the runtime context related to this object."""
         _LOGGER.debug("Exiting ChatService context.")
         if self._enter_lock:
