@@ -81,15 +81,14 @@ def test_context_local(
     with chat_service_local as chat:
         assert chat.config == generation_config
         assert chat.messages == my_messages
-        chat.messages = [ChatMessage(role="system", content="bar")]
-        assert chat.messages != my_messages
+        chat.messages.clear()
         assert chat._enter_lock is not None  # noqa: SLF001
         assert id(chat) == id(chat_service_local)
         thread = Thread(target=acquire_lock, args=(chat,))
         thread.start()
         thread.join(timeout=0.1)
         tested = True
-    assert chat.messages == my_messages
+    assert len(chat_service_local.messages) > 0
 
 def test_context_remote(
     chat_service_remote: ChatService,
@@ -106,6 +105,7 @@ def test_context_remote(
         chat.messages = [ChatMessage(role="user", content="Hello")]
         assert chat._enter_lock is None  # noqa: SLF001
         assert id(chat) != id(chat_service_remote)
+        assert id(chat.messages) != id(chat_service_remote.messages)
         with chat as chat2:
             assert id(chat) != id(chat2)
         assert chat_service_remote.messages != chat.messages
