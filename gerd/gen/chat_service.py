@@ -45,7 +45,7 @@ class ChatService:
         self._enter_lock: Lock | None = (
             Lock() if not isinstance(self._model, gerd_loader.RemoteLLM) else None
         )
-        # Lock is only needed for remote models
+        # Lock is only needed for local models
 
         self.reset(parameters)
 
