@@ -16,14 +16,14 @@ from gerd.models.model import ChatMessage, ModelConfig, ModelEndpoint
 def chat_service_local(
     mocker: MockerFixture, generation_config: GenerationConfig
 ) -> ChatService:
-    """A fixture that returns a GenerationService instance.
+    """A fixture that returns a ChatService instance.
 
     Parameters:
         mocker: The mocker fixture
         generation_config: The generation configuration fixture
 
     Returns:
-        A GenerationService instance
+        A ChatService instance
     """
     _ = mocker.patch(
         "gerd.loader.load_model_from_config",
@@ -36,14 +36,14 @@ def chat_service_local(
 def chat_service_remote(
     mocker: MockerFixture, generation_config: GenerationConfig
 ) -> ChatService:
-    """A fixture that returns a GenerationService instance.
+    """A fixture that returns a ChatService instance.
 
     Parameters:
         mocker: The mocker fixture
         generation_config: The generation configuration fixture
 
     Returns:
-        A GenerationService instance
+        A ChatService instance
     """
     _ = mocker.patch(
         "gerd.loader.load_model_from_config",
