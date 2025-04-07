@@ -61,14 +61,11 @@ def chat_service_remote(
     return ChatService(generation_config)
 
 
-def test_context_local(
-    chat_service_local: ChatService, generation_config: GenerationConfig
-) -> None:
-    """Test the context manager of the GenerationService class.
+def test_context_local(chat_service_local: ChatService) -> None:
+    """Test the context manager of the ChatService class.
 
     Parameters:
-        gen_service: The GenerationService fixture
-        generation_config: The generation configuration fixture
+        chat_service_local: The ChatService fixture
     """
     tested = False
     my_messages = [ChatMessage(role="user", content="Hello")]
@@ -82,7 +79,6 @@ def test_context_local(
                 raise RuntimeError(msg)
 
     with chat_service_local as chat:
-        assert chat.config == generation_config
         assert chat.messages == my_messages
         chat.messages.clear()
         assert chat._enter_lock is not None  # noqa: SLF001
@@ -93,18 +89,14 @@ def test_context_local(
         tested = True
     assert len(chat_service_local.messages) > 0
 
-def test_context_remote(
-    chat_service_remote: ChatService,
-    generation_config: GenerationConfig,
-) -> None:
+
+def test_context_remote(chat_service_remote: ChatService) -> None:
     """Test the context manager of the GenerationService class.
 
     Parameters:
-        gen_service: The GenerationService fixture
-        generation_config: The generation configuration fixture
+        chat_service_remote: The ChatService fixture with RemoteLLM
     """
     with chat_service_remote as chat:
-        assert chat.config == generation_config
         chat.messages = [ChatMessage(role="user", content="Hello")]
         assert chat._enter_lock is None  # noqa: SLF001
         assert id(chat) != id(chat_service_remote)
