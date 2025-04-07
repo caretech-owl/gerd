@@ -62,7 +62,7 @@ def chat_service_remote(
 
 
 def test_context_local(chat_service_local: ChatService) -> None:
-    """Test the context manager of the ChatService class.
+    """Test the context manager of the ChatService class for local LLM.
 
     Parameters:
         chat_service_local: The ChatService fixture
@@ -91,7 +91,7 @@ def test_context_local(chat_service_local: ChatService) -> None:
 
 
 def test_context_remote(chat_service_remote: ChatService) -> None:
-    """Test the context manager of the GenerationService class.
+    """Test the context manager of the ChatService class for remote LLM.
 
     Parameters:
         chat_service_remote: The ChatService fixture with RemoteLLM
