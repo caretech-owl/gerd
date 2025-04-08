@@ -70,7 +70,15 @@ class PromptConfig(PromptConfigBase):
         Returns:
             A deep copy of the prompt configuration
         """
-        return PromptConfig.model_validate_json(self.model_dump_json())
+        if memo is None:
+            memo = {}
+
+        if id(self) in memo:
+            return memo[id(self)]
+
+        copied_obj = PromptConfig.model_validate_json(self.model_dump_json())
+        memo[id(self)] = copied_obj
+        return copied_obj
 
     def as_base(self) -> PromptConfigBase:
         """Returns parameter of the prompt configurations.
