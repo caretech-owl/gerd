@@ -57,6 +57,21 @@ class PromptConfig(PromptConfigBase):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
+    # Jinja2 template is not deepcopyable:
+    # https://github.com/pallets/jinja/issues/758
+    def __deepcopy__(self, memo: dict[int, Any] | None = None) -> "PromptConfig":
+        """Deep copy the prompt configuration.
+
+        We need to copy the PromptConfig object to avoid issues with the jinja2
+        template as it is not deepcopyable. We use the model_dump_json method to
+        serialize the object to JSON and then deserialize it back to a PromptConfig.
+        Parameters:
+            memo: The memo dictionary for the deepcopy
+        Returns:
+            A deep copy of the prompt configuration
+        """
+        return PromptConfig.model_validate_json(self.model_dump_json())
+
     def as_base(self) -> PromptConfigBase:
         """Returns parameter of the prompt configurations.
 
