@@ -9,7 +9,7 @@ from pytest_mock import MockerFixture
 from gerd.gen.chat_service import ChatService
 from gerd.loader import MockLLM, RemoteLLM
 from gerd.models.gen import GenerationConfig
-from gerd.models.model import ChatMessage, ModelConfig, ModelEndpoint
+from gerd.models.model import ChatMessage, ModelConfig, ModelEndpoint, PromptConfig
 
 
 @pytest.fixture
@@ -104,3 +104,32 @@ def test_context_remote(chat_service_remote: ChatService) -> None:
         with chat as chat2:
             assert id(chat) != id(chat2)
         assert chat_service_remote.messages != chat.messages
+
+
+def test_context_remote_template(chat_service_remote: ChatService) -> None:
+    """Test the context manager with a template config and remote LLM.
+
+    Parameters:
+        chat_service_remote: The ChatService fixture with RemoteLLM
+    """
+    chat_service_remote.set_prompt_config(PromptConfig(is_template=True, text="Hello!"))
+    with chat_service_remote as chat:
+        chat.messages = [ChatMessage(role="user", content="Hello")]
+        assert chat._enter_lock is None  # noqa: SLF001
+        assert id(chat) != id(chat_service_remote)
+        assert id(chat.messages) != id(chat_service_remote.messages)
+        with chat as chat2:
+            assert id(chat) != id(chat2)
+        assert chat_service_remote.messages != chat.messages
+
+
+def test_context_local_template(chat_service_local: ChatService) -> None:
+    """Test the context manager with a template config and local LLM.
+
+    Parameters:
+        chat_service_local: The ChatService fixture with local LLM
+    """
+    chat_service_local.set_prompt_config(PromptConfig(is_template=True, text="Hello!"))
+    with chat_service_local as chat:
+        assert chat.get_prompt_config().is_template
+        assert chat._enter_lock is not None  # noqa: SLF001
