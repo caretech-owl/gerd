@@ -1,5 +1,6 @@
 """Model configuration for supported model classes."""
 
+import logging
 import sys
 from pathlib import Path
 from string import Formatter
@@ -18,6 +19,9 @@ from pydantic import (
     SecretStr,
     computed_field,
 )
+
+_LOGGER = logging.getLogger(__name__)
+_LOGGER.addHandler(logging.NullHandler())
 
 ChatRole = Literal["system", "user", "assistant"]
 """Currently supported chat roles."""
@@ -74,7 +78,12 @@ class PromptConfig(PromptConfigBase):
             memo = {}
 
         if id(self) in memo:
-            return memo[id(self)]
+            previous_copy = memo[id(self)]
+            if isinstance(previous_copy, PromptConfig):
+                return previous_copy
+            _LOGGER.warning(
+                "Previous copy of PromptConfig was not a PromptConfig object."
+            )
 
         copied_obj = PromptConfig.model_validate_json(self.model_dump_json())
         memo[id(self)] = copied_obj
