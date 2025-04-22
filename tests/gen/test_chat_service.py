@@ -1,5 +1,6 @@
 """Unit tests for the chat service."""
 
+import json
 from threading import Thread
 from time import sleep
 
@@ -34,7 +35,7 @@ def chat_service_local(
 
 @pytest.fixture
 def chat_service_remote(
-    mocker: MockerFixture, generation_config: GenerationConfig
+    generation_config: GenerationConfig
 ) -> ChatService:
     """A fixture that returns a ChatService instance.
 
@@ -45,18 +46,10 @@ def chat_service_remote(
     Returns:
         A ChatService instance
     """
-    _ = mocker.patch(
-        "gerd.loader.load_model_from_config",
-        return_value=RemoteLLM(
-            ModelConfig(
-                name="not_used",
-                endpoint=ModelEndpoint(
-                    url="not_used",
-                    type="llama.cpp",
-                    key=None,
-                ),
-            )
-        ),
+    generation_config.model.name = "not_used"
+    generation_config.model.endpoint = ModelEndpoint(
+        url="not_used",
+        type="openai",
     )
     return ChatService(generation_config)
 
@@ -133,3 +126,34 @@ def test_context_local_template(chat_service_local: ChatService) -> None:
     with chat_service_local as chat:
         assert chat.get_prompt_config().is_template
         assert chat._enter_lock is not None  # noqa: SLF001
+
+
+def test_model_edit(mocker: MockerFixture, chat_service_remote: ChatService) -> None:
+    """Test wether model edits are considered.
+
+    Parameters:
+        chat_service_remote: The ChatService fixture
+    """
+    from requests.models import Response
+
+    chat_service_remote.set_prompt_config(
+        PromptConfig(is_template=True, text="{message}")
+    )
+    res = Response()
+    res.status_code = 200
+    res._content = b'{"choices":[{"message":{"role":"assistant","content":"Hello!"}}]}'  # noqa: SLF001
+    chat_completion = mocker.patch(
+        "requests.post",
+        return_value=res
+    )
+    test_model = "test_model"
+    chat_service_remote.config.model.name = test_model
+    chat_service_remote.submit_user_message({"message": "Hello"})
+    parsed = json.loads(chat_completion.call_args_list[-1][1]["data"])
+    assert parsed["model"] == test_model
+    with chat_service_remote as chat:
+        another_model = "another_model"
+        chat.config.model.name = another_model
+        chat.submit_user_message({"message": "Hello"})
+        parsed = json.loads(chat_completion.call_args_list[-1][1]["data"])
+        assert parsed["model"] == another_model
