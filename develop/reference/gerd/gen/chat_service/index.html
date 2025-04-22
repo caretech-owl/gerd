@@ -2052,13 +2052,7 @@ manual configuration to set up the prompt according to the model's requirements.
 <span class="normal"><a href="#__codelineno-0-157">157</a></span>
 <span class="normal"><a href="#__codelineno-0-158">158</a></span>
 <span class="normal"><a href="#__codelineno-0-159">159</a></span>
-<span class="normal"><a href="#__codelineno-0-160">160</a></span>
-<span class="normal"><a href="#__codelineno-0-161">161</a></span>
-<span class="normal"><a href="#__codelineno-0-162">162</a></span>
-<span class="normal"><a href="#__codelineno-0-163">163</a></span>
-<span class="normal"><a href="#__codelineno-0-164">164</a></span>
-<span class="normal"><a href="#__codelineno-0-165">165</a></span>
-<span class="normal"><a href="#__codelineno-0-166">166</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="k">def</span> <span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GenResponse</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-160">160</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="k">def</span> <span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GenResponse</span><span class="p">:</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a response based on the chat history.</span>
 <a id="__codelineno-0-124" name="__codelineno-0-124"></a>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">    This method can be used as a replacement for</span>
@@ -2088,21 +2082,15 @@ manual configuration to set up the prompt according to the model's requirements.
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a>    <span class="k">else</span><span class="p">:</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a>        <span class="n">resolved</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">)</span>
 <a id="__codelineno-0-151" name="__codelineno-0-151"></a>        <span class="n">_LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-<a id="__codelineno-0-152" name="__codelineno-0-152"></a>            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a>            <span class="s2">&quot;===== Resolved prompt ======</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-154" name="__codelineno-0-154"></a>            <span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-155" name="__codelineno-0-155"></a>            <span class="s2">&quot;============================&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-156" name="__codelineno-0-156"></a>            <span class="n">resolved</span><span class="p">,</span>
-<a id="__codelineno-0-157" name="__codelineno-0-157"></a>        <span class="p">)</span>
-<a id="__codelineno-0-158" name="__codelineno-0-158"></a>        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">resolved</span><span class="p">)</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a>        <span class="n">_LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-<a id="__codelineno-0-160" name="__codelineno-0-160"></a>            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a>            <span class="s2">&quot;========= Response =========</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a>            <span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-163" name="__codelineno-0-163"></a>            <span class="s2">&quot;============================&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-164" name="__codelineno-0-164"></a>            <span class="n">response</span><span class="p">,</span>
-<a id="__codelineno-0-165" name="__codelineno-0-165"></a>        <span class="p">)</span>
-<a id="__codelineno-0-166" name="__codelineno-0-166"></a>    <span class="k">return</span> <span class="n">GenResponse</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">response</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="n">resolved</span><span class="p">)</span>
+<a id="__codelineno-0-152" name="__codelineno-0-152"></a>            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">===== Resolved prompt ======</span><span class="se">\n\n</span><span class="si">%s</span><span class="se">\n\n</span><span class="s2">============================&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a>            <span class="n">resolved</span><span class="p">,</span>
+<a id="__codelineno-0-154" name="__codelineno-0-154"></a>        <span class="p">)</span>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a>        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">resolved</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a>        <span class="n">_LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a>            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">========= Response =========</span><span class="se">\n\n</span><span class="si">%s</span><span class="se">\n\n</span><span class="s2">============================&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a>            <span class="n">response</span><span class="p">,</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a>        <span class="p">)</span>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a>    <span class="k">return</span> <span class="n">GenResponse</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">response</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="n">resolved</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -2262,7 +2250,13 @@ Parameters:
 
             <details class="quote">
               <summary>Source code in <code>gerd/gen/chat_service.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-168">168</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-162">162</a></span>
+<span class="normal"><a href="#__codelineno-0-163">163</a></span>
+<span class="normal"><a href="#__codelineno-0-164">164</a></span>
+<span class="normal"><a href="#__codelineno-0-165">165</a></span>
+<span class="normal"><a href="#__codelineno-0-166">166</a></span>
+<span class="normal"><a href="#__codelineno-0-167">167</a></span>
+<span class="normal"><a href="#__codelineno-0-168">168</a></span>
 <span class="normal"><a href="#__codelineno-0-169">169</a></span>
 <span class="normal"><a href="#__codelineno-0-170">170</a></span>
 <span class="normal"><a href="#__codelineno-0-171">171</a></span>
@@ -2290,47 +2284,41 @@ Parameters:
 <span class="normal"><a href="#__codelineno-0-193">193</a></span>
 <span class="normal"><a href="#__codelineno-0-194">194</a></span>
 <span class="normal"><a href="#__codelineno-0-195">195</a></span>
-<span class="normal"><a href="#__codelineno-0-196">196</a></span>
-<span class="normal"><a href="#__codelineno-0-197">197</a></span>
-<span class="normal"><a href="#__codelineno-0-198">198</a></span>
-<span class="normal"><a href="#__codelineno-0-199">199</a></span>
-<span class="normal"><a href="#__codelineno-0-200">200</a></span>
-<span class="normal"><a href="#__codelineno-0-201">201</a></span>
-<span class="normal"><a href="#__codelineno-0-202">202</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="k">def</span> <span class="nf">submit_user_message</span><span class="p">(</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a>    <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a>    <span class="n">prompt_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PromptConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GenResponse</span><span class="p">:</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Submit a message with the user role and generates a response.</span>
+<span class="normal"><a href="#__codelineno-0-196">196</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="k">def</span> <span class="nf">submit_user_message</span><span class="p">(</span>
+<a id="__codelineno-0-163" name="__codelineno-0-163"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-164" name="__codelineno-0-164"></a>    <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-165" name="__codelineno-0-165"></a>    <span class="n">prompt_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PromptConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GenResponse</span><span class="p">:</span>
+<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Submit a message with the user role and generates a response.</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    The service&#39;s prompt configuration is used to format the prompt unless</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    a different prompt configuration is provided.</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">    Parameters:</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">        parameters: The parameters to format the prompt with</span>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        prompt_config: The optional prompt configuration to be used</span>
 <a id="__codelineno-0-174" name="__codelineno-0-174"></a>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">    The service&#39;s prompt configuration is used to format the prompt unless</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">    a different prompt configuration is provided.</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    Parameters:</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">        parameters: The parameters to format the prompt with</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">        prompt_config: The optional prompt configuration to be used</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">        The generation result</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">prompt_config</span><span class="o">=</span><span class="n">prompt_config</span><span class="p">)</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a>    <span class="n">_LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a>        <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a>        <span class="s2">&quot;===== Resolved prompt ======</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a>        <span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a>        <span class="s2">&quot;============================&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a>        <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;role&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">),</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="p">)</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a>    <span class="n">role</span><span class="p">,</span> <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">create_chat_completion</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">)</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a>    <span class="n">_LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a>        <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a>        <span class="s2">&quot;========= Response =========</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a>        <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a>        <span class="s2">&quot;============================&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a>        <span class="n">role</span><span class="p">,</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="n">response</span><span class="p">,</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="p">)</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">role</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">response</span><span class="p">})</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a>    <span class="k">return</span> <span class="n">GenResponse</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">response</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="s2">&quot;content&quot;</span><span class="p">])</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">        The generation result</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">prompt_config</span><span class="o">=</span><span class="n">prompt_config</span><span class="p">)</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a>    <span class="n">_LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a>        <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">===== Resolved prompt ======</span><span class="se">\n\n</span><span class="si">%s</span><span class="se">\n\n</span><span class="s2">============================&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a>        <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;role&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">),</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a>    <span class="p">)</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a>    <span class="n">role</span><span class="p">,</span> <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">create_chat_completion</span><span class="p">(</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model</span>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a>    <span class="p">)</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a>    <span class="n">_LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a>        <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">========= Response =========</span><span class="se">\n\n</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="se">\n\n</span><span class="s2">============================&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a>        <span class="n">role</span><span class="p">,</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a>        <span class="n">response</span><span class="p">,</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a>    <span class="p">)</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">role</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">response</span><span class="p">})</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a>        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Message queue should contain at least 2 messages.&quot;</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a>        <span class="n">_LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a>        <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a>    <span class="k">return</span> <span class="n">GenResponse</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">response</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="s2">&quot;content&quot;</span><span class="p">])</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
