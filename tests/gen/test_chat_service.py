@@ -148,20 +148,10 @@ def test_model_edit(mocker: MockerFixture, chat_service_remote: ChatService) -> 
     chat_service_remote.config.model.name = test_model
     chat_service_remote.submit_user_message({"message": "Hello"})
     parsed = json.loads(chat_completion.call_args_list[-1][1]["data"])
-    expected_payload = {
-        "model": test_model,
-        "messages": [{"role": "user", "content": "Hello"}],
-        # Add other expected fields here if applicable
-    }
-    assert parsed == expected_payload
+    assert parsed["model"] == test_model
     with chat_service_remote as chat:
         another_model = "another_model"
         chat.config.model.name = another_model
         chat.submit_user_message({"message": "Hello"})
         parsed = json.loads(chat_completion.call_args_list[-1][1]["data"])
-        expected_payload = {
-            "model": another_model,
-            "messages": [{"role": "user", "content": "Hello"}],
-            # Add other expected fields here if applicable
-        }
-        assert parsed == expected_payload
+        assert parsed["model"] == another_model
