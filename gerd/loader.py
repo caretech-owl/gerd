@@ -9,7 +9,7 @@ import abc
 import logging
 import os
 from pathlib import Path
-from typing import Iterator
+from typing import Iterator, TypeGuard
 
 from typing_extensions import override
 
@@ -35,7 +35,7 @@ class LLM:
         pass
 
     @abc.abstractmethod
-    def generate(self, prompt: str) -> str:
+    def generate(self, prompt: str, config: ModelConfig | None = None) -> str:
         """Generate text based on a prompt.
 
         Parameters:
@@ -48,7 +48,7 @@ class LLM:
 
     @abc.abstractmethod
     def create_chat_completion(
-        self, messages: list[ChatMessage]
+        self, messages: list[ChatMessage], config: ModelConfig | None = None
     ) -> tuple[ChatRole, str]:
         """Create a chat completion based on a list of messages.
 
@@ -70,11 +70,13 @@ class MockLLM(LLM):
         pass
 
     @override
-    def generate(self, _: str) -> str:
+    def generate(self, _unused: str, _not_used: ModelConfig | None = None) -> str:
         return self.ret_value
 
     @override
-    def create_chat_completion(self, _: list[ChatMessage]) -> tuple[ChatRole, str]:
+    def create_chat_completion(
+        self, _unused: list[ChatMessage], _not_used: ModelConfig | None = None
+    ) -> tuple[ChatRole, str]:
         return ("assistant", self.ret_value)
 
 
@@ -96,33 +98,35 @@ class LlamaCppLLM(LLM):
         )
 
     @override
-    def generate(self, prompt: str) -> str:
+    def generate(self, prompt: str, config: ModelConfig | None = None) -> str:
+        config = config or self.config
         res = self._model(
             prompt,
-            stop=self.config.stop,
-            max_tokens=self.config.max_new_tokens,
-            top_p=self.config.top_p,
-            top_k=self.config.top_k,
-            temperature=self.config.temperature,
-            repeat_penalty=self.config.repetition_penalty,
+            stop=config.stop,
+            max_tokens=config.max_new_tokens,
+            top_p=config.top_p,
+            top_k=config.top_k,
+            temperature=config.temperature,
+            repeat_penalty=config.repetition_penalty,
         )
         output = next(res) if isinstance(res, Iterator) else res
         return output["choices"][0]["text"]
 
     @override
     def create_chat_completion(
-        self, messages: list[ChatMessage]
+        self, messages: list[ChatMessage], config: ModelConfig | None = None
     ) -> tuple[ChatRole, str]:
+        config = config or self.config
         res = self._model.create_chat_completion(
             # mypy cannot resolve the role parameter even though
             # is is defined on compatible literals
             [{"role": m["role"], "content": m["content"]} for m in messages],  # type: ignore[misc]
-            stop=self.config.stop,
-            max_tokens=self.config.max_new_tokens,
-            top_p=self.config.top_p,
-            top_k=self.config.top_k,
-            temperature=self.config.temperature,
-            repeat_penalty=self.config.repetition_penalty,
+            stop=config.stop,
+            max_tokens=config.max_new_tokens,
+            top_p=config.top_p,
+            top_k=config.top_k,
+            temperature=config.temperature,
+            repeat_penalty=config.repetition_penalty,
         )
         if not isinstance(res, Iterator):
             msg = res["choices"][0]["message"]
@@ -209,14 +213,15 @@ class TransformerLLM(LLM):
         )
 
     @override
-    def generate(self, prompt: str) -> str:
+    def generate(self, prompt: str, config: ModelConfig | None = None) -> str:
+        config = config or self.config
         res = self._pipe(
             prompt,
-            max_new_tokens=self.config.max_new_tokens,
-            repetition_penalty=self.config.repetition_penalty,
-            top_k=self.config.top_k,
-            top_p=self.config.top_p,
-            temperature=self.config.temperature,
+            max_new_tokens=config.max_new_tokens,
+            repetition_penalty=config.repetition_penalty,
+            top_k=config.top_k,
+            top_p=config.top_p,
+            temperature=config.temperature,
             do_sample=True,
         )
         output: str = res[0]["generated_text"]
@@ -224,15 +229,16 @@ class TransformerLLM(LLM):
 
     @override
     def create_chat_completion(
-        self, messages: list[ChatMessage]
+        self, messages: list[ChatMessage], config: ModelConfig | None = None
     ) -> tuple[ChatRole, str]:
+        config = config or self.config
         msg = self._pipe(
             messages,
-            max_new_tokens=self.config.max_new_tokens,
-            repetition_penalty=self.config.repetition_penalty,
-            top_k=self.config.top_k,
-            top_p=self.config.top_p,
-            temperature=self.config.temperature,
+            max_new_tokens=config.max_new_tokens,
+            repetition_penalty=config.repetition_penalty,
+            top_k=config.top_k,
+            top_p=config.top_p,
+            temperature=config.temperature,
             do_sample=True,
         )[0]["generated_text"][-1]
         return (msg["role"], msg["content"].strip())
@@ -249,59 +255,48 @@ class RemoteLLM(LLM):
     @override
     def __init__(self, config: ModelConfig) -> None:
         self.config = config
-        if self.config.endpoint is None:
+        if config.endpoint is None:
             msg = "Endpoint is required for remote LLM"
             raise ValueError(msg)
 
-        self._ep: ModelEndpoint = self.config.endpoint
-        self._prompt_field = "prompt"
-        self._header = {"Content-Type": "application/json"}
-        if self.config.endpoint.key:
-            self._header["Authorization"] = (
-                f"Bearer {self.config.endpoint.key.get_secret_value()}"
-            )
-
-        if self.config.endpoint.type == "openai":
-            self.msg_template = {
-                "model": self.config.name,
-                "temperature": self.config.temperature,
-                "frequency_penalty": self.config.repetition_penalty,
-                "max_completion_tokens": self.config.max_new_tokens,
-                "n": 1,
-                "stop": self.config.stop,
-                "top_p": self.config.top_p,
-            }
-        elif self.config.endpoint.type == "llama.cpp":
-            self.msg_template = {
-                "temperature": self.config.temperature,
-                "top_k": self.config.top_k,
-                "top_p": self.config.top_p,
-                "repeat_penalty": self.config.repetition_penalty,
-                "n_predict": self.config.max_new_tokens,
-                "stop": self.config.stop or [],
-            }
-        else:
-            msg = f"Unknown endpoint type: {self.config.endpoint.type}"
-            raise ValueError(msg)
-
     @override
-    def generate(self, prompt: str) -> str:
+    def generate(self, prompt: str, config: ModelConfig | None = None) -> str:
         import json
 
         import requests
 
-        if self.config.endpoint and self.config.endpoint.type != "llama.cpp":
+        config = config or self.config
+        if config.endpoint is None:
+            msg = "Endpoint is required for remote LLM"
+            raise ValueError(msg)
+
+        headers = {"Content-Type": "application/json"}
+        if config.endpoint.key:
+            headers["Authorization"] = (
+                f"Bearer {config.endpoint.key.get_secret_value()}"
+            )
+
+        if config.endpoint and config.endpoint.type != "llama.cpp":
             msg = (
                 "Only llama.cpp supports simple completion yet. "
                 "Use chat completion instead."
             )
             raise NotImplementedError(msg)
 
-        self.msg_template[self._prompt_field] = prompt
+        req = {
+            "temperature": config.temperature,
+            "top_k": config.top_k,
+            "top_p": config.top_p,
+            "repeat_penalty": config.repetition_penalty,
+            "n_predict": config.max_new_tokens,
+            "stop": config.stop or [],
+            "prompt": prompt,
+        }
+
         res = requests.post(
-            self._ep.url + "/completion",
-            headers=self._header,
-            data=json.dumps(self.msg_template),
+            config.endpoint.url + "/completion",
+            headers=headers,
+            data=json.dumps(req),
             timeout=300,
         )
         if res.status_code == 200:
@@ -312,25 +307,66 @@ class RemoteLLM(LLM):
 
     @override
     def create_chat_completion(
-        self, messages: list[ChatMessage]
+        self, messages: list[ChatMessage], config: ModelConfig | None = None
     ) -> tuple[ChatRole, str]:
         import json
 
         import requests
 
-        self.msg_template["messages"] = messages
+        config = config or self.config
+        if config.endpoint is None:
+            msg = "Endpoint is required for remote LLM"
+            raise ValueError(msg)
+
+        headers = {"Content-Type": "application/json"}
+        if config.endpoint.key:
+            headers["Authorization"] = (
+                f"Bearer {config.endpoint.key.get_secret_value()}"
+            )
+
+        if config.endpoint.type == "openai":
+            req = {
+                "model": config.name,
+                "temperature": config.temperature,
+                "frequency_penalty": config.repetition_penalty,
+                "max_completion_tokens": config.max_new_tokens,
+                "n": 1,
+                "stop": config.stop,
+                "top_p": config.top_p,
+            }
+        elif config.endpoint.type == "llama.cpp":
+            req = {
+                "temperature": config.temperature,
+                "top_k": config.top_k,
+                "top_p": config.top_p,
+                "repeat_penalty": config.repetition_penalty,
+                "n_predict": config.max_new_tokens,
+                "stop": config.stop or [],
+            }
+        else:
+            msg = f"Unknown endpoint type: {config.endpoint.type}"
+            raise ValueError(msg)
+
+        req["messages"] = messages
         res = requests.post(
-            self._ep.url + "/v1/chat/completions",
-            headers=self._header,
-            data=json.dumps(self.msg_template),
+            config.endpoint.url + "/v1/chat/completions",
+            headers=headers,
+            data=json.dumps(req),
             timeout=300,
         )
         if res.status_code == 200:
-            msg = res.json()["choices"][0]["message"]
-            return (msg["role"], msg["content"].strip())
+            res_message: dict[str, str] = res.json()["choices"][0]["message"]
+            if _is_valid_role(res_message["role"]):
+                return (res_message["role"], res_message["content"].strip())
+            msg = "Unknown role: %s" % res_message["role"]
+            raise ValueError(msg)
         else:
             _LOGGER.warning("Server returned error code %d", res.status_code)
         return ("assistant", "")
+
+
+def _is_valid_role(role: str) -> TypeGuard[ChatRole]:
+    return role in {"user", "assistant", "system"}
 
 
 def load_model_from_config(config: ModelConfig) -> LLM:
