@@ -359,6 +359,7 @@ class RemoteLLM(LLM):
             if _is_valid_role(res_message["role"]):
                 return (res_message["role"], res_message["content"].strip())
             msg = "Unknown role: %s" % res_message["role"]
+            _LOGGER.error(msg)
             raise ValueError(msg)
         else:
             _LOGGER.warning("Server returned error code %d", res.status_code)
