@@ -189,4 +189,7 @@ class ChatService:
             response,
         )
         self.messages.append({"role": role, "content": response})
+        if len(self.messages) < 2:
+            msg = "Not enough messages in history to access the second-to-last message."
+            raise IndexError(msg)
         return GenResponse(text=response, prompt=self.messages[-2]["content"])
