@@ -11,4 +11,4 @@ features:
       - text: "{question}"
       - text: "Here is a statement:\n{response_1}\n\nMake a bullet point list of the assumptions you made when producing the above statement.\n\n"
       - text: "Here is a bullet point list of assertions:\n{response_2}\n\nFor each assertion, determine whether it is true or false. If it is false, explain why.\n\n"
-      - text: "{response_3}\n\nIn light of the above facts, how would you answer the question '{question}'"
+      - text: "Here is a statement:\n{response_1}\n\n Here is a bullet point list of assertions for that statement:\n{response_2}\n\nFinally, here  is some reasoning about the assertions {response_3}\n\nIn light of the above facts, how would you answer the question '{question}'"
