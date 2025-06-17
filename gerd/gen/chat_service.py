@@ -135,7 +135,6 @@ class ChatService:
             The generation result
         """
         self.reset(parameters)
-        self.add_message(parameters, role="user")
 
         if self.config.features.prompt_chaining:
             for i, prompt_config in enumerate(
@@ -147,6 +146,7 @@ class ChatService:
             response = res.text
             resolved = "\n".join(parameters.values())
         else:
+            self.add_message(parameters, role="user")
             resolved = "\n".join(m["content"] for m in self.messages)
             _LOGGER.debug(
                 "\n===== Resolved prompt ======\n\n%s\n\n============================",
