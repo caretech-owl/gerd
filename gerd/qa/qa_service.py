@@ -12,8 +12,8 @@ from os import unlink
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
-
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+#from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
 
 import gerd.loader as gerd_loader
@@ -80,6 +80,9 @@ class QAService:
         Returns:
             A list of document sources
         """
+
+
+        
         if not self._vectorstore:
             return []
         return [
@@ -112,6 +115,9 @@ class QAService:
             return []
         return self._vectorstore.embeddings.embed_documents([question.question])[0]
 
+
+
+
     def query(self, question: QAQuestion) -> QAAnswer:
         """Pass a question to the language model.
 
@@ -124,6 +130,12 @@ class QAService:
         Returns:
             The answer from the language model
         """
+        print(f'no_think: {question.no_think}')
+        print(f'model: {self.config.model.name}')
+        if question.no_think and not question.question.strip().startswith("/no_think"):   #-> hier Änderung
+            question.question = f"/no_think {question.question.strip()}"
+            _LOGGER.warning("Applied /no_think prefix to question: %s", question.question)
+        
         if not self._database:
             if not self._vectorstore:
                 return QAAnswer(error_msg="No database available!", status=404)
@@ -134,7 +146,10 @@ class QAService:
                 self._vectorstore,
                 self.config.features.return_source,
             )
+            
         return self._database.query(question)
+    
+
 
     def analyze_query(self) -> QAAnalyzeAnswer:
         """Read a set of data from a set of documents.

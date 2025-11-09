@@ -20,15 +20,16 @@ dependencies = [
     "requests>=2.32.3",
     "sentence-transformers>=3.3.1",
     "torch>=2.5",
-    "transformers>=4.46.2",
+    "transformers==4.57.1",
     "uvicorn>=0.32.1",
     "peft>=0.14.0",
     "datasets>=3.2.0",
     "gradio>=5.12",
+    "langchain-text-splitters>=1.0.0",
 ]
 
 [project.optional-dependencies]
-llama-cpp = ["llama-cpp-python>=0.3.2"]
+llama-cpp = []
 # bitsandbytes is highly architecture dependent
 bitsandbytes = ["bitsandbytes>=0.45.0"]
 
@@ -63,11 +64,6 @@ docs = [
 name = "llama-cpp-prebuilt"
 url = "https://abetlen.github.io/llama-cpp-python/whl/metal"
 explicit = true
-
-[tool.uv.sources]
-llama-cpp-python = [
-  { index = "llama-cpp-prebuilt", marker = "sys_platform == 'darwin'" },
-]
 
 [tool.poe.tasks]
 test = "pytest -x"

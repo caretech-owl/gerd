@@ -35,6 +35,7 @@ class QAQuestion(BaseModel):
     """The search strategy to use."""
     max_sources: int = 3
     """The maximum number of sources to return."""
+    no_think:bool = False
 
 
 # Dataclass to hold a docsource

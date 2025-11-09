@@ -1,6 +1,8 @@
 model: &qa_model
-  name: "mlabonne/Meta-Llama-3.1-8B-Instruct-abliterated-GGUF"
-  file: "meta-llama-3.1-8b-instruct-abliterated.Q6_K.gguf"
+  #name: "mlabonne/Meta-Llama-3.1-8B-Instruct-abliterated-GGUF"
+  #file: "meta-llama-3.1-8b-instruct-abliterated.Q6_K.gguf"
+  #name: "Qwen/Qwen3-0.6B"
+  name: "Qwen/Qwen2.5-0.5B-Instruct"
   temperature: 0.01
   max_new_tokens: 128
   context_length: 512
