@@ -1,0 +1,21 @@
+file,question,label,ground_truth,predicted,match_score,match
+Neubauer.txt,Wie heißt der Patient?,PatientName,Klaus Neubauer,"<think>
+
+</think>
+
+Klaus Neubauer",1.000,True
+Neubauer.txt,Wann hat der Patient Geburtsdatum?,PatientGeburtsdatum,23.11.1999,"<think>
+
+</think>
+
+- Geburtsdatum: Nicht bekannt.",0.000,False
+Neubauer.txt,Wann wurde der Patient aufgenommen?,AufnahmeDatum,21.02.2024,"<think>
+
+</think>
+
+Der Patient wurde am 23.11.1999 aufgenommen.",0.049,False
+Neubauer.txt,Wann wurde der Patient entlassen?,EntlassungsDatum,25.02.2024,"<think>
+
+</think>
+
+Der Patient wurde am 25.02.2024 entlassen.",1.000,True

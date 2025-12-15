@@ -1,0 +1,101 @@
+file,question,label,ground_truth,predicted,match_score,match
+Albers.txt,Wie heißt der Patient?,PatientName,Beate Albers,"<think>
+
+</think>
+
+Unbekannt.",0.148,False
+Albers.txt,Wann hat der Patient Geburtsdatum?,PatientGeburtsdatum,4.4.1997,"<think>
+
+</think>
+
+Unbekannt.",0.000,False
+Albers.txt,Wann wurde der Patient aufgenommen?,AufnahmeDatum,19.3.,"<think>
+
+</think>
+
+Unbekannt.",0.037,False
+Albers.txt,Wann wurde der Patient entlassen?,EntlassungsDatum,,"<think>
+
+</think>
+
+Unbekannt.",0.000,False
+Amanda_Alzheimer.txt,Wie heißt der Patient?,PatientName,Amanda Alzheimer,"<think>
+
+</think>
+
+Unbekannt.",0.148,False
+Amanda_Alzheimer.txt,Wann hat der Patient Geburtsdatum?,PatientGeburtsdatum,,"<think>
+
+</think>
+
+Unbekannt",0.000,False
+Amanda_Alzheimer.txt,Wann wurde der Patient aufgenommen?,AufnahmeDatum,24.01.2028,"<think>
+
+</think>
+
+Unbekannt",0.000,False
+Amanda_Alzheimer.txt,Wann wurde der Patient entlassen?,EntlassungsDatum,,"<think>
+
+</think>
+
+Unbekannt",0.000,False
+Baastrup.txt,Wie heißt der Patient?,PatientName,Asger Baastrup,"<think>
+
+</think>
+
+Unbekannt.",0.074,False
+Baastrup.txt,Wann hat der Patient Geburtsdatum?,PatientGeburtsdatum,5.7.54,"<think>
+
+</think>
+
+Unbekannt.",0.000,False
+Baastrup.txt,Wann wurde der Patient aufgenommen?,AufnahmeDatum,8.3.,"<think>
+
+</think>
+
+Unbekannt.",0.037,False
+Baastrup.txt,Wann wurde der Patient entlassen?,EntlassungsDatum,22.3.2025,"<think>
+
+</think>
+
+Unbekannt.",0.000,False
+Beuerle.txt,Wie heißt der Patient?,PatientName,Manuela Beuerle,"<think>
+
+</think>
+
+Unbekannt.",0.148,False
+Beuerle.txt,Wann hat der Patient Geburtsdatum?,PatientGeburtsdatum,19.04.2020,"<think>
+
+</think>
+
+Unbekannt.",0.000,False
+Beuerle.txt,Wann wurde der Patient aufgenommen?,AufnahmeDatum,09.02.22,"<think>
+
+</think>
+
+Unbekannt.",0.000,False
+Beuerle.txt,Wann wurde der Patient entlassen?,EntlassungsDatum,09.02.22,"<think>
+
+</think>
+
+Unbekannt.",0.000,False
+Boeck.txt,Wie heißt der Patient?,PatientName,M. Boec,"<think>
+
+</think>
+
+Unbekannt.",0.074,False
+Boeck.txt,Wann hat der Patient Geburtsdatum?,PatientGeburtsdatum,1.2.2000,"<think>
+
+</think>
+
+Unbekannt.",0.000,False
+Boeck.txt,Wann wurde der Patient aufgenommen?,AufnahmeDatum,3.5,"<think>
+
+</think>
+
+Unbekannt.",0.000,False
+Boeck.txt,Wann wurde der Patient entlassen?,EntlassungsDatum,8.5.2028,"<think>
+
+</think>
+
+Unbekannt.",0.000,False

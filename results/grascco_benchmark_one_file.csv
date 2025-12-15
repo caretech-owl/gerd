@@ -1,0 +1,32 @@
+file,question,label,ground_truth,predicted,match_score,match
+Neubauer.txt,Wie heißt der Patient?,PatientName,Klaus Neubauer,"<think>
+Okay, let's see. The user is asking ""Wie heißt der Patient?"" based on the given context. The patient mentioned is Klaus Neubauer.
+
+Looking at the context provided, there's a part that says ""Patient comes to the assessment after phone call through PIA. Patient in treatment at Fr. Schönfeld in PIA."" Then later it mentions ""Herr Klaus Neubauer"" as the patient. So the answer should be Klaus Neubauer.
+
+The user wants only the helpful answer in stanzersatz and nothing else. Also, they specified to keep it short. So just state Klaus Neubauer without any extra text.
+</think>
+
+Klaus Neubauer",1.000,True
+Neubauer.txt,Wann hat der Patient Geburtsdatum?,PatientGeburtsdatum,23.11.1999,"<think>
+Okay, let's see. The user is asking for the patient's birth date based on the provided context.
+
+Looking at the context, it says ""23.11.1999"" which is the birthdate. The patient was born on November 23, 1999. I need to make sure there's no other information conflicting here. The rest of the details about the patient's social history don't affect the birth date. So the answer should just state the birth date in the required format.
+</think>
+
+23.11.1999",1.000,True
+Neubauer.txt,Wann wurde der Patient aufgenommen?,AufnahmeDatum,21.02.2024,"<think>
+Okay, let's see. The user is asking ""Wann wurde der Patient aufgenommen?"" based on the provided context.
+
+First, I need to look at the context given. The context mentions that the patient came for a consultation via phone through PIA. He's currently in treatment at the PIA clinic. Then there's a mention of his date of birth as 23.11.1999 and his current residence in Gingen. Also, the time he was treated from 21-25 February 2024.
+
+So the question is about when the patient was taken into the system (aufgenommen). From the context, it says he was admitted after being called by phone through PIA. But the key dates are his birthday and the treatment period. However, the exact time of admission isn't directly stated except that he was in treatment during those months. Wait, but the answer should be based solely on the given information. Let me check again.
+
+The original text says: ""Patient comes zur Aufnahme nach telefonischer Ankündigung durch PIA. Patient in Behandlung bei Fr. O'Schönfeld in PIA."" So the patient was admitted after being called by phone. Then later",0.007,False
+Neubauer.txt,Wann wurde der Patient entlassen?,EntlassungsDatum,25.02.2024,"<think>
+Okay, let's see. The user is asking for the date when the patient was discharged based on the provided context.
+
+Looking at the text: ""Herr Neubauer am heutigen 25.02.2014 in ihre hausärztliche Betreung entlassen."" So the answer should be February 25, 2014. They want it in a concise way without any extra information. Also, only the answer in German with bullet points as instructed. Make sure to keep it short and direct.
+</think>
+
+25.02.2014",0.022,False

@@ -1,0 +1,101 @@
+file,question,label,ground_truth,predicted,match_score,match
+Albers.txt,Wie heißt der Patient?,PatientName,Beate Albers,"<think>
+
+</think>
+
+Patient: Frau Albers",0.312,False
+Albers.txt,Wann hat der Patient Geburtsdatum?,PatientGeburtsdatum,4.4.1997,"<think>
+
+</think>
+
+- Geburtsdatum: Nicht genannt.",0.000,False
+Albers.txt,Wann wurde der Patient aufgenommen?,AufnahmeDatum,19.3.,"<think>
+
+</think>
+
+Der Patient wurde aufgenommen im psychischen Verlauf.",0.014,False
+Albers.txt,Wann wurde der Patient entlassen?,EntlassungsDatum,,"<think>
+
+</think>
+
+Patient entlassen.",0.000,False
+Amanda_Alzheimer.txt,Wie heißt der Patient?,PatientName,Amanda Alzheimer,"<think>
+
+</think>
+
+- Patient: Somnolent, erweckbar, antwortet mit Ja und Nein.",0.118,False
+Amanda_Alzheimer.txt,Wann hat der Patient Geburtsdatum?,PatientGeburtsdatum,,"<think>
+
+</think>
+
+Patient: 05.02.2028",0.000,False
+Amanda_Alzheimer.txt,Wann wurde der Patient aufgenommen?,AufnahmeDatum,24.01.2028,"<think>
+
+</think>
+
+Patient aufgenommen: 23.01.28",0.109,False
+Amanda_Alzheimer.txt,Wann wurde der Patient entlassen?,EntlassungsDatum,,"<think>
+
+</think>
+
+Der Patient wurde entlassen am 30. Juli 2023.",0.000,False
+Baastrup.txt,Wie heißt der Patient?,PatientName,Asger Baastrup,"<think>
+
+</think>
+
+Patient: Hr. Baastrup Asger",0.273,False
+Baastrup.txt,Wann hat der Patient Geburtsdatum?,PatientGeburtsdatum,5.7.54,"<think>
+
+</think>
+
+PSA 0,7 ng/ml, Kreatinin 1,5, Harnstoff 51%",0.033,False
+Baastrup.txt,Wann wurde der Patient aufgenommen?,AufnahmeDatum,8.3.,"<think>
+
+</think>
+
+Der Patient wurde am 27. März 2025 aufgenommen.",0.031,False
+Baastrup.txt,Wann wurde der Patient entlassen?,EntlassungsDatum,22.3.2025,"<think>
+
+</think>
+
+Patient entlassen.",0.000,False
+Beuerle.txt,Wie heißt der Patient?,PatientName,Manuela Beuerle,"<think>
+
+</think>
+
+Patient: Spina bifida mit L4-5 re., Knick-Hackenförmigkeit, minimale große Li-Konvex-Bogeliebe.",0.089,False
+Beuerle.txt,Wann hat der Patient Geburtsdatum?,PatientGeburtsdatum,19.04.2020,"<think>
+
+</think>
+
+Patient: 19.04.2020",1.000,True
+Beuerle.txt,Wann wurde der Patient aufgenommen?,AufnahmeDatum,09.02.22,"<think>
+
+</think>
+
+Der Patient wurde im Rahmen der Diagnostik aufgenommen.",0.000,False
+Beuerle.txt,Wann wurde der Patient entlassen?,EntlassungsDatum,09.02.22,"<think>
+
+</think>
+
+Der Patient wurde entlassen im April 2023.",0.034,False
+Boeck.txt,Wie heißt der Patient?,PatientName,M. Boec,"<think>
+
+</think>
+
+Frederic Meisenbacher",0.079,False
+Boeck.txt,Wann hat der Patient Geburtsdatum?,PatientGeburtsdatum,1.2.2000,"<think>
+
+</think>
+
+- Geburtsdatum: Nicht angegeben.",0.000,False
+Boeck.txt,Wann wurde der Patient aufgenommen?,AufnahmeDatum,3.5,"<think>
+
+</think>
+
+M. Boeck wurde im stationären Verlauf von 3.5. bis 8.5.2028 aufgenommen.",0.034,False
+Boeck.txt,Wann wurde der Patient entlassen?,EntlassungsDatum,8.5.2028,"<think>
+
+</think>
+
+Der Patient wurde entlassen am 8.5.2028.",1.000,True
