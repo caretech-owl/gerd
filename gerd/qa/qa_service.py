@@ -12,10 +12,10 @@ from os import unlink
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
-
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+#from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
-
+#from gerd.benchmark import make_prompt
 import gerd.loader as gerd_loader
 from gerd.models.qa import QAConfig
 from gerd.rag import FAISS, Rag, create_faiss, load_faiss
@@ -34,9 +34,32 @@ if TYPE_CHECKING:
     from langchain.docstore.document import Document
     from langchain.document_loaders.base import BaseLoader
 
+project_dir = Path(__file__).parent.parent.parent
+RAW_TEXT_DIR = project_dir / "tests/data/grascco/raw"
+
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
+
+def make_prompt(text: str, question: str) -> str:
+    return f"""Gib ausschließlich den exakten Wortlaut zurück, wie er im Text vorkommt.
+Keine Sätze. Keine Erklärungen. Nur den wörtlichen relevanten Text.
+Antworte mit 'Unbekannt', wenn die Information im Text nicht vorhanden ist.
+Auf deutsche Sprache antworten.
+
+Text:
+{text}
+
+Frage:
+{question}
+""".strip()
+
+
+
+
+
+
+
 
 
 class QAService:
@@ -80,6 +103,9 @@ class QAService:
         Returns:
             A list of document sources
         """
+
+
+        
         if not self._vectorstore:
             return []
         return [
@@ -112,6 +138,9 @@ class QAService:
             return []
         return self._vectorstore.embeddings.embed_documents([question.question])[0]
 
+
+
+
     def query(self, question: QAQuestion) -> QAAnswer:
         """Pass a question to the language model.
 
@@ -124,6 +153,21 @@ class QAService:
         Returns:
             The answer from the language model
         """
+       
+        
+       
+        if question.no_think and not question.question.strip().startswith("/no_think"):   #-> hier Änderung
+            question.question = f"/no_think {question.question.strip()}"
+            #_LOGGER.warning("Applied /no_think prefix to question: %s", question.question)
+        """  
+        file_path = RAW_TEXT_DIR / "Theodor.txt"
+        text = file_path.read_text(encoding="utf-8")
+        temp_promp = make_prompt(text, question.question)
+        prompt = temp_promp    
+        
+        _LOGGER.info("prompt: %s", prompt)
+        """
+
         if not self._database:
             if not self._vectorstore:
                 return QAAnswer(error_msg="No database available!", status=404)
@@ -134,7 +178,10 @@ class QAService:
                 self._vectorstore,
                 self.config.features.return_source,
             )
+            
         return self._database.query(question)
+    
+
 
     def analyze_query(self) -> QAAnalyzeAnswer:
         """Read a set of data from a set of documents.
@@ -555,3 +602,16 @@ class QAService:
             return attending_doctors
         else:
             return []
+        
+
+
+
+    def clear_vectorstore(self):
+        """Remove ALL embeddings from the vectorstore."""
+        if not self._vectorstore:
+            return QAAnswer(error_msg="No vector store initialized!", status=404)
+        self._vectorstore.delete(
+        list(self._vectorstore.index_to_docstore_id.values())
+    )
+        return QAAnswer(status=200)
+

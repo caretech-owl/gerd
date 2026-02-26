@@ -11,7 +11,7 @@ from typing import Dict, List, Protocol
 from pydantic import BaseModel
 
 from gerd.models.model import PromptConfig
-
+from typing import  Optional
 
 class GenResponse(BaseModel):
     """Dataclass to hold a response from the generation service."""
@@ -31,10 +31,13 @@ class QAQuestion(BaseModel):
 
     question: str
     """The question to ask the QA service."""
+    prompt: Optional[str] = None
+    """The full prompt (text + question + assistent prompt) to use for the QA service."""
     search_strategy: str = "similarity"
     """The search strategy to use."""
     max_sources: int = 3
     """The maximum number of sources to return."""
+    no_think:bool = False
 
 
 # Dataclass to hold a docsource
@@ -300,5 +303,14 @@ class Transport(Protocol):
 
         Returns:
             The generation result
+        """
+        pass
+    
+    def clear_vectorstore(self) -> QAAnswer:
+        """Clears the vector store.
+
+        Returns:
+            The answer from the QA service
+            status code of 200 if the vector store was cleared successfully.
         """
         pass
