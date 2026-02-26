@@ -4,8 +4,8 @@ model: &qa_model
   name: "Qwen/Qwen3-0.6B"
   #name: "Qwen/Qwen2.5-0.5B-Instruct"
   temperature: 0.01
-  max_new_tokens: 128
-  context_length: 512
+  max_new_tokens: 256
+  context_length: 2048
   prompt_config:
     text: "Du bist ein hilfreicher Assistent.\nBitte beantworte die Frage: '{question}' basierend auf dem folgenden Kontext:\n{context}\nGib nur die hilfreiche Antwort unten zurück und nichts anderes. Halte dich außerdem sehr kurz mit der Antwort und antworte nur in Stichworten."
 features:
@@ -30,5 +30,6 @@ embedding:
     name: "sentence-transformers/all-MiniLM-L6-v2"
     #name: "jinaai/jina-embeddings-v2-base-de"
     #name: "mixedbread-ai/deepset-mxbai-embed-de-large-v1"
+    #name: "Qwen/Qwen3-Embedding-0.6B"
   #db_path: "vectorstore/db_faiss"
   db_path: ""
