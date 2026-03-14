@@ -113,7 +113,6 @@ select = [
     "D",     # enforce documented functions
 ]
 pydocstyle.convention = "google"
-
 # 2. Fix everything except flake8-bugbear (`B`) violations.
 fixable = ["ALL"]
 unfixable = ["B"]
@@ -121,6 +120,7 @@ unfixable = ["B"]
 # 3. Things to ignore
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"] # assert is fine in pytest
+"gerd/benchmark.py" = ["C901"]  # ← NUR hier C901 ignorieren
 
 # Without build system declaration the package cannot be imported
 # https://github.com/astral-sh/uv/issues/9291
