@@ -7,8 +7,9 @@ based on FAISS.
 import logging
 from pathlib import Path
 
-from langchain.docstore.document import Document
+# from langchain.docstore.document import Document
 from langchain_community.vectorstores import FAISS
+from langchain_core.documents import Document
 from langchain_huggingface import HuggingFaceEmbeddings
 
 from gerd.loader import LLM

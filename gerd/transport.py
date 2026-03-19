@@ -35,6 +35,7 @@ class QAQuestion(BaseModel):
     """The search strategy to use."""
     max_sources: int = 3
     """The maximum number of sources to return."""
+    no_think: bool = False
 
 
 # Dataclass to hold a docsource
@@ -300,5 +301,14 @@ class Transport(Protocol):
 
         Returns:
             The generation result
+        """
+        pass
+
+    def clear_vectorstore(self) -> QAAnswer:
+        """Clears the vector store.
+
+        Returns:
+            The answer from the QA service
+            status code of 200 if the vector store was cleared successfully.
         """
         pass

@@ -13,9 +13,11 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+# from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+# from gerd.benchmark import make_prompt
 import gerd.loader as gerd_loader
 from gerd.models.qa import QAConfig
 from gerd.rag import FAISS, Rag, create_faiss, load_faiss
@@ -124,6 +126,12 @@ class QAService:
         Returns:
             The answer from the language model
         """
+        if question.no_think and not question.question.strip().startswith("/no_think"):
+            question.question = f"/no_think {question.question.strip()}"
+            _LOGGER.warning(
+                "Applied /no_think prefix to question: %s", question.question
+            )
+
         if not self._database:
             if not self._vectorstore:
                 return QAAnswer(error_msg="No database available!", status=404)
@@ -555,3 +563,14 @@ class QAService:
             return attending_doctors
         else:
             return []
+
+    def clear_vectorstore(self) -> QAAnswer:
+        """Clears the vector store by deleting all documents.
+
+        Returns:
+            an answer object with status 200 if successful.
+        """
+        if not self._vectorstore:
+            return QAAnswer(error_msg="No vector store initialized!", status=404)
+        self._vectorstore.delete(list(self._vectorstore.index_to_docstore_id.values()))
+        return QAAnswer(status=200)

@@ -35,7 +35,13 @@ def get_qa_mode(search_type: str) -> QAModesEnum:
         return QAModesEnum.NONE
 
 
-def query(question: str, search_type: str, k_source: int, search_strategy: str) -> str:
+def query(
+    question: str,
+    search_type: str,
+    k_source: int,
+    search_strategy: str,
+    no_think: bool = False,
+) -> str:
     """Starts the selected QA Mode.
 
     Parameters:
@@ -43,16 +49,21 @@ def query(question: str, search_type: str, k_source: int, search_strategy: str) 
         search_type: The search type
         k_source: The number of sources
         search_strategy: The search strategy
+        no_think_mode: activate  or deactivate no_think mode
 
     Returns:
         The response from the QA service
     """
+    _LOGGER.info("no_think parameter: %s", no_think)
     q = QAQuestion(
-        question=question, search_strategy=search_strategy, max_sources=k_source
+        question=question,
+        search_strategy=search_strategy,
+        max_sources=k_source,
+        no_think=no_think,
     )
     # start search mode
     if search_type == "LLM":
-        qa_res = TRANSPORTER.qa_query(q)
+        qa_res = TRANSPORTER.qa_query(q)  # -> hier eine Änderung
         if qa_res.status != 200:
             msg = (
                 f"Query was unsuccessful: {qa_res.error_msg}"
@@ -260,13 +271,15 @@ demo = gr.Blocks(title="Entlassbriefe QA")
 with demo:
     # define the GUI Layout
     developer_mode: bool = False
+    no_think: bool = False
+    # think box in btn.click und inp.submit
 
     gr.Markdown("# GERD - Entlassbriefe QA")
 
     with gr.Row():
-        with gr.Column(scale=1):
+        with gr.Column(scale=2):
             file_upload = gr.Files(file_types=[".txt"])
-        with gr.Column(scale=1):
+        with gr.Column(scale=2):
             developer_checkbox = gr.Checkbox(
                 info="Aktivieren/Deaktivieren von zusätzlichen Modi",
                 label="Developer Mode",
@@ -299,6 +312,13 @@ with demo:
                 visible=developer_mode,
             )
 
+        with gr.Column(scale=1):
+            think_box = gr.Checkbox(
+                value=no_think,
+                info="aktivieren/ deaktivieren von /no_think Tag",
+                label="no_think Mode",
+            )
+
     prompt = gr.TextArea(
         value=TRANSPORTER.get_qa_prompt(get_qa_mode(type_radio.value)).text,
         interactive=True,
@@ -320,10 +340,14 @@ with demo:
     file_upload.clear(fn=files_changed, inputs=file_upload, outputs=out)
     btn = gr.Button("Frage stellen")
     btn.click(
-        fn=query, inputs=[inp, type_radio, k_slider, strategy_dropdown], outputs=out
+        fn=query,
+        inputs=[inp, type_radio, k_slider, strategy_dropdown, think_box],
+        outputs=out,
     )
     inp.submit(
-        fn=query, inputs=[inp, type_radio, k_slider, strategy_dropdown], outputs=out
+        fn=query,
+        inputs=[inp, type_radio, k_slider, strategy_dropdown, think_box],
+        outputs=out,
     )
     prompt_submit.click(fn=set_prompt, inputs=[prompt, type_radio], outputs=out)
 
