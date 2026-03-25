@@ -34,9 +34,6 @@ if TYPE_CHECKING:
     from langchain_core.document_loaders.base import BaseLoader
     from langchain_core.documents import Document
 
-project_dir = Path(__file__).parent.parent.parent
-RAW_TEXT_DIR = project_dir / "tests/data/grascco/raw"
-
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
