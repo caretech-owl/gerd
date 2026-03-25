@@ -58,8 +58,8 @@ class Bridge(Transport):
         return self._gen
 
     @override
-    def qa_query(self, query: QAQuestion) -> QAAnswer:
-        return self.qa.query(query)
+    def qa_query(self, question: QAQuestion) -> QAAnswer:
+        return self.qa.query(question)
 
     @override
     def analyze_query(self) -> QAAnalyzeAnswer:
@@ -107,4 +107,4 @@ class Bridge(Transport):
 
     @override
     def clear_vectorstore(self) -> QAAnswer:
-        return self.qa.clear_vectorstore()  
+        return self.qa.clear_vectorstore()

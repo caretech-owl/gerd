@@ -1,8 +1,5 @@
 model: &qa_model
-  #name: "mlabonne/Meta-Llama-3.1-8B-Instruct-abliterated-GGUF"
-  #file: "meta-llama-3.1-8b-instruct-abliterated.Q6_K.gguf"
   name: "Qwen/Qwen3-0.6B"
-  #name: "Qwen/Qwen2.5-0.5B-Instruct"
   temperature: 0.01
   max_new_tokens: 256
   context_length: 2048
@@ -26,10 +23,6 @@ embedding:
   chunk_overlap: 25
   vector_count: 2
   model:
-    #name: "sentence-transformers/distiluse-base-multilingual-cased-v1"
     name: "sentence-transformers/all-MiniLM-L6-v2"
-    #name: "jinaai/jina-embeddings-v2-base-de"
-    #name: "mixedbread-ai/deepset-mxbai-embed-de-large-v1"
-    #name: "Qwen/Qwen3-Embedding-0.6B"
   #db_path: "vectorstore/db_faiss"
   db_path: ""

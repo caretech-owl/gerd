@@ -146,6 +146,10 @@ class RestServer(Transport):
     def generate(self, parameters: Dict[str, str]) -> GenResponse:
         return self._bridge.generate(parameters)
 
+    @override
+    def clear_vectorstore(self) -> QAAnswer:
+        return self._bridge.clear_vectorstore()
+
 
 app = FastAPI()
 rest_server = RestServer()
