@@ -117,7 +117,7 @@ class Rag:
             resolved = f"/no_think {resolved.strip()}"
             _LOGGER.debug("Applied /no_think prefix")
         if question.think is True:
-            resolved = f"{resolved.strip()} /think"
+            resolved = f"/think {resolved.strip()}"
             _LOGGER.debug("Applied /think prefix")
 
         _, response = self.model.create_chat_completion(
