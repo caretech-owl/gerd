@@ -49,7 +49,7 @@ def query_llm(question: QAQuestion) -> str:
         msg = f"Query was unsuccessful: {qa_res.error_msg} (Error Code {qa_res.status})"
         raise gr.Error(msg)
     return (
-        qa_res.response + "\n\n *Thought process*:\n" + (qa_res.thoughts or "N/A")
+        qa_res.response + "\n\n *Thought process*:\n" + qa_res.thoughts
         if qa_res.thoughts
         else qa_res.response
     )
