@@ -561,5 +561,9 @@ class QAService:
         """Remove ALL embeddings from the in memory vectorstore."""
         if not self._vectorstore:
             return QAAnswer(error_msg="No vector store initialized!", status=404)
-        self._vectorstore.delete(list(self._vectorstore.index_to_docstore_id.values()))
+        ids = list(self._vectorstore.index_to_docstore_id.values())
+
+        # Check len to avoid bug in FAISS when trying to delete with empty id list
+        if len(ids) > 0:
+            self._vectorstore.delete(ids)
         return QAAnswer(status=200)
