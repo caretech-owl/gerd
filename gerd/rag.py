@@ -114,10 +114,10 @@ class Rag:
         # Apply /think or /no_think prefix if specified in the question
         # TODO: Does not work for Qwen3.5
         if question.think is False:
-            resolved = f"/no_think {resolved.strip()}"
+            resolved = f"/no_think {resolved.lstrip()}"
             _LOGGER.debug("Applied /no_think prefix")
-        if question.think is True:
-            resolved = f"/think {resolved.strip()}"
+        elif question.think is True:
+            resolved = f"/think {resolved.lstrip()}"
             _LOGGER.debug("Applied /think prefix")
 
         _, response = self.model.create_chat_completion(
