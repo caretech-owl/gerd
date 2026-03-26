@@ -31,9 +31,6 @@ class QAQuestion(BaseModel):
 
     question: str
     """The question to ask the QA service."""
-    prompt: Optional[str] = None
-    """The full prompt (text + question + assistant prompt) to use
-    for the QA service."""
     search_strategy: str = "similarity"
     """The search strategy to use."""
     max_sources: int = 3
