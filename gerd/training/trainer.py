@@ -181,11 +181,14 @@ class Trainer:
             callback_cls: The list of callbacks
         """
         self.config = config
+        quant_config = transformers.BitsAndBytesConfig(
+            load_in_4bit=config.flags.use_4bit,
+            load_in_8bit=config.flags.use_8bit,
+        )
         self.base_model: transformers.PreTrainedModel = (
             transformers.AutoModelForCausalLM.from_pretrained(
                 config.model.name,
-                load_in_4bit=config.flags.use_4bit,
-                load_in_8bit=config.flags.use_8bit,
+                quantization_config=quant_config,
             )
         )
 
