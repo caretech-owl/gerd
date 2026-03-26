@@ -4,9 +4,7 @@ import re
 from typing import Dict, Generator, List
 
 import torch
-from langchain_core.documents import Document
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from transformers import PreTrainedTokenizer, PreTrainedTokenizerBase
+from transformers import PreTrainedTokenizerBase
 
 
 def split_chunks(
