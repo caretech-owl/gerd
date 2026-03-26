@@ -558,7 +558,13 @@ class QAService:
             return []
 
     def clear_vectorstore(self) -> QAAnswer:
-        """Remove ALL embeddings from the in memory vectorstore."""
+        """Remove all documents from the vector store.
+
+        If no vector store is initialized, return an error message.
+
+        Returns:
+            QAAnswer: Including status code and error message if applicable.
+        """
         if not self._vectorstore:
             return QAAnswer(error_msg="No vector store initialized!", status=404)
         ids = list(self._vectorstore.index_to_docstore_id.values())
