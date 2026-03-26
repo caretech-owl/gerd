@@ -10,7 +10,7 @@ import shutil
 import sys
 import threading
 from dataclasses import dataclass, field
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, cast
 
 import torch
 import transformers
@@ -215,7 +215,7 @@ class Trainer:
         self.lora_model.config.use_cache = False
 
         self.tracked = Tracked(self.lora_model, self.config)
-        self.trainer = None
+        self.trainer: transformers.Trainer | None = None
         self.callbacks = (
             [cls(self.tracked) for cls in callback_cls]
             if callback_cls is not None
@@ -330,7 +330,7 @@ class Trainer:
         """
         _LOGGER.debug("Training parameter\n============\n %s", self.args)
         self.trainer = transformers.Trainer(
-            model=self.lora_model,
+            model=cast("torch.nn.Module", self.lora_model),
             train_dataset=train_data,
             eval_dataset=None,
             args=self.args,
@@ -365,7 +365,7 @@ class Trainer:
         When the `zip_output` flag is set, the output directory is zipped as well.
         """
         if self.trainer is not None:
-            self.trainer.save_model(self.config.output_dir)
+            self.trainer.save_model(str(self.config.output_dir))
             if self.config.zip_output:
                 shutil.make_archive(
                     base_name=self.config.output_dir.as_posix(),
