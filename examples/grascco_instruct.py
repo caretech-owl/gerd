@@ -80,6 +80,8 @@ for file in (project_dir / "tests/data/grascco/raw").glob("*.txt"):
 
 # %%
 # Save training data
+if not (project_dir / "tmp").exists():
+    (project_dir / "tmp").mkdir()
 with (project_dir / "tmp/grascco_instruct.json").open("w") as f:
     f.write(data.model_dump_json(indent=2))
 
