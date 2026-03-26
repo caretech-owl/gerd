@@ -10,12 +10,18 @@ import shutil
 import sys
 import threading
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Type
+from typing import Callable, Dict, List, Optional
 
 import torch
 import transformers
 from datasets import Dataset
-from peft import LoraConfig, PeftModel, get_peft_model, prepare_model_for_kbit_training
+from peft import (
+    LoraConfig,
+    PeftMixedModel,
+    PeftModel,
+    get_peft_model,
+    prepare_model_for_kbit_training,
+)
 
 from gerd.training.lora import MODEL_CLASSES, LoraTrainingConfig
 
@@ -26,7 +32,7 @@ _LOGGER = logging.getLogger(__name__)
 class Tracked:
     """Dataclass to track the training progress."""
 
-    lora_model: PeftModel
+    lora_model: PeftModel | PeftMixedModel
     """The training model."""
     config: LoraTrainingConfig
     """The training configuration."""
@@ -62,9 +68,9 @@ class Callbacks(transformers.TrainerCallback):
 
     def on_save(
         self,
-        _args: transformers.TrainingArguments,  # noqa: ARG002
-        _state: transformers.TrainerState,  # noqa: ARG002
-        _control: transformers.TrainerControl,  # noqa: ARG002
+        args: transformers.TrainingArguments,  # noqa: ARG002
+        state: transformers.TrainerState,  # noqa: ARG002
+        control: transformers.TrainerControl,  # noqa: ARG002
         **kwargs: int,  # noqa: ARG002
     ) -> None:
         """Saves the training log when the model is saved."""
@@ -78,7 +84,7 @@ class Callbacks(transformers.TrainerCallback):
 
     def on_step_begin(
         self,
-        _args: transformers.TrainingArguments,  # noqa: ARG002
+        args: transformers.TrainingArguments,  # noqa: ARG002
         state: transformers.TrainerState,
         control: transformers.TrainerControl,
         **kwargs: int,  # noqa: ARG002
@@ -103,8 +109,8 @@ class Callbacks(transformers.TrainerCallback):
 
     def on_substep_end(
         self,
-        _args: transformers.TrainingArguments,  # noqa: ARG002
-        _state: transformers.TrainerState,  # noqa: ARG002
+        args: transformers.TrainingArguments,  # noqa: ARG002
+        state: transformers.TrainerState,  # noqa: ARG002
         control: transformers.TrainerControl,
         **kwargs: int,  # noqa: ARG002
     ) -> None:
@@ -122,11 +128,11 @@ class Callbacks(transformers.TrainerCallback):
 
     def on_log(
         self,
-        _args: transformers.TrainingArguments,  # noqa: ARG002
-        _state: transformers.TrainerState,  # noqa: ARG002
+        args: transformers.TrainingArguments,  # noqa: ARG002
+        state: transformers.TrainerState,  # noqa: ARG002
         control: transformers.TrainerControl,
-        logs: Dict,
-        **kwargs: int,  # noqa: ARG002
+        # logs: Dict,
+        **kwargs: Dict,  # noqa: ARG002
     ) -> None:
         """Callback to log the training progress.
 
@@ -136,6 +142,7 @@ class Callbacks(transformers.TrainerCallback):
             control: The trainer control
             logs: The training logs
         """
+        logs: Dict = kwargs.get("logs", {})
         self.tracked.train_log.update(logs)
         self.tracked.train_log.update({"current_steps": self.tracked.current_steps})
         if self.tracked.interrupted:
@@ -161,7 +168,9 @@ class Trainer:
     def __init__(
         self,
         config: LoraTrainingConfig,
-        callback_cls: Optional[List[Type[transformers.TrainerCallback]]] = None,
+        callback_cls: Optional[
+            List[Callable[[Tracked], transformers.TrainerCallback]]
+        ] = None,
     ) -> None:
         """The LoRa traininer requires a configuration and optional list of callbacks.
 
@@ -199,7 +208,7 @@ class Trainer:
             self.base_model = prepare_model_for_kbit_training(self.base_model)
             _LOGGER.info("Quantization detected!")
 
-        self.lora_model = get_peft_model(self.base_model, training_config)
+        self.lora_model = get_peft_model(self.base_model, training_config, mixed=False)
         if not hasattr(self.lora_model.config, "use_cache"):
             msg = "LoRA model config not have 'use_cache' attribute"
             raise AssertionError(msg)
@@ -229,12 +238,11 @@ class Trainer:
             eval_strategy="no",
             eval_steps=None,
             save_strategy="no",
-            output_dir=config.output_dir,
+            output_dir=str(config.output_dir),
             lr_scheduler_type=config.lr_scheduler,
             load_best_model_at_end=False,
             # TODO: Enable multi-device support
             ddp_find_unused_parameters=None,
-            use_ipex=config.flags.use_ipex,
             save_steps=config.save_steps,
             use_cpu=config.flags.use_cpu,
             # any of these two will set `torch_compile=True`
