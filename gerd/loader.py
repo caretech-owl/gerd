@@ -9,9 +9,8 @@ import abc
 import logging
 import os
 from pathlib import Path
-from typing import Any, Iterator, TypeGuard, cast
+from typing import Iterator, TypeGuard
 
-from gradio import List
 from typing_extensions import override
 
 from gerd.models.model import ChatMessage, ChatRole, ModelConfig, ModelEndpoint
