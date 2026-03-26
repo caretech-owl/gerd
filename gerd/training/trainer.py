@@ -95,7 +95,7 @@ class Callbacks(transformers.TrainerCallback):
         checks if the training was interrupted.
 
         Parameters:
-            _args: The training arguments (not used)
+            args: The training arguments (not used)
             state: The trainer state
             control: The trainer control
         """
@@ -117,8 +117,8 @@ class Callbacks(transformers.TrainerCallback):
         """Update the training progress and check for interruption.
 
         Parameters:
-            _args: The training arguments (not used)
-            _state: The trainer state (not used)
+            args: The training arguments (not used)
+            state: The trainer state (not used)
             control: The trainer control
         """
         self.tracked.current_steps += 1
@@ -137,8 +137,8 @@ class Callbacks(transformers.TrainerCallback):
         """Callback to log the training progress.
 
         Parameters:
-            _args: The training arguments (not used)
-            _state: The trainer state (not used)
+            args: The training arguments (not used)
+            state: The trainer state (not used)
             control: The trainer control
             logs: The training logs
         """
