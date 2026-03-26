@@ -104,3 +104,7 @@ class Bridge(Transport):
     @override
     def generate(self, parameters: Dict[str, str]) -> GenResponse:
         return self.gen.generate(parameters)
+
+    @override
+    def clear_vectorstore(self) -> QAAnswer:
+        return self.qa.clear_vectorstore()

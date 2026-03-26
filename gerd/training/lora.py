@@ -9,7 +9,7 @@ import transformers
 # from peft.utils.other import (
 #     TRANSFORMERS_MODELS_TO_LORA_TARGET_MODULES_MAPPING as model_to_lora_modules,
 # )
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
@@ -77,7 +77,6 @@ class TrainingFlags(BaseModel):
 
     use_cpu: bool = not torch.cuda.is_available()
     use_bf16: bool = False
-    use_ipex: bool = False
     use_4bit: bool = False
     use_8bit: bool = False
 
@@ -144,11 +143,18 @@ class LoraTrainingConfig(BaseSettings):
     modules: LoraModules = Field(default_factory=LoraModules)
     flags: TrainingFlags = Field(default_factory=TrainingFlags)
 
+    _tokenizer: Optional[transformers.PreTrainedTokenizerBase] = PrivateAttr(
+        default=None
+    )
+
     @property
-    def tokenizer(self) -> transformers.PreTrainedTokenizer:
+    def tokenizer(self) -> transformers.PreTrainedTokenizerBase:
         """Get the tokenizer for the model."""
         if self._tokenizer is None:
             self.reset_tokenizer()
+        if self._tokenizer is None:
+            msg = "Tokenizer initialization failed"
+            raise RuntimeError(msg)
         return self._tokenizer
 
     def reset_tokenizer(self) -> None:

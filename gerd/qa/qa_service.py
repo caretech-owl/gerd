@@ -13,8 +13,8 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 import gerd.loader as gerd_loader
 from gerd.models.qa import QAConfig
@@ -31,8 +31,8 @@ from gerd.transport import (
 )
 
 if TYPE_CHECKING:
-    from langchain.docstore.document import Document
-    from langchain.document_loaders.base import BaseLoader
+    from langchain_core.document_loaders.base import BaseLoader
+    from langchain_core.documents import Document
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -134,6 +134,7 @@ class QAService:
                 self._vectorstore,
                 self.config.features.return_source,
             )
+
         return self._database.query(question)
 
     def analyze_query(self) -> QAAnalyzeAnswer:
@@ -555,3 +556,20 @@ class QAService:
             return attending_doctors
         else:
             return []
+
+    def clear_vectorstore(self) -> QAAnswer:
+        """Remove all documents from the vector store.
+
+        If no vector store is initialized, return an error message.
+
+        Returns:
+            QAAnswer: Including status code and error message if applicable.
+        """
+        if not self._vectorstore:
+            return QAAnswer(error_msg="No vector store initialized!", status=404)
+        ids = list(self._vectorstore.index_to_docstore_id.values())
+
+        # Check len to avoid bug in FAISS when trying to delete with empty id list
+        if len(ids) > 0:
+            self._vectorstore.delete(ids)
+        return QAAnswer(status=200)

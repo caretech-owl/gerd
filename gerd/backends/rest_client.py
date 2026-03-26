@@ -158,3 +158,9 @@ class RestClient(Transport):
                 timeout=self.timeout,
             ).json()
         )
+
+    @override
+    def clear_vectorstore(self) -> QAAnswer:
+        return QAAnswer.model_validate(
+            requests.delete(f"{self._url}/qa/vectorstore", timeout=self.timeout).json()
+        )

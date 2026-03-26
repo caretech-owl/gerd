@@ -20,11 +20,12 @@ dependencies = [
     "requests>=2.32.3",
     "sentence-transformers>=3.3.1",
     "torch>=2.5",
-    "transformers>=4.46.2",
+    "transformers==4.57.1",
     "uvicorn>=0.32.1",
     "peft>=0.14.0",
     "datasets>=3.2.0",
     "gradio>=5.12",
+    "langchain-text-splitters>=1.0.0",
 ]
 
 [project.optional-dependencies]

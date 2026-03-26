@@ -6,7 +6,7 @@ Implemetations of the transport protocol can be found in the
 """
 
 from enum import Enum
-from typing import Dict, List, Protocol
+from typing import Dict, List, Optional, Protocol
 
 from pydantic import BaseModel
 
@@ -35,6 +35,8 @@ class QAQuestion(BaseModel):
     """The search strategy to use."""
     max_sources: int = 3
     """The maximum number of sources to return."""
+    think: bool | None = None
+    """Whether to force enable/disable thinking for reasoning models."""
 
 
 # Dataclass to hold a docsource
@@ -63,6 +65,8 @@ class QAAnswer(BaseModel):
     """The sources of the answer."""
     response: str = ""
     """The response of the answer."""
+    thoughts: Optional[str] = None
+    """The thoughts of the answer if the model is a reasoning model."""
 
 
 class QAAnalyzeAnswer(BaseModel):
@@ -161,11 +165,11 @@ class Transport(Protocol):
     interact with the backend.
     """
 
-    def qa_query(self, query: QAQuestion) -> QAAnswer:
+    def qa_query(self, question: QAQuestion) -> QAAnswer:
         """Query the QA service with a question.
 
         Parameters:
-            query: The question to query the QA service with.
+            question: The question to query the QA service with.
 
         Returns:
            The answer from the QA service.
@@ -300,5 +304,14 @@ class Transport(Protocol):
 
         Returns:
             The generation result
+        """
+        pass
+
+    def clear_vectorstore(self) -> QAAnswer:
+        """Clears the vector store.
+
+        Returns:
+            The answer from the QA service
+            status code of 200 if the vector store was cleared successfully.
         """
         pass

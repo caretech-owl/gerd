@@ -168,7 +168,7 @@ class TransformerLLM(LLM):
             model_kwargs["torch_dtype"] = torch_dtypes[config.torch_dtype]
 
         tokenizer = AutoTokenizer.from_pretrained(config.name, use_fast=False)
-        model: PreTrainedModel = AutoModelForCausalLM.from_pretrained(  # type: ignore[no-any-unimported]
+        model: PreTrainedModel = AutoModelForCausalLM.from_pretrained(
             config.name, **model_kwargs
         )
 
@@ -178,7 +178,7 @@ class TransformerLLM(LLM):
             if not Path(lora / "adapter_model.safetensors").exists():
                 _LOGGER.warning("Adapter %s does not exist", lora)
                 continue
-            model.load_adapter(lora)
+            model.load_adapter(str(lora))
             loaded_loras.add(lora)
             train_params = Path(lora) / "training_parameters.json"
             if train_params.exists() and tokenizer.pad_token_id is None:
@@ -233,7 +233,7 @@ class TransformerLLM(LLM):
     ) -> tuple[ChatRole, str]:
         config = config or self.config
         msg = self._pipe(
-            messages,
+            [{"role": m["role"], "content": m["content"]} for m in messages],
             max_new_tokens=config.max_new_tokens,
             repetition_penalty=config.repetition_penalty,
             top_k=config.top_k,
@@ -241,7 +241,11 @@ class TransformerLLM(LLM):
             temperature=config.temperature,
             do_sample=True,
         )[0]["generated_text"][-1]
-        return (msg["role"], msg["content"].strip())
+        role = msg["role"]
+        if _is_valid_role(role):
+            return (role, msg["content"].strip())
+        error_msg = "Unknown role: %s" % role
+        raise ValueError(error_msg)
 
 
 class RemoteLLM(LLM):
