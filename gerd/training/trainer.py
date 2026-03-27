@@ -181,16 +181,27 @@ class Trainer:
             callback_cls: The list of callbacks
         """
         self.config = config
-        quant_config = transformers.BitsAndBytesConfig(
-            load_in_4bit=config.flags.use_4bit,
-            load_in_8bit=config.flags.use_8bit,
-        )
-        self.base_model: transformers.PreTrainedModel = (
-            transformers.AutoModelForCausalLM.from_pretrained(
-                config.model.name,
-                quantization_config=quant_config,
+        if config.flags.use_4bit and config.flags.use_8bit:
+            msg = "Cannot use both 4bit and 8bit quantization at the same time."
+            raise ValueError(msg)
+        elif config.flags.use_4bit or config.flags.use_8bit:
+            bnb_kwargs = {}
+            if config.flags.use_4bit:
+                bnb_kwargs["load_in_4bit"] = True
+            elif config.flags.use_8bit:
+                bnb_kwargs["load_in_8bit"] = True
+            quant_config = transformers.BitsAndBytesConfig(**bnb_kwargs)
+
+            self.base_model: transformers.PreTrainedModel = (
+                transformers.AutoModelForCausalLM.from_pretrained(
+                    config.model.name,
+                    quantization_config=quant_config,
+                )
             )
-        )
+        else:
+            self.base_model = transformers.AutoModelForCausalLM.from_pretrained(
+                config.model.name,
+            )
 
         training_config = LoraConfig(
             lora_alpha=config.lora_alpha,
