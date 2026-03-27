@@ -77,7 +77,7 @@ def train_lora(
                 lora_config.cutoff_len - lora_config.overlap_len,
             )
         )
-    text_chunks = [lora_config.tokenizer.decode(x) for x in training_tokens]
+    text_chunks = [str(lora_config.tokenizer.decode(x)) for x in training_tokens]
     train_data = Dataset.from_list(
         [
             tokenize(x, lora_config.tokenizer, lora_config.cutoff_len)

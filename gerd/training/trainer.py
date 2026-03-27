@@ -10,7 +10,7 @@ import shutil
 import sys
 import threading
 from dataclasses import dataclass, field
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, cast
 
 import torch
 import transformers
@@ -181,13 +181,27 @@ class Trainer:
             callback_cls: The list of callbacks
         """
         self.config = config
-        self.base_model: transformers.PreTrainedModel = (
-            transformers.AutoModelForCausalLM.from_pretrained(
-                config.model.name,
-                load_in_4bit=config.flags.use_4bit,
-                load_in_8bit=config.flags.use_8bit,
+        if config.flags.use_4bit and config.flags.use_8bit:
+            msg = "Cannot use both 4bit and 8bit quantization at the same time."
+            raise ValueError(msg)
+        elif config.flags.use_4bit or config.flags.use_8bit:
+            bnb_kwargs = {}
+            if config.flags.use_4bit:
+                bnb_kwargs["load_in_4bit"] = True
+            elif config.flags.use_8bit:
+                bnb_kwargs["load_in_8bit"] = True
+            quant_config = transformers.BitsAndBytesConfig(**bnb_kwargs)
+
+            self.base_model: transformers.PreTrainedModel = (
+                transformers.AutoModelForCausalLM.from_pretrained(
+                    config.model.name,
+                    quantization_config=quant_config,
+                )
             )
-        )
+        else:
+            self.base_model = transformers.AutoModelForCausalLM.from_pretrained(
+                config.model.name,
+            )
 
         training_config = LoraConfig(
             lora_alpha=config.lora_alpha,
@@ -215,7 +229,7 @@ class Trainer:
         self.lora_model.config.use_cache = False
 
         self.tracked = Tracked(self.lora_model, self.config)
-        self.trainer = None
+        self.trainer: transformers.Trainer | None = None
         self.callbacks = (
             [cls(self.tracked) for cls in callback_cls]
             if callback_cls is not None
@@ -330,7 +344,7 @@ class Trainer:
         """
         _LOGGER.debug("Training parameter\n============\n %s", self.args)
         self.trainer = transformers.Trainer(
-            model=self.lora_model,
+            model=cast("torch.nn.Module", self.lora_model),
             train_dataset=train_data,
             eval_dataset=None,
             args=self.args,
@@ -365,7 +379,7 @@ class Trainer:
         When the `zip_output` flag is set, the output directory is zipped as well.
         """
         if self.trainer is not None:
-            self.trainer.save_model(self.config.output_dir)
+            self.trainer.save_model(str(self.config.output_dir))
             if self.config.zip_output:
                 shutil.make_archive(
                     base_name=self.config.output_dir.as_posix(),

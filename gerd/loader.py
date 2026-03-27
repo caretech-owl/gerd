@@ -208,7 +208,6 @@ class TransformerLLM(LLM):
                 if torch.backends.mps.is_available()
                 else "cpu"
             ),
-            framework="pt",
             use_fast=False,
         )
 
