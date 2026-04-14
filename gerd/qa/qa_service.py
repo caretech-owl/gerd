@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+# from gerd.benchmark import make_prompt
 import gerd.loader as gerd_loader
 from gerd.models.qa import QAConfig
 from gerd.rag import FAISS, Rag, create_faiss, load_faiss
@@ -124,6 +125,12 @@ class QAService:
         Returns:
             The answer from the language model
         """
+        if question.no_think and not question.question.strip().startswith("/no_think"):
+            question.question = f"/no_think {question.question.strip()}"
+            _LOGGER.warning(
+                "Applied /no_think prefix to question: %s", question.question
+            )
+
         if not self._database:
             if not self._vectorstore:
                 return QAAnswer(error_msg="No database available!", status=404)

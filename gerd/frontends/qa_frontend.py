@@ -306,13 +306,15 @@ demo = gr.Blocks(title="Entlassbriefe QA")
 with demo:
     # define the GUI Layout
     developer_mode: bool = False
+    no_think: bool = False
+    # think box in btn.click und inp.submit
 
     gr.Markdown("# GERD - Entlassbriefe QA")
 
     with gr.Row():
-        with gr.Column(scale=1):
+        with gr.Column(scale=2):
             file_upload = gr.Files(file_types=[".txt"])
-        with gr.Column(scale=1):
+        with gr.Column(scale=2):
             developer_checkbox = gr.Checkbox(
                 info="Aktivieren/Deaktivieren von zusätzlichen Modi",
                 label="Developer Mode",
