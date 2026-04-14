@@ -72,6 +72,9 @@ class RestServer(Transport):
         self.router.add_api_route(
             f"{prefix}/gen/generate", self.generate, methods=["POST"]
         )
+        self.router.add_api_route(
+            f"{prefix}/qa/vectorstore", self.clear_vectorstore, methods=["DELETE"]
+        )
 
     @override
     def qa_query(self, question: QAQuestion) -> QAAnswer:
@@ -145,6 +148,10 @@ class RestServer(Transport):
     @override
     def generate(self, parameters: Dict[str, str]) -> GenResponse:
         return self._bridge.generate(parameters)
+
+    @override
+    def clear_vectorstore(self) -> QAAnswer:
+        return self._bridge.clear_vectorstore()
 
 
 app = FastAPI()

@@ -35,12 +35,90 @@ def get_qa_mode(search_type: str) -> QAModesEnum:
         return QAModesEnum.NONE
 
 
+def query_llm(question: QAQuestion) -> str:
+    """Query the QA service in LLM mode.
+
+    Parameters:
+        question: The question to ask
+
+    Returns:
+        The response from the QA service
+    """
+    qa_res = TRANSPORTER.qa_query(question)
+    if qa_res.status != 200:
+        msg = f"Query was unsuccessful: {qa_res.error_msg} (Error Code {qa_res.status})"
+        raise gr.Error(msg)
+    return (
+        qa_res.response + "\n\n *Thought process*:\n" + qa_res.thoughts
+        if qa_res.thoughts
+        else qa_res.response
+    )
+
+
+def query_analyze() -> str:
+    """Query the QA service in Analyze mode.
+
+    Returns:
+        The response from the QA service
+    """
+    qa_analyze_res = TRANSPORTER.analyze_query()
+    if qa_analyze_res.status != 200:
+        msg = (
+            f"Query was unsuccessful: {qa_analyze_res.error_msg}"
+            f" (Error Code {qa_analyze_res.status})"
+        )
+        raise gr.Error(msg)
+    # remove unwanted fields from answer
+    qa_res_dic = {
+        key: value
+        for key, value in vars(qa_analyze_res).items()
+        if value is not None
+        and value != ""
+        and key not in qa_analyze_res.__class__.__dict__
+        and key != "sources"
+        and key != "status"
+        and key != "response"
+        and key != "prompt"
+    }
+    qa_res_str = ", ".join(f"{key}={value}" for key, value in qa_res_dic.items())
+    return qa_res_str
+
+
+def query_analyze_mult() -> str:
+    """Query the QA service in Analyze mult. mode.
+
+    Returns:
+        The response from the QA service
+    """
+    qa_analyze_mult_res = TRANSPORTER.analyze_mult_prompts_query()
+    if qa_analyze_mult_res.status != 200:
+        msg = (
+            f"Query was unsuccessful: {qa_analyze_mult_res.error_msg}"
+            f" (Error Code {qa_analyze_mult_res.status})"
+        )
+        raise gr.Error(msg)
+    # remove unwanted fields from answer
+    qa_res_dic = {
+        key: value
+        for key, value in vars(qa_analyze_mult_res).items()
+        if value is not None
+        and value != ""
+        and key not in qa_analyze_mult_res.__class__.__dict__
+        and key != "sources"
+        and key != "status"
+        and key != "response"
+        and key != "prompt"
+    }
+    qa_res_str = ", ".join(f"{key}={value}" for key, value in qa_res_dic.items())
+    return qa_res_str
+
+
 def query(
     question: str,
     search_type: str,
     k_source: int,
     search_strategy: str,
-    no_think: bool = False,
+    thinking: str,
 ) -> str:
     """Starts the selected QA Mode.
 
@@ -49,74 +127,31 @@ def query(
         search_type: The search type
         k_source: The number of sources
         search_strategy: The search strategy
-        no_think_mode: activate  or deactivate no_think mode
+        thinking: The thinking mode (Default, Think, No Think)
 
     Returns:
         The response from the QA service
     """
-    _LOGGER.info("no_think parameter: %s", no_think)
+    think = None
+
+    if thinking == "Think":
+        think = True
+    elif thinking == "No Think":
+        think = False
     q = QAQuestion(
         question=question,
         search_strategy=search_strategy,
         max_sources=k_source,
-        no_think=no_think,
+        think=think,
     )
     # start search mode
     if search_type == "LLM":
-        qa_res = TRANSPORTER.qa_query(q)  # -> hier eine Änderung
-        if qa_res.status != 200:
-            msg = (
-                f"Query was unsuccessful: {qa_res.error_msg}"
-                f" (Error Code {qa_res.status})"
-            )
-            raise gr.Error(msg)
-        return qa_res.response
-    # start analyze mode
+        return query_llm(q)
     elif search_type == "Analyze":
-        qa_analyze_res = TRANSPORTER.analyze_query()
-        if qa_analyze_res.status != 200:
-            msg = (
-                f"Query was unsuccessful: {qa_analyze_res.error_msg}"
-                f" (Error Code {qa_analyze_res.status})"
-            )
-            raise gr.Error(msg)
-        # remove unwanted fields from answer
-        qa_res_dic = {
-            key: value
-            for key, value in vars(qa_analyze_res).items()
-            if value is not None
-            and value != ""
-            and key not in qa_analyze_res.__class__.__dict__
-            and key != "sources"
-            and key != "status"
-            and key != "response"
-            and key != "prompt"
-        }
-        qa_res_str = ", ".join(f"{key}={value}" for key, value in qa_res_dic.items())
-        return qa_res_str
+        return query_analyze()
     # start analyze mult prompts mode
     elif search_type == "Analyze mult.":
-        qa_analyze_mult_res = TRANSPORTER.analyze_mult_prompts_query()
-        if qa_analyze_mult_res.status != 200:
-            msg = (
-                f"Query was unsuccessful: {qa_analyze_mult_res.error_msg}"
-                f" (Error Code {qa_analyze_mult_res.status})"
-            )
-            raise gr.Error(msg)
-        # remove unwanted fields from answer
-        qa_res_dic = {
-            key: value
-            for key, value in vars(qa_analyze_mult_res).items()
-            if value is not None
-            and value != ""
-            and key not in qa_analyze_mult_res.__class__.__dict__
-            and key != "sources"
-            and key != "status"
-            and key != "response"
-            and key != "prompt"
-        }
-        qa_res_str = ", ".join(f"{key}={value}" for key, value in qa_res_dic.items())
-        return qa_res_str
+        return query_analyze_mult()
     # start db search mode
     db_res = TRANSPORTER.db_query(q)
     if not db_res:
@@ -312,11 +347,11 @@ with demo:
                 visible=developer_mode,
             )
 
-        with gr.Column(scale=1):
-            think_box = gr.Checkbox(
-                value=no_think,
-                info="aktivieren/ deaktivieren von /no_think Tag",
-                label="no_think Mode",
+            think_radio = gr.Radio(
+                choices=["Default", "Think", "No Think"],
+                value="Default",
+                label="Thinking Modus",
+                info="Thinking-Verhalten für Reasoning Modelle",
             )
 
     prompt = gr.TextArea(
@@ -341,12 +376,12 @@ with demo:
     btn = gr.Button("Frage stellen")
     btn.click(
         fn=query,
-        inputs=[inp, type_radio, k_slider, strategy_dropdown, think_box],
+        inputs=[inp, type_radio, k_slider, strategy_dropdown, think_radio],
         outputs=out,
     )
     inp.submit(
         fn=query,
-        inputs=[inp, type_radio, k_slider, strategy_dropdown, think_box],
+        inputs=[inp, type_radio, k_slider, strategy_dropdown, think_radio],
         outputs=out,
     )
     prompt_submit.click(fn=set_prompt, inputs=[prompt, type_radio], outputs=out)

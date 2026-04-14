@@ -7,7 +7,6 @@ based on FAISS.
 import logging
 from pathlib import Path
 
-# from langchain.docstore.document import Document
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -111,10 +110,25 @@ class Rag:
         )
         context = "\n".join(doc.page_content for doc in docs)
         resolved = self.prompt.text.format(context=context, question=question.question)
+
+        # Apply /think or /no_think prefix if specified in the question
+        # TODO: Does not work for Qwen3.5
+        if question.think is False:
+            resolved = f"/no_think {resolved.lstrip()}"
+            _LOGGER.debug("Applied /no_think prefix")
+        elif question.think is True:
+            resolved = f"/think {resolved.lstrip()}"
+            _LOGGER.debug("Applied /think prefix")
+
         _, response = self.model.create_chat_completion(
             [{"role": "user", "content": resolved}]
         )
-        answer = QAAnswer(response=response)
+        thoughts = None
+        if "</think>" in response:
+            thoughts, response = response.split("</think>", 1)
+            response = response.strip()
+            thoughts = thoughts.strip().removeprefix("<think>")
+        answer = QAAnswer(response=response, thoughts=thoughts)
         if self.return_source:
             for doc in docs:
                 answer.sources.append(

@@ -4,9 +4,7 @@ import re
 from typing import Dict, Generator, List
 
 import torch
-from langchain.docstore.document import Document
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from transformers import PreTrainedTokenizer
+from transformers import PreTrainedTokenizerBase
 
 
 def split_chunks(
@@ -55,7 +53,7 @@ def despacyfy(text: str) -> str:
 
 
 def encode(
-    text: str, add_bos_token: bool, tokenizer: PreTrainedTokenizer, cutoff_len: int
+    text: str, add_bos_token: bool, tokenizer: PreTrainedTokenizerBase, cutoff_len: int
 ) -> List[int]:
     """Encodes a text using a tokenizer.
 
@@ -83,7 +81,7 @@ def encode(
 
 def tokenize(
     prompt: str,
-    tokenizer: PreTrainedTokenizer,
+    tokenizer: PreTrainedTokenizerBase,
     cutoff_len: int,
     append_eos_token: bool = False,
 ) -> Dict[str, torch.Tensor | list[int]]:

@@ -10,6 +10,7 @@ import logging
 import os
 import shutil
 from pathlib import Path
+from typing import List, cast
 
 import yaml
 from datasets import Dataset
@@ -108,7 +109,7 @@ def train_lora(
         [
             lora_config.tokenizer(
                 lora_config.tokenizer.apply_chat_template(
-                    sample.messages, tokenize=False
+                    cast(List[dict[str, str]], sample.messages), tokenize=False
                 )
             )
             for sample in data.samples

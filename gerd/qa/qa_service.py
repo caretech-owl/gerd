@@ -13,7 +13,6 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
-# from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
@@ -33,8 +32,8 @@ from gerd.transport import (
 )
 
 if TYPE_CHECKING:
-    from langchain.docstore.document import Document
-    from langchain.document_loaders.base import BaseLoader
+    from langchain_core.document_loaders.base import BaseLoader
+    from langchain_core.documents import Document
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -142,6 +141,7 @@ class QAService:
                 self._vectorstore,
                 self.config.features.return_source,
             )
+
         return self._database.query(question)
 
     def analyze_query(self) -> QAAnalyzeAnswer:
@@ -565,30 +565,18 @@ class QAService:
             return []
 
     def clear_vectorstore(self) -> QAAnswer:
-        """Clears the vector store by deleting all documents.
+        """Remove all documents from the vector store.
+
+        If no vector store is initialized, return an error message.
 
         Returns:
-            an answer object with status 200 if successful.
+            QAAnswer: Including status code and error message if applicable.
         """
         if not self._vectorstore:
             return QAAnswer(error_msg="No vector store initialized!", status=404)
-        self._vectorstore.delete(list(self._vectorstore.index_to_docstore_id.values()))
+        ids = list(self._vectorstore.index_to_docstore_id.values())
+
+        # Check len to avoid bug in FAISS when trying to delete with empty id list
+        if len(ids) > 0:
+            self._vectorstore.delete(ids)
         return QAAnswer(status=200)
-
-    def reinit_qa_service(self, qa_config: QAConfig) -> None:
-        """Reinitialize the QA service with a new config.
-
-        Parameters:
-            qa_config: The QA configuration object to use for
-                reinitializing the service.
-        """
-        old_vectorstore = self._vectorstore
-        self.config = qa_config
-        self._llm = gerd_loader.load_model_from_config(qa_config.model)
-        self._vectorstore = old_vectorstore
-        self._database = None
-
-        _LOGGER.info(
-            "QA service reinitialized with new config: %s",
-            qa_config.model.name,
-        )

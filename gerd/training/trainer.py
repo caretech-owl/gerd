@@ -10,12 +10,18 @@ import shutil
 import sys
 import threading
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Type
+from typing import Callable, Dict, List, Optional, cast
 
 import torch
 import transformers
 from datasets import Dataset
-from peft import LoraConfig, PeftModel, get_peft_model, prepare_model_for_kbit_training
+from peft import (
+    LoraConfig,
+    PeftMixedModel,
+    PeftModel,
+    get_peft_model,
+    prepare_model_for_kbit_training,
+)
 
 from gerd.training.lora import MODEL_CLASSES, LoraTrainingConfig
 
@@ -26,7 +32,7 @@ _LOGGER = logging.getLogger(__name__)
 class Tracked:
     """Dataclass to track the training progress."""
 
-    lora_model: PeftModel
+    lora_model: PeftModel | PeftMixedModel
     """The training model."""
     config: LoraTrainingConfig
     """The training configuration."""
@@ -62,9 +68,9 @@ class Callbacks(transformers.TrainerCallback):
 
     def on_save(
         self,
-        _args: transformers.TrainingArguments,  # noqa: ARG002
-        _state: transformers.TrainerState,  # noqa: ARG002
-        _control: transformers.TrainerControl,  # noqa: ARG002
+        args: transformers.TrainingArguments,  # noqa: ARG002
+        state: transformers.TrainerState,  # noqa: ARG002
+        control: transformers.TrainerControl,  # noqa: ARG002
         **kwargs: int,  # noqa: ARG002
     ) -> None:
         """Saves the training log when the model is saved."""
@@ -78,7 +84,7 @@ class Callbacks(transformers.TrainerCallback):
 
     def on_step_begin(
         self,
-        _args: transformers.TrainingArguments,  # noqa: ARG002
+        args: transformers.TrainingArguments,  # noqa: ARG002
         state: transformers.TrainerState,
         control: transformers.TrainerControl,
         **kwargs: int,  # noqa: ARG002
@@ -89,7 +95,7 @@ class Callbacks(transformers.TrainerCallback):
         checks if the training was interrupted.
 
         Parameters:
-            _args: The training arguments (not used)
+            args: The training arguments (not used)
             state: The trainer state
             control: The trainer control
         """
@@ -103,16 +109,16 @@ class Callbacks(transformers.TrainerCallback):
 
     def on_substep_end(
         self,
-        _args: transformers.TrainingArguments,  # noqa: ARG002
-        _state: transformers.TrainerState,  # noqa: ARG002
+        args: transformers.TrainingArguments,  # noqa: ARG002
+        state: transformers.TrainerState,  # noqa: ARG002
         control: transformers.TrainerControl,
         **kwargs: int,  # noqa: ARG002
     ) -> None:
         """Update the training progress and check for interruption.
 
         Parameters:
-            _args: The training arguments (not used)
-            _state: The trainer state (not used)
+            args: The training arguments (not used)
+            state: The trainer state (not used)
             control: The trainer control
         """
         self.tracked.current_steps += 1
@@ -122,20 +128,21 @@ class Callbacks(transformers.TrainerCallback):
 
     def on_log(
         self,
-        _args: transformers.TrainingArguments,  # noqa: ARG002
-        _state: transformers.TrainerState,  # noqa: ARG002
+        args: transformers.TrainingArguments,  # noqa: ARG002
+        state: transformers.TrainerState,  # noqa: ARG002
         control: transformers.TrainerControl,
-        logs: Dict,
-        **kwargs: int,  # noqa: ARG002
+        # logs: Dict,
+        **kwargs: Dict,  # noqa: ARG002
     ) -> None:
         """Callback to log the training progress.
 
         Parameters:
-            _args: The training arguments (not used)
-            _state: The trainer state (not used)
+            args: The training arguments (not used)
+            state: The trainer state (not used)
             control: The trainer control
             logs: The training logs
         """
+        logs: Dict = kwargs.get("logs", {})
         self.tracked.train_log.update(logs)
         self.tracked.train_log.update({"current_steps": self.tracked.current_steps})
         if self.tracked.interrupted:
@@ -161,7 +168,9 @@ class Trainer:
     def __init__(
         self,
         config: LoraTrainingConfig,
-        callback_cls: Optional[List[Type[transformers.TrainerCallback]]] = None,
+        callback_cls: Optional[
+            List[Callable[[Tracked], transformers.TrainerCallback]]
+        ] = None,
     ) -> None:
         """The LoRa traininer requires a configuration and optional list of callbacks.
 
@@ -172,13 +181,27 @@ class Trainer:
             callback_cls: The list of callbacks
         """
         self.config = config
-        self.base_model: transformers.PreTrainedModel = (
-            transformers.AutoModelForCausalLM.from_pretrained(
-                config.model.name,
-                load_in_4bit=config.flags.use_4bit,
-                load_in_8bit=config.flags.use_8bit,
+        if config.flags.use_4bit and config.flags.use_8bit:
+            msg = "Cannot use both 4bit and 8bit quantization at the same time."
+            raise ValueError(msg)
+        elif config.flags.use_4bit or config.flags.use_8bit:
+            bnb_kwargs = {}
+            if config.flags.use_4bit:
+                bnb_kwargs["load_in_4bit"] = True
+            elif config.flags.use_8bit:
+                bnb_kwargs["load_in_8bit"] = True
+            quant_config = transformers.BitsAndBytesConfig(**bnb_kwargs)
+
+            self.base_model: transformers.PreTrainedModel = (
+                transformers.AutoModelForCausalLM.from_pretrained(
+                    config.model.name,
+                    quantization_config=quant_config,
+                )
             )
-        )
+        else:
+            self.base_model = transformers.AutoModelForCausalLM.from_pretrained(
+                config.model.name,
+            )
 
         training_config = LoraConfig(
             lora_alpha=config.lora_alpha,
@@ -199,14 +222,14 @@ class Trainer:
             self.base_model = prepare_model_for_kbit_training(self.base_model)
             _LOGGER.info("Quantization detected!")
 
-        self.lora_model = get_peft_model(self.base_model, training_config)
+        self.lora_model = get_peft_model(self.base_model, training_config, mixed=False)
         if not hasattr(self.lora_model.config, "use_cache"):
             msg = "LoRA model config not have 'use_cache' attribute"
             raise AssertionError(msg)
         self.lora_model.config.use_cache = False
 
         self.tracked = Tracked(self.lora_model, self.config)
-        self.trainer = None
+        self.trainer: transformers.Trainer | None = None
         self.callbacks = (
             [cls(self.tracked) for cls in callback_cls]
             if callback_cls is not None
@@ -229,12 +252,11 @@ class Trainer:
             eval_strategy="no",
             eval_steps=None,
             save_strategy="no",
-            output_dir=config.output_dir,
+            output_dir=str(config.output_dir),
             lr_scheduler_type=config.lr_scheduler,
             load_best_model_at_end=False,
             # TODO: Enable multi-device support
             ddp_find_unused_parameters=None,
-            use_ipex=config.flags.use_ipex,
             save_steps=config.save_steps,
             use_cpu=config.flags.use_cpu,
             # any of these two will set `torch_compile=True`
@@ -322,7 +344,7 @@ class Trainer:
         """
         _LOGGER.debug("Training parameter\n============\n %s", self.args)
         self.trainer = transformers.Trainer(
-            model=self.lora_model,
+            model=cast("torch.nn.Module", self.lora_model),
             train_dataset=train_data,
             eval_dataset=None,
             args=self.args,
@@ -357,7 +379,7 @@ class Trainer:
         When the `zip_output` flag is set, the output directory is zipped as well.
         """
         if self.trainer is not None:
-            self.trainer.save_model(self.config.output_dir)
+            self.trainer.save_model(str(self.config.output_dir))
             if self.config.zip_output:
                 shutil.make_archive(
                     base_name=self.config.output_dir.as_posix(),

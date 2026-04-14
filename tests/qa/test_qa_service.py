@@ -195,3 +195,22 @@ def test_set_qa_prompt(qa_service: QAService) -> None:
     )
     assert res.status == 200
     assert res.error_msg == ""
+
+
+def test_clear_vectorstore(qa_service: QAService, cajal_txt: bytes) -> None:
+    """Test the clear_vectorstore method of the QAService class."""
+    # Should return 404 if no vectorstore is initialized
+    res = qa_service.clear_vectorstore()
+    assert res.status == 404
+    assert "No vector store initialized" in res.error_msg
+
+    # Add a document to initialize the vectorstore
+    request = QAFileUpload(data=cajal_txt, name="Cajal.txt")
+    qa_service.add_file(request)
+
+    # Now clear_vectorstore should succeed
+    res = qa_service.clear_vectorstore()
+    assert res.status == 200
+    # After clearing, calling again should return 200 (idempotent, but nothing to clear)
+    res = qa_service.clear_vectorstore()
+    assert res.status == 200
