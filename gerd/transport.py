@@ -11,6 +11,7 @@ from typing import Dict, List, Protocol
 from pydantic import BaseModel
 
 from gerd.models.model import PromptConfig
+from gerd.models.qa import QAConfig
 
 
 class GenResponse(BaseModel):
@@ -310,5 +311,13 @@ class Transport(Protocol):
         Returns:
             The answer from the QA service
             status code of 200 if the vector store was cleared successfully.
+        """
+        pass
+
+    def reinit_qa_service(self, qa_config: QAConfig) -> None:
+        """Reinitialize the QA service with a new config.
+
+        Parameters:
+            qa_config: The QA configuration object.
         """
         pass

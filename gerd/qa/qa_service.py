@@ -574,3 +574,21 @@ class QAService:
             return QAAnswer(error_msg="No vector store initialized!", status=404)
         self._vectorstore.delete(list(self._vectorstore.index_to_docstore_id.values()))
         return QAAnswer(status=200)
+
+    def reinit_qa_service(self, qa_config: QAConfig) -> None:
+        """Reinitialize the QA service with a new config.
+
+        Parameters:
+            qa_config: The QA configuration object to use for
+                reinitializing the service.
+        """
+        old_vectorstore = self._vectorstore
+        self.config = qa_config
+        self._llm = gerd_loader.load_model_from_config(qa_config.model)
+        self._vectorstore = old_vectorstore
+        self._database = None
+
+        _LOGGER.info(
+            "QA service reinitialized with new config: %s",
+            qa_config.model.name,
+        )

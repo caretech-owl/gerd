@@ -8,6 +8,7 @@ and view relevant sources and answers.
 
 import logging
 import pathlib
+import threading
 from typing import Optional
 
 import gradio as gr
@@ -19,9 +20,8 @@ from gerd.transport import QAFileUpload, QAQuestion
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
-qa_config = load_qa_config()
-model_config = qa_config.model
-store: FAISS | None = None
+_MODEL_SWITCH_LOCK = threading.Lock()
+_CURRENT_MODEL = load_qa_config().model.name
 
 
 # -----------------------------
@@ -30,7 +30,7 @@ store: FAISS | None = None
 def change_model(name: str) -> None:
     """Change the LLM model used for QA.
 
-    Updates the global `model_config` with the selected model name.
+    Updates the QA service with the selected model name.
 
     Parameter:
         name (str): The name of the model to switch to.
@@ -38,11 +38,16 @@ def change_model(name: str) -> None:
     Returns:
         none
     """
-    _LOGGER.info("Before Changing model to: %s", name)
-    model_config.name = name
-    qa_config.model = model_config
-    _LOGGER.info("Model switched to: %s", model_config.name)
-    _LOGGER.info("Current QA Config: %s", qa_config)
+    global _CURRENT_MODEL
+    with _MODEL_SWITCH_LOCK:
+        if name == _CURRENT_MODEL:
+            return
+        _LOGGER.info("Changing model to: %s", name)
+        qa_config = load_qa_config()
+        qa_config.model.name = name
+        TRANSPORTER.reinit_qa_service(qa_config)
+        _CURRENT_MODEL = name
+        _LOGGER.info("Model successfully switched to: %s", name)
 
 
 store_set: set[str] = set()
@@ -94,7 +99,7 @@ def files_changed(file_paths: Optional[list[str]]) -> None:
 # Query LLM
 # -----------------------------
 def query(
-    question: str, k_source: int, strategy: str, no_think: bool
+    question: str, k_source: int, strategy: str, no_think: bool, model_name: str
 ) -> tuple[str, str]:
     """Handle the QA query.
 
@@ -107,6 +112,15 @@ def query(
     Returns:
         tuple[str, str]: A tuple containing the answer and the relevant sources.
     """
+    # Guarantees query and model selection stay in sync even if events race.
+    if model_name != _CURRENT_MODEL:
+        _LOGGER.warning(
+            "Model mismatch detected before query (%s != %s). Applying switch first.",
+            model_name,
+            _CURRENT_MODEL,
+        )
+        change_model(model_name)
+
     gesamt_context = ""
     _LOGGER.info("no_think: %s", no_think)
     q = QAQuestion(
@@ -122,7 +136,7 @@ def query(
         context = f"Source retrieval error: {e}"
     for cnt in context:
         # _LOGGER.info("Retrieved source: %s", cnt.content[:100])
-        gesamt_context += cnt.content + "\n\n"
+        gesamt_context += cnt.content + "\n" + "******************************" + "\n\n"
 
     try:
         qa_res = TRANSPORTER.qa_query(q)
@@ -154,8 +168,8 @@ with demo:
         with gr.Column(scale=2):
             think_box = gr.Checkbox(value=False, label="no_think Mode")
             type_radio = gr.Radio(
-                choices=["qwen2.5-0.5B-instruct", "qwen3-0.6B"],
-                value="qwen3-0.6B",
+                choices=["qwen/qwen2.5-0.5B-instruct", "qwen/qwen3-0.6B"],
+                value="qwen/qwen3-0.6B",
                 label="Model",
             )
             k_slider = gr.Slider(
@@ -182,12 +196,12 @@ with demo:
     type_radio.change(fn=change_model, inputs=type_radio)
     submit_btn.click(
         fn=query,
-        inputs=[question_box, k_slider, strategy_dropdown, think_box],
+        inputs=[question_box, k_slider, strategy_dropdown, think_box, type_radio],
         outputs=[answer_box, source_box],
     )
     question_box.submit(
         fn=query,
-        inputs=[question_box, k_slider, strategy_dropdown, think_box],
+        inputs=[question_box, k_slider, strategy_dropdown, think_box, type_radio],
         outputs=[answer_box, source_box],
     )
 # -----------------------------

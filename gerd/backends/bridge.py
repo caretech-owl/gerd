@@ -7,6 +7,7 @@ from typing_extensions import override
 
 from gerd.config import load_gen_config, load_qa_config
 from gerd.gen import GenerationService
+from gerd.models.qa import QAConfig
 from gerd.qa import QAService
 from gerd.transport import QAQuestion
 
@@ -108,3 +109,7 @@ class Bridge(Transport):
     @override
     def clear_vectorstore(self) -> QAAnswer:
         return self.qa.clear_vectorstore()
+
+    @override
+    def reinit_qa_service(self, qa_config: QAConfig) -> None:
+        return self.qa.reinit_qa_service(qa_config)
